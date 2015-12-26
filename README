@@ -1,0 +1,28 @@
+Getting started with Iron Curtain 2 development. 
+
+To minimize the risks of version clashes or other incompatibilities it is recommended to install virtualenv for python, which "is a tool to create isolated Python environments."
+
+==Virtual env setup==
+Follow the guide from: http://docs.python-guide.org/en/latest/dev/virtualenvs/
+
+Install virtualenv using pip
+[sudo] pip install virtualenv
+
+Setup your virutal environment inside the project directory:
+virtualenv venv
+virtualenv -p /usr/bin/python2.7 venv
+source venv/bin/activate
+
+Now you can install packages using pip and all of them will be instaled in this environment. 
+
+To return to your standard environment simply write deactivate.
+
+
+This part of the guide will assume you are in a unix environment. It has been tested in ubuntu.
+
+
+==Linux Install==
+First install virtual env.
+sudo pip install virtualenv
+
+sudo apt-get install python-pygame
