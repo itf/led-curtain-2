@@ -96,7 +96,7 @@ class PygameCurtain(object,DisplayInterface):
             lenWidth = min(len(row),self.width)
             for j in xrange(lenWidth):
                 (r,g,b) = colorArray[i][j]
-                self.cells[i][j].setColor(r, g, b)
+                self.cells[j][i].setColor(r, g, b)
 
         self._renderCells()
         pygame.display.flip()

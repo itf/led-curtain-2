@@ -3,3 +3,4 @@ class ServerInterface:
         raise Exception("Not Implemented")
     def getData(self):
         raise Exception("Not Implemented")
+
