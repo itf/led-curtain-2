@@ -22,4 +22,5 @@ def colorDictToString(colorDict):
     raise Exception("Not Implemented")
 
 def colorArrayToString(colorArray):
-    return[chr(x) for colorRow in colorArray for _tuple in colorRow for x in _tuple]
+    convert = lambda x: chr(max(min(255,x),0))
+    return[convert(x) for colorRow in colorArray for _tuple in colorRow for x in _tuple]
