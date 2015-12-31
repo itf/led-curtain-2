@@ -25,4 +25,5 @@ This part of the guide will assume you are in a unix environment. It has been te
 First install virtual env.
 sudo pip install virtualenv
 
+For fake display.
 sudo apt-get install python-pygame
