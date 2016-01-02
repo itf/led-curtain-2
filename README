@@ -27,3 +27,16 @@ sudo pip install virtualenv
 
 For fake display.
 sudo apt-get install python-pygame
+
+==Command Line Interface==
+To test locally first run: LocalDisplay.py
+Then run Cli.py
+
+example input:
+p
+compose(movingHue,red)
+r
+{'hueFrameRate':0.03}
+
+
+For testing, you are still using UDP sockets. They are pretty computation intensive, but this is to assure that the code would run with the led panel

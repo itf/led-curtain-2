@@ -9,7 +9,5 @@ class ClientSocketUDP(ClientInterface):
 
         
     def sendData(self,data):
-        try:
-            sent = self.sock.sendto(data, self._serverAddress)
-        except:
-            print "Unexpected Error.", sys.exc_info()[0] 
+        sent = self.sock.sendto(data, self._serverAddress)
+

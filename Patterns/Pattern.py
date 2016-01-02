@@ -1,15 +1,47 @@
-import time
-from functools import wraps
-
 '''
 This file defines functions to be used for creating patterns, and
 defines the PatternInput
 
-Patterns are functions that take a PatternInput and returns a Canvas
+Patterns are functions that take a PatternInput and return a PatternInput
+The patternInput has a Canvas inside it.
 
 '''
 
+import time
+import Patterns.Function as F
+from functools import wraps
 
+_dict_of_patterns={}
+def getPattern(name):
+    return _dict_of_patterns[name]
+
+def getPatternDic():
+    return _dict_of_patterns
+
+def pattern(name):
+    '''
+    To add your pattern to the dictionary of patterns
+    add the decorator @pattern(name) on your pattern.
+    '''
+    def builder(patternFunction):
+        _dict_of_patterns[name]=patternFunction
+        return patternFunction
+    return builder
+
+def canvasPattern(pattern):
+    '''
+    Since for most patterns it makes no sense to return the whole PatternInput,
+but rather only the canvas, use the @canvasPattern decorator to turn a function
+that returns a canvas into a pattern.
+    '''
+    @wraps(pattern) #preserves __name__ and __doc__
+    def builder(patternInput):
+        canvas = pattern(patternInput)
+        patternInput['canvas']=canvas
+        return patternInput
+    return builder
+
+@F.function("intCache")
 def intCache(intFunctionCondition):
     '''
     Takes a function that returns an int or boolean, and then a function
@@ -42,7 +74,7 @@ def intCache(intFunctionCondition):
         return cachedFunction
     return buildFunctionWithIntCache
 
-
+@F.function("frameRate")
 def timedPattern(frameRate=30):
     '''
     Returns a pattern that will only be called on the determined frameRate
@@ -60,10 +92,13 @@ def timedPattern(frameRate=30):
     '''
     PREVIOUS_TIME = [None]
     miliseconds=1000
-    def timeFrames(*args, **kwargs):
+    def timeFrames(patternInput):
+        rate=frameRate
+        if patternInput.has_key('frameRate'):
+            rate=patternInput['frameRate']
         thisTime=time.time()*miliseconds
         if(PREVIOUS_TIME[0]!=None):
-            frames = int((thisTime - PREVIOUS_TIME[0])/miliseconds*frameRate)
+            frames = int((thisTime - PREVIOUS_TIME[0])/miliseconds*rate)
             if(frames>0):
                 PREVIOUS_TIME[0]=thisTime
         else:
@@ -73,11 +108,11 @@ def timedPattern(frameRate=30):
     return lambda function:intCache(timeFrames)(function)
 
 
-def framePattern(intFunction):
+def framePattern(intFunction = lambda patternInput:patternInput["frame"]):
     '''
     Takes  a function to calculate the frame, 
-    a frameGetter (a function that takes an int and returns
-    a frame, and returns a pattern
+    a frameGetter (a function that takes an int(frame Number) and returns
+    a canvas, and returns a pattern
 
     Example usage:
     @framePattern(lambda x:2*x)
@@ -88,8 +123,9 @@ def framePattern(intFunction):
     '''
     def buildPatternFrame(frameGetter):
         @wraps(frameGetter)#preserves __name__ and __doc__
-        def getFrame(*args, **kwargs):
-            frame=intFunction(*args, **kwargs)
+        @canvasPattern
+        def getFrame(patternInput):
+            frame=intFunction(patternInput)
             return frameGetter(frame)
         return getFrame
     return buildPatternFrame
@@ -98,40 +134,45 @@ def timedFramePattern(frameRate=30):
     '''
     Takes a frame rate and a function that takes a frame;
     returns the result of the frameGetter for the particular frameRate
-    in time
+    in time.
+    The frameRate can be overriden by the patternInput
 
     Example:
     @timedFramePattern()
     def test(x):
-	return x
+    return x
     
     while(1):
 	test(1)
     '''
     miliseconds=1000
     START_TIME = time.time()*miliseconds
-    def timeFrames(*args, **kwargs):
+    def timeFrames(patternInput):
+        rate=frameRate
+        if patternInput.has_key('frameRate'):
+            rate=patternInput['frameRate']
         thisTime = time.time()*miliseconds
-        return int((thisTime - START_TIME)/miliseconds*frameRate)
+        return int((thisTime - START_TIME)/miliseconds*rate)
     return lambda frameGetter:framePattern(timeFrames)(frameGetter)
 
 
-def staticPattern(pattern):
-    '''
-    Marker
-    '''
-    return pattern
-
 
 '''
-A pattern is a function that takes a PatternInput and returns a canvas
+A pattern is a function that takes a PatternInput and returns a patternInput
 '''
 
-class PaterrnInput(dict):
-    def __init__(self, height, width, audioData=None, frame=None, params=None, canvas=None):
+class PatternInput(dict):
+    def __init__(self,
+                 height,
+                 width,
+                 audioData=None,
+                 frame=0,
+                 params=None,
+                 canvas=None):
         self['width']=width
         self['height']=height
         self['audioData']=audioData
         self['frame']=frame
         self['params']=params
         self['canvas']=canvas
+    

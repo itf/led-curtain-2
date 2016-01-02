@@ -10,7 +10,7 @@ class Canvas:
 
     The values of the color channels on the canvas should be floats from 0 to 1.
     '''
-    def __init__(self,width, height):
+    def __init__(self,height, width):
         self._colorArray = [[(0,0,0) for x in xrange(width)] for y in xrange(height)]
         self.height=height
         self.width=width
