@@ -1,0 +1,4 @@
+Audio makes use of jackd for python
+Install following the instructions on https://jackclient-python.readthedocs.org/en/0.4.0/
+
+To connect the client, I recommend http://kxstudio.linuxaudio.org/Applications:Cadence. It will make your life a lot easier; you won't have to debug jackd error messages, and will only need to drag and drop connections.
