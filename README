@@ -37,6 +37,16 @@ p
 compose(movingHue,red)
 r
 {'hueFrameRate':0.03}
-
+p
+compose(movingHue,rainbow)
 
 For testing, you are still using UDP sockets. They are pretty computation intensive, but this is to assure that the code would run with the led panel
+
+
+====TODO===
+[]Integrate audio
+[]separate functions that are inside patterns to a separate file and organize them
+[]Write saver and importer
+[]Standardize the input to functions
+[]Decorator to make functions that take patternInputs and extra parameters  take patterns and extra parameters
+[] list function list the name of the input variables to functions.

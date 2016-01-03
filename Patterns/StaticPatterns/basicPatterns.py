@@ -1,13 +1,15 @@
 import random
 import ScreenCanvas
 import Patterns.Pattern as P
+import Patterns.Function as F
+
 
 @P.pattern("random")
-@P.canvasPattern
 def randomPattern(PatternInput):
-    height = PatternInput['height']
-    width = PatternInput['width']
-    canvas=ScreenCanvas.Canvas(height=height, width=width)
+    '''
+    (PatternInput) -> randomColors
+    '''
+    canvas=PatternInput['canvas']
     canvas.mapFunction(_getRandomColor)
     return canvas
 
@@ -16,13 +18,31 @@ def _getRandomColor(value, y, x):
 
 @P.pattern("trivial")
 def trivialPattern(PatternInput):
+    '''
+    (PatternInput) -> (PatternInput)
+    '''
     return PatternInput
 
 @P.pattern("red")
 def randomPattern(PatternInput):
+    '''
+    (PatternInput) -> redCanvas
+    '''
     canvas=PatternInput['canvas']
     canvas.mapFunction(_getRedColor)
     return PatternInput
 
 def _getRedColor(value, y, x):
     return (1,0,0)
+
+@P.pattern('rainbow')
+def movingHue(PatternInput):
+    width=PatternInput["width"]
+    xHueShift =1./width
+    def shifter(rgb,y,x):
+        red=(1,0,0)
+        amount=xHueShift*x
+        return F.hsvShifter(red,amount)
+    canvas=PatternInput["canvas"]
+    canvas.mapFunction(shifter)
+    return PatternInput

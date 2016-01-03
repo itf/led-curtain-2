@@ -2,7 +2,7 @@
 Functions are functions used to modify patterns. They take a pattern or multiple
 patterns and output a different pattern.
 
-Patterns functions that take a PatternInput and return a PatternInput 
+Patterns are functions that take a PatternInput and return a PatternInput 
 '''
 import colorsys
 _dict_of_functions={}
@@ -33,12 +33,21 @@ Fancier functions from here.
 @function('movingHue')
 def movingHue(PatternInput):
     hueFrameRate=0.01
-    width=PatternInput["width"]
-    xHueShift =1./width
     if PatternInput.has_key("hueFrameRate"):
         hueFrameRate=PatternInput["hueFrameRate"]
     def shifter(rgb,y,x):
-        amount=PatternInput["frame"]*hueFrameRate + xHueShift*x
+        amount=PatternInput["frame"]*hueFrameRate
+        return hsvShifter(rgb,amount)
+    canvas=PatternInput["canvas"]
+    canvas.mapFunction(shifter)
+    return PatternInput
+
+@function('rainbownize')
+def rainbownize(PatternInput):
+    width=PatternInput["width"]
+    xHueShift =1./width
+    def shifter(rgb,y,x):
+        amount=xHueShift*x*numberOfRainbows
         return hsvShifter(rgb,amount)
     canvas=PatternInput["canvas"]
     canvas.mapFunction(shifter)

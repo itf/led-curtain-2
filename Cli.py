@@ -40,13 +40,24 @@ def runCliCurtain(argv):
     threadSender.start()
     while(patternContainer[0]):
         try:
-            instruction = raw_input('Pattern (p) or parameter(r)')
+            instruction = raw_input('Pattern (p), parameter(r) or List (l)')
             if instruction=="r":
                 parameter = input('Please input {\'parameterName\':value} ')
                 patternInput.update(parameter)
-            if instruction=="p":
+            elif instruction=="p":
                 function = input ('Please write the pattern')
                 patternContainer[0]=function
+            elif instruction =="l":
+                print "PATTERNS:"
+                patternDict=Pattern.getPatternDic()
+                for pattern in patternDict.keys():
+                    print str(pattern) +" " + str(patternDict[pattern].func_doc)
+
+                print "\nFUNCTIONS:"
+                funcDict=Function.getFunctionDict()
+                for function in funcDict.keys():
+                    print str(function) +" " + str(funcDict[function].func_doc)
+                
         except KeyboardInterrupt:
             patternContainer[0]=None
             threadSender.join()
