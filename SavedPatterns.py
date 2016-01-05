@@ -11,3 +11,7 @@ importFunctionsFromDict(Pattern.getPatternDic())
 importFunctionsFromDict(Function.getFunctionDict())
 
 Pattern.pattern('rotatingRainbow')(step(rainbow,vRainbownize(trivial)))
+
+Pattern.pattern('coolRandom')(movingHue(constant(random)))
+
+Pattern.pattern('movingColors')(movingHue(red))

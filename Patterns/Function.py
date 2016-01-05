@@ -9,6 +9,7 @@ Patterns are functions that take a PatternInput and return a PatternInput
 import colorsys
 import functools
 from functools import wraps
+import copy
 
 _dict_of_functions={}
 def function(name):

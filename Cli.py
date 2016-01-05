@@ -24,7 +24,7 @@ SEND_RATE=60
 
 def savePattern(name, code):
     with open("SavedPatterns.py", "a") as savedFunctions:
-        savedFunctions.write('\n' + 'pattern(\''+name+'\')('+ code+')')
+        savedFunctions.write('\n' + 'Pattern.pattern(\''+name+'\')('+ code+')')
         savedFunctions.close()
 
 
