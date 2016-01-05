@@ -14,15 +14,18 @@ def testServer(host, port, height, width):
         curtain.sendColorArray(colorArray)
 
 def main(argv):
+    if len(argv)==4:
+        host, height,width,port=argv
+        testServer(host, int(port), int(height), int(width))
     if len(argv)==3:
         height,width,port=argv
         host ='localhost'
         testServer(host, int(port), int(height), int(width))
     elif len(argv)==0:
-        host ='localhost'
+        host =''
         testServer(host, 5000, 30, 60)
     else:
-        print "Usage Cli <height> <width> <port> "
+        print "Usage Cli [host] <height> <width> <port> "
 
     
 if __name__ == "__main__":

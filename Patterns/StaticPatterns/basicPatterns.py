@@ -11,7 +11,7 @@ def randomPattern(PatternInput):
     '''
     canvas=PatternInput['canvas']
     canvas.mapFunction(_getRandomColor)
-    return canvas
+    return PatternInput
 
 def _getRandomColor(value, y, x):
     return (random.random(),random.random(),random.random())
@@ -24,7 +24,7 @@ def trivialPattern(PatternInput):
     return PatternInput
 
 @P.pattern("red")
-def randomPattern(PatternInput):
+def redPattern(PatternInput):
     '''
     (PatternInput) -> redCanvas
     '''
@@ -46,3 +46,5 @@ def movingHue(PatternInput):
     canvas=PatternInput["canvas"]
     canvas.mapFunction(shifter)
     return PatternInput
+
+

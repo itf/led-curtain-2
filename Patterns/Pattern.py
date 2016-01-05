@@ -10,6 +10,7 @@ The patternInput has a Canvas inside it.
 import time
 import Patterns.Function as F
 from functools import wraps
+import copy
 
 _dict_of_patterns={}
 def getPattern(name):
@@ -28,6 +29,8 @@ def pattern(name):
         return patternFunction
     return builder
 
+
+
 def canvasPattern(pattern):
     '''
     Since for most patterns it makes no sense to return the whole PatternInput,
@@ -41,7 +44,7 @@ that returns a canvas into a pattern.
         return patternInput
     return builder
 
-@F.function("intCache")
+
 def intCache(intFunctionCondition):
     '''
     Takes a function that returns an int or boolean, and then a function
@@ -74,8 +77,13 @@ def intCache(intFunctionCondition):
         return cachedFunction
     return buildFunctionWithIntCache
 
-@F.function("frameRate")
+@F.function("updateRate")
 def timedPattern(frameRate=30):
+    '''
+    Caches the output and updates it with the specified frameRate
+    timedPattern(frameRate)(pattern)->pattern
+    '''
+
     '''
     Returns a pattern that will only be called on the determined frameRate
     Example usage:
@@ -107,6 +115,23 @@ def timedPattern(frameRate=30):
         return frames
     return lambda function:intCache(timeFrames)(function)
 
+
+@F.function("frameRate")
+def frameRate(rate=30):
+    '''
+    Changes the frame of the patternInput at the specified rate
+    '''
+    miliseconds=1000
+    START_TIME = time.time()*miliseconds
+    @F.rFunctionize
+    def frameRated(patternInput):
+        fRate=rate
+        if patternInput.has_key('frameRate'):
+            fRate=patternInput['frameRate']
+        thisTime = time.time()*miliseconds
+        patternInput['frame']= int((thisTime - START_TIME)/miliseconds*fRate)
+        return patternInput
+    return frameRated
 
 def framePattern(intFunction = lambda patternInput:patternInput["frame"]):
     '''
