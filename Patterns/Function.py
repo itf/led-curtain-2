@@ -115,6 +115,21 @@ def defaultArguments(**kwargs):
             return patternInput
     return runOnceApplyDefaultArguments
 
+@metaFunction('constArgs')
+def constantArguments(**kwargs):
+    '''
+    usage: constantArgs(arg=value)(function) -> function
+    constantArgs(arg=value)(function)(pattern) -> pattern
+    order of execution: function(pattern(applyArguments))
+    '''
+    @rMetaFunctionize
+    @functionize
+    def applyArguments(patternInput):
+        newPatternInput=copy.copy(patternInput)
+        newPatternInput.update(kwargs)
+        return newPatternInput
+    return applyArguments
+
             
 @function('constant')
 def constant(pattern):
@@ -161,6 +176,18 @@ def movingHue(patternInput):
     hueFrameRate=patternInput["hueFrameRate"]
     def shifter(rgb,y,x):
         amount=patternInput["frame"]*hueFrameRate
+        return hsvShifter(rgb,amount)
+    canvas=patternInput["canvas"]
+    canvas.mapFunction(shifter)
+    return patternInput
+
+@function('shiftHue')
+@defaultArguments(hue=0.01)
+@functionize
+def movingHue(patternInput):
+    hue=patternInput["hue"]
+    def shifter(rgb,y,x):
+        amount=hue
         return hsvShifter(rgb,amount)
     canvas=patternInput["canvas"]
     canvas.mapFunction(shifter)
