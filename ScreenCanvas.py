@@ -1,3 +1,4 @@
+import copy
 class Canvas:
     '''
     Nice abstraction to work on a Canvas.
@@ -10,8 +11,11 @@ class Canvas:
 
     The values of the color channels on the canvas should be floats from 0 to 1.
     '''
-    def __init__(self,height, width):
-        self._colorArray = [[(0,0,0) for x in xrange(width)] for y in xrange(height)]
+    def __init__(self,height, width, colorArray=None):
+        if (colorArray==None):
+            self._colorArray = [[(0,0,0) for x in xrange(width)] for y in xrange(height)]
+        else:
+            self._colorArray=colorArray
         self.height=height
         self.width=width
     def __getitem__(self, arg):
@@ -44,3 +48,9 @@ class Canvas:
 
     def _floatToByte(self, f):
         return max(min(255,round(f*255)),0)
+    def __deepcopy__(self,memo):
+        height=self.height
+        width=self.width
+        newColorarray=[[copy.deepcopy(self[y,x]+tuple()) for x in xrange(width)] for y in xrange(height)]
+        newone=Canvas(self.height,self.width,newColorarray)
+        return newone

@@ -47,4 +47,16 @@ def movingHue(PatternInput):
     canvas.mapFunction(shifter)
     return PatternInput
 
+@P.pattern('fractal')
+def movingHue(PatternInput):
+    width=PatternInput["width"]
+    xHueShift =1./width
+    def mapper(rgb,y,x):
+        intensity=(x**y%255)/255.
+        color=(intensity,intensity,intensity)
+        return color
+    canvas=PatternInput["canvas"]
+    canvas.mapFunction(mapper)
+    return PatternInput
+
 

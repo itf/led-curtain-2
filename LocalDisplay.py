@@ -19,7 +19,7 @@ def main(argv):
         testServer(host, int(port), int(height), int(width))
     if len(argv)==3:
         height,width,port=argv
-        host ='localhost'
+        host =''
         testServer(host, int(port), int(height), int(width))
     elif len(argv)==0:
         host =''

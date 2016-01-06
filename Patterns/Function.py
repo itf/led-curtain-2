@@ -2,7 +2,7 @@
 Functions are functions used to modify patterns. They take a pattern or multiple
 patterns, besides arguments,  and output a different pattern.
 
-Or, they take a function, and output a different function
+Metafunctions take a function, and output a different function
 
 Patterns are functions that take a PatternInput and return a PatternInput 
 '''
@@ -12,6 +12,7 @@ from functools import wraps
 import copy
 
 _dict_of_functions={}
+_dict_of_meta_functions={}
 def function(name):
     '''
     To add your function to the dictionary of functions
@@ -22,11 +23,23 @@ def function(name):
         return patternFunction
     return builder
 
+def metaFunction(name):
+    '''
+    To add your metaFunction to the dictionary of metaFunctions
+    add the decorator @metaFunction(name) on your pattern.
+    '''
+    def builder(metaFunction):
+        _dict_of_meta_functions[name]=metaFunction
+        return metaFunction
+    return builder
+
 def getFunctionDict():
     return _dict_of_functions
 
+def getMetaFunctionDict():
+    return _dict_of_meta_functions
 
-@function("compose")
+@metaFunction("compose")
 def compose(*functions):
     '''
     Composes one or more functions
@@ -38,40 +51,6 @@ def compose(*functions):
     else:
         return compose(functions[0],compose(*functions[1:]))
 
-
-@function('constant')
-def constant(pattern):
-    '''
-    Gets the output once, always send the same output
-    '''
-    cache = [None]
-    @wraps(pattern) #preserves __name__ and __doc__
-    def cached_f(patternInput):
-        if cache[0]==None:
-            cache[0] = pattern(patternInput)
-        return copy.deepcopy(cache[0])
-    return cached_f
-
-
-@function('step')
-def step(pattern0, pattern1):
-    '''
-    On first run it runs pattern0. On every
-    following run it runs pattern1
-    '''
-    step = [False]
-    def steppedPattern(patternInput):
-        if step[0]==False:
-            step[0]=True
-            return pattern0(patternInput)
-        else:
-            return pattern1(patternInput)
-    steppedPattern.__name__= "Stepped: " + str(pattern0.__name__) + "->"+str(pattern1.__name__)
-    return steppedPattern
-
-'''
-Fancier functions from here.
-'''
 
 def functionize(myFunction):
     '''
@@ -93,14 +72,93 @@ def rFunctionize(myFunction):
     @wraps(myFunction) #preserves __name__ and __doc__
     def function(pattern):
         return compose(pattern,myFunction)
-    return function    
+    return function
+
+def metaFunctionize(myMetaFunction):
+    '''
+    Takes a function that takes a pattern and returns a pattern
+    and returns a metaFunction that takes a function and returns a function
+    '''
+    @wraps(myMetaFunction) #preserves __name__ and __doc__
+    def metaFunction(function):
+        return compose(myMetaFunction,function)
+    return metaFunction
+
+def rMetaFunctionize(myMetaFunction):
+    '''
+    Takes a function that takes a pattern and returns a pattern
+    and returns a metaFunction that takes a function and returns a function
+    See rFunctionize
+    '''
+    @wraps(myMetaFunction) #preserves __name__ and __doc__
+    def metaFunction(function):
+        return compose(function,myMetaFunction)
+    return metaFunction
+
+@metaFunction('defaultArgs')
+def defaultArguments(**kwargs):
+    '''
+    usage: defaultArgs(arg=value)(function) -> function
+    defaultArgs(arg=value)(function)(pattern) -> pattern
+    order of execution: function(pattern(applyDefaultArguments))
+    '''
+    hasRun=[False]
+
+    @rMetaFunctionize
+    @rFunctionize
+    def runOnceApplyDefaultArguments(patternInput):
+        if hasRun[0]==False:
+            hasRun[0]=True
+            patternInput.update(kwargs)
+            return patternInput
+        else:
+            return patternInput
+    return runOnceApplyDefaultArguments
+
+            
+@function('constant')
+def constant(pattern):
+    '''
+    Gets the output canvas once, always send the same output canvas
+    '''
+    cache = [None]
+    @wraps(pattern) #preserves __name__ and __doc__
+    def cached_f(patternInput):
+        if cache[0]==None:
+            cache[0] = copy.deepcopy(pattern(patternInput)['canvas'])
+        patternInput['canvas']=copy.deepcopy(cache[0])
+        return patternInput
+    return cached_f
+
+
+@function('step')
+def step(pattern0, pattern1):
+    '''
+    On first run it runs pattern0. On every
+    following run it runs pattern1
+    '''
+    step = [False]
+    def steppedPattern(patternInput):
+        if step[0]==False:
+            step[0]=True
+            return pattern0(patternInput)
+        else:
+            return pattern1(patternInput)
+    steppedPattern.__name__= "Stepped: " + str(pattern0.__name__) + "->"+str(pattern1.__name__)
+    return steppedPattern
+
+ 
+
+'''
+End of meta functions
+'''
+
 
 @function('movingHue')
+@defaultArguments(hueFrameRate=0.01)
 @functionize
 def movingHue(patternInput):
-    hueFrameRate=0.01
-    if patternInput.has_key("hueFrameRate"):
-        hueFrameRate=patternInput["hueFrameRate"]
+    hueFrameRate=patternInput["hueFrameRate"]
     def shifter(rgb,y,x):
         amount=patternInput["frame"]*hueFrameRate
         return hsvShifter(rgb,amount)
@@ -109,8 +167,10 @@ def movingHue(patternInput):
     return patternInput
 
 @function('rainbownize')
+@defaultArguments(nRainbows=1)
 @functionize
-def rainbownize(patternInput,numberOfRainbows=1):
+def rainbownize(patternInput):
+    numberOfRainbows=patternInput["nRainbows"]
     width=patternInput["width"]
     xHueShift =1./width
     def shifter(rgb,y,x):
@@ -121,11 +181,13 @@ def rainbownize(patternInput,numberOfRainbows=1):
     return patternInput
 
 @function('vRainbownize')
+@defaultArguments(nVRainbows=1)
 @functionize
-def vRainbownize(patternInput, numberOfRainbows=1):
+def vRainbownize(patternInput):
     '''
     Vertical rainbownize
     '''
+    numberOfRainbows=patternInput["nVRainbows"]
     height=patternInput["height"]
     yHueShift =1./height
     def shifter(rgb,y,x):
@@ -151,10 +213,11 @@ def timechange(functionArray, timeArray, startTime):
         if timeElapsed>time:
             timeElapsed = timeElapsed-time
         else:
-            return functionArray(i)
+            return functionArray[i]
     else:
         return lambda x: x #Should never happen
         
 
 def getCurrentTime():
     raise Exception("Not Implemented")
+

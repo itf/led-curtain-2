@@ -31,6 +31,7 @@ def savePattern(name, code):
 def runCliCurtain(argv):
     importFunctionsFromDict(Pattern.getPatternDic())
     importFunctionsFromDict(Function.getFunctionDict())
+    importFunctionsFromDict(Function.getMetaFunctionDict())
     height, width, host, port = argv
     height = int(height)
     width = int(width)
@@ -72,6 +73,11 @@ def runCliCurtain(argv):
                 funcDict=Function.getFunctionDict()
                 for function in funcDict.keys():
                     print str(function) +" " + str(funcDict[function].func_doc)
+
+                print "\nMETA FUNCTIONS:"
+                metaFuncDict=Function.getMetaFunctionDict()
+                for function in metaFuncDict.keys():
+                    print str(function) +" " + str(metaFuncDict[function].func_doc)
             elif instruction =="s":
                 name = raw_input('Name for previous pattern:\n')
                 savePattern(name,patternString)
@@ -124,7 +130,7 @@ def main(argv):
     if len(argv)==4:
         runCliCurtain(argv)
     elif len(argv)==0:
-        argv=[30,60,'localhost',5000]
+        argv=[30,60,'localhost',5000]   
         runCliCurtain(argv)
     else:
         print "Usage Cli <height> <width> <host> <port> "

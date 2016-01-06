@@ -46,7 +46,7 @@ For testing, you are still using UDP sockets. They are pretty computation intens
 ====TODO===
 []Integrate audio
 []separate functions that are inside patterns to a separate file and organize them
-[]Write saver and importer
-[]Standardize the input to functions
-[]Decorator to make functions that take patternInputs and extra parameters  take patterns and extra parameters
+[x]Write saver and importer
+[x]Standardize the input to functions
+[x]Decorator to make functions that take patternInputs and extra parameters  take patterns and extra parameters
 [] list function list the name of the input variables to functions.
