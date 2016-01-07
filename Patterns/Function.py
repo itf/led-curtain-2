@@ -268,7 +268,10 @@ def meanPattern(pattern0, pattern1):
         def meaner(rgb,y,x):
             return tuple([sum(color)/2 for color in zip(canvas0[y,x], canvas1[y,x])])
         canvas=patternInput['canvas']
+        patternInput.update(patternOutput0)
+        patternInput.update(patternOutput1)
         canvas.mapFunction(meaner)
+        patternInput['canvas']=canvas
         return patternInput
     return meanP
     
