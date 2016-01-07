@@ -8,7 +8,6 @@ import readline
 import traceback
 
 
-
 import Transportation.Protocol.SimpleProtocol as P
 import Transportation.Sockets.ClientSocketUDP as Client
 import Patterns.Pattern as Pattern
@@ -17,7 +16,7 @@ import SavedPatterns
 
 
 import Patterns.StaticPatterns.basicPatterns as basicPattern
-from ScreenCanvas import Canvas
+from ScreenCanvasArray import Canvas
 
 """
 Usage Cli <height> <width> <host> <port>
@@ -93,20 +92,10 @@ def runCliCurtain(argv):
     threadSender.start()
     while(patternContainer[0]):
         try:
-            instruction = raw_input('Pattern (p), parameter(r), List (l), Save (s) or Safe Save (ss)\n')
+            instruction = raw_input('Write pattern code, parameter(r), List (l), Save (s) or Safe Save (ss)\n')
             if instruction=="r":
                 parameter = input('Please input {\'parameterName\':value} \n')
                 patternInput.update(parameter)
-            elif instruction=="p":
-                try:
-                    rawFunction = raw_input ('Please write the pattern\n')
-                    function = eval(rawFunction)
-                    patternString=rawFunction
-                    patternContainer[1]=patternContainer[0]
-                    patternContainer[0]=function
-                except:
-                    e = sys.exc_info()[0]
-                    print e
             elif instruction =="l":
                 print "PATTERNS:"
                 patternDict=Pattern.getPatternDic()
@@ -130,6 +119,14 @@ def runCliCurtain(argv):
                 else:
                     safeSavePattern(name,patternString)
                     globals()[name] = isolateCanvas(patternContainer[0])
+            else:
+                try:
+                    function = eval(instruction)
+                    patternString=instruction
+                    patternContainer[1]=patternContainer[0]
+                    patternContainer[0]=function
+                except:
+                    traceback.print_exc(file=sys.stdout)
 
 
                 

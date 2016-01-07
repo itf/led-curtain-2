@@ -36,7 +36,7 @@ def _getRedColor(value, y, x):
     return (1,0,0)
 
 @P.pattern('rainbow')
-def movingHue(PatternInput):
+def rainbow(PatternInput):
     width=PatternInput["width"]
     xHueShift =1./width
     def shifter(rgb,y,x):
@@ -48,7 +48,8 @@ def movingHue(PatternInput):
     return PatternInput
 
 @P.pattern('fractal')
-def movingHue(PatternInput):
+@F.constant
+def fractal(PatternInput):
     width=PatternInput["width"]
     xHueShift =1./width
     def mapper(rgb,y,x):
