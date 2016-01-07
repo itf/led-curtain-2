@@ -198,7 +198,7 @@ def movingHue(patternInput):
     canvas.mapFunction(shifter)
     return patternInput
 
-@function('shiftHue')
+@function('hueShift')
 @defaultArguments(hue=0.01)
 @functionize
 def movingHue(patternInput):

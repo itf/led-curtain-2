@@ -5,6 +5,8 @@ import time
 import copy
 import rlcompleter
 import readline
+import traceback
+
 
 
 import Transportation.Protocol.SimpleProtocol as P
@@ -140,7 +142,7 @@ def dataSender(patternContainer, patternInput, host, port):
     timeSleep = 1.0/SEND_RATE
     errorSleep= 3
     while patternContainer[0]:
-            #try:
+            try:
                 pattern=patternContainer[0]
                 if(pattern!=previousPattern):
                     frame=0
@@ -154,10 +156,9 @@ def dataSender(patternContainer, patternInput, host, port):
                 clientSocket.sendData(data)
                 patternInput=newPatternInput
                 time.sleep(timeSleep)
-            #except:
-            #    e = sys.exc_info()[0]
-            #    print e
-            #    patternContainer[0]=patternContainer[1]
+            except:
+                traceback.print_exc(file=sys.stdout)
+                patternContainer[0]=patternContainer[1]
 
 
 
