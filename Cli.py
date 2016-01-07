@@ -56,8 +56,11 @@ class Completer(rlcompleter.Completer):
 
 def savePattern(name, code):
     with open("SavedPatterns.py", "a") as savedFunctions:
-        savedFunctions.write('\n' + 'Pattern.pattern(\''+name+'\')('+ code+')')
+        savedFunctions.write('\n' + name + ' = Pattern.pattern(\''+name+'\')('+ code+')')
         savedFunctions.close()
+
+def safeSavePattern(name, code):
+    savePattern(name, 'isolateCanvas('+code+')')
 
 
 def runCliCurtain(argv):
@@ -90,7 +93,7 @@ def runCliCurtain(argv):
     threadSender.start()
     while(patternContainer[0]):
         try:
-            instruction = raw_input('Pattern (p), parameter(r), List (l) or Save (s)\n')
+            instruction = raw_input('Pattern (p), parameter(r), List (l), Save (s) or Safe Save (ss)\n')
             if instruction=="r":
                 parameter = input('Please input {\'parameterName\':value} \n')
                 patternInput.update(parameter)
@@ -119,9 +122,14 @@ def runCliCurtain(argv):
                 metaFuncDict=Function.getMetaFunctionDict()
                 for function in metaFuncDict.keys():
                     print str(function) +" " + str(metaFuncDict[function].func_doc)
-            elif instruction =="s":
+            elif instruction =="s" or instruction =="ss":
                 name = raw_input('Name for previous pattern:\n')
-                savePattern(name,patternString)
+                if instruction=="s":
+                    savePattern(name,patternString)
+                    globals()[name] = patternContainer[0]
+                else:
+                    safeSavePattern(name,patternString)
+                    globals()[name] = isolateCanvas(patternContainer[0])
 
 
                 

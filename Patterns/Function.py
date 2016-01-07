@@ -107,7 +107,7 @@ def defaultArguments(**kwargs):
     @rMetaFunctionize
     @rFunctionize
     def runOnceApplyDefaultArguments(patternInput):
-        if hasRun[0]==False:
+        if hasRun[0]==False or any([not patternInput.has_key(key) for key in kwargs.keys()]):
             hasRun[0]=True
             patternInput.update(kwargs)
             return patternInput
@@ -184,6 +184,22 @@ def isolate(pattern):
         return copy.deepcopy(pattern(previousInput[0]))
     return isolated
 
+@function('isolateCanvas')
+def isolateCanvas(pattern):
+    '''
+    Runs the pattern in its own canvas environment
+    '''
+    previousCanvas = [None]
+    @wraps(pattern) #preserves __name__ and __doc__
+    def isolated(patternInput):
+        if previousCanvas[0]==None:
+            previousCanvas[0] = copy.deepcopy(patternInput['canvas'])
+        isolatedPatternInput = copy.copy(patternInput)
+        isolatedPatternInput['canvas']=previousCanvas[0]
+        patternOutput = pattern(isolatedPatternInput)
+        previousCanvas[0]=copy.deepcopy(patternOutput['canvas'])
+        return patternOutput
+    return isolated
 
 
 @function('movingHue')
