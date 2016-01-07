@@ -47,9 +47,10 @@ def compose(*functions):
     if len(functions)==1:
         return functions[0]
     elif len(functions)==2:
-        return lambda x: functions[0](functions[1](x))
+        return lambda patternInput: functions[0](functions[1](patternInput))
     else:
-        return compose(functions[0],compose(*functions[1:]))
+        nHalfFunctions = len(functions)/2
+        return lambda patternInput: compose(*functions[0:nHalfFunctions])(compose(*functions[nHalfFunctions:])(patternInput))
 
 
 def functionize(myFunction):

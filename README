@@ -9,11 +9,9 @@ To test locally first run: LocalDisplay.py
 Then run Cli.py
 
 example input:
-p
 movingHue(red)
 r
 {'hueFrameRate':0.03}
-p
 movingHue(rainbow)
 
 For testing, you are still using UDP sockets. They are pretty computation intensive, but this is to assure that the code would run with the led panel
@@ -24,12 +22,14 @@ It has autocomplete for the functions and patterns
 ==Improving performance==
 Function calls are pretty expensive when using the python compiler.  Instead of using the default compiler, use pypy
 
+http://pypy.org/download.html
+
 for Debian:
 apt-get install pypy
 example:
 pypy Cli.py
 
-This will make the code 2 to 4 times more efficient.
+This will make the code 2 to 4 times more efficient for simple functions, and can give a N times performance improvement where N is the number of nested functions, apparently, for more complex code.
 
 ====TODO===
 []Integrate audio
@@ -41,3 +41,7 @@ This will make the code 2 to 4 times more efficient.
 [] Find a way to make it clear that certain functions take arguments
 [] split CLI in multiple files
 [] Mock audio processing
+[] Implement lazy evaluation for canvas
+[] Find the problems with pretty diagonal rainbow. Possible meta function problem?
+[] Improve parameter input in CLI
+[x] Improve compose performance (implent it in log n instead of N)
