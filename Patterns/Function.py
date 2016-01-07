@@ -262,7 +262,7 @@ def vRainbownize(patternInput):
 def meanPattern(pattern0, pattern1):
     def meanP(patternInput):
         patternOutput0 = pattern0(copy.deepcopy(patternInput))
-        patternOutput1 = pattern1(patternInput)
+        patternOutput1 = pattern1(copy.deepcopy(patternInput))
         canvas0=patternOutput0['canvas']
         canvas1=patternOutput1['canvas']
         def meaner(rgb,y,x):
