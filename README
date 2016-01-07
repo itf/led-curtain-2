@@ -1,30 +1,6 @@
 Getting started with Iron Curtain 2 development. 
 
-To minimize the risks of version clashes or other incompatibilities it is recommended to install virtualenv for python, which "is a tool to create isolated Python environments."
-
-==Virtual env setup==
-Follow the guide from: http://docs.python-guide.org/en/latest/dev/virtualenvs/
-
-Install virtualenv using pip
-[sudo] pip install virtualenv
-
-Setup your virutal environment inside the project directory:
-virtualenv venv
-virtualenv -p /usr/bin/python2.7 venv
-source venv/bin/activate
-
-Now you can install packages using pip and all of them will be instaled in this environment. 
-
-To return to your standard environment simply write deactivate.
-
-
-This part of the guide will assume you are in a unix environment. It has been tested in ubuntu.
-
-
-==Linux Install==
-First install virtual env.
-sudo pip install virtualenv
-
+==Debian Install==
 For fake display.
 sudo apt-get install python-pygame
 
@@ -34,14 +10,26 @@ Then run Cli.py
 
 example input:
 p
-compose(movingHue,red)
+movingHue(red)
 r
 {'hueFrameRate':0.03}
 p
-compose(movingHue,rainbow)
+movingHue(rainbow)
 
 For testing, you are still using UDP sockets. They are pretty computation intensive, but this is to assure that the code would run with the led panel
 
+
+It has autocomplete for the functions and patterns
+
+==Improving performance==
+Function calls are pretty expensive when using the python compiler.  Instead of using the default compiler, use pypy
+
+for Debian:
+apt-get install pypy
+example:
+pypy Cli.py
+
+This will make the code 2 to 4 times more efficient.
 
 ====TODO===
 []Integrate audio
@@ -50,5 +38,6 @@ For testing, you are still using UDP sockets. They are pretty computation intens
 []Standardize the input to functions
 [x]Decorator to make functions that take patternInputs and extra parameters  take patterns and extra parameters
 [] list function list the name of the input variables to functions.
-[x] implement tab Autocomplete
-[] improve tab Autocomplete
+[] Find a way to make it clear that certain functions take arguments
+[] split CLI in multiple files
+[] Mock audio processing

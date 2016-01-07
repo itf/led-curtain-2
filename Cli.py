@@ -23,7 +23,7 @@ Usage Cli <height> <width> <host> <port>
 This class is a prototype with lots of poor choices(in my opinion)
 """
 
-SEND_RATE=60
+SEND_RATE=30
 
 class Completer(rlcompleter.Completer):
     '''
@@ -36,12 +36,8 @@ class Completer(rlcompleter.Completer):
         defined in self.namespace that match.
 
         """
-        import keyword
         matches = []
         n = len(text)
-        for word in keyword.kwlist:
-            if word[:n] == text:
-                matches.append(word)
         for nspace in [self.namespace]:
             for word, val in nspace.items():
                 if word[:n] == text:
@@ -144,7 +140,7 @@ def dataSender(patternContainer, patternInput, host, port):
     timeSleep = 1.0/SEND_RATE
     errorSleep= 3
     while patternContainer[0]:
-            try:
+            #try:
                 pattern=patternContainer[0]
                 if(pattern!=previousPattern):
                     frame=0
@@ -158,10 +154,10 @@ def dataSender(patternContainer, patternInput, host, port):
                 clientSocket.sendData(data)
                 patternInput=newPatternInput
                 time.sleep(timeSleep)
-            except:
-                    e = sys.exc_info()[0]
-                    print e
-                    patternContainer[0]=patternContainer[1]
+            #except:
+            #    e = sys.exc_info()[0]
+            #    print e
+            #    patternContainer[0]=patternContainer[1]
 
 
 

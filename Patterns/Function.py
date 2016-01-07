@@ -168,6 +168,23 @@ def step(pattern0, pattern1):
 End of meta functions
 '''
 
+@function('isolate')
+def isolate(pattern):
+    '''
+    Runs the pattern in its own environment
+    It updates the frame in each update
+    '''
+    previousInput = [None]
+    @wraps(pattern) #preserves __name__ and __doc__
+    def isolated(patternInput):
+        if previousInput[0]==None:
+            previousInput[0] = copy.deepcopy(patternInput)
+        else:
+            previousInput[0]['frame']+=1
+        return copy.deepcopy(pattern(previousInput[0]))
+    return isolated
+
+
 
 @function('movingHue')
 @defaultArguments(hueFrameRate=0.01)
@@ -223,7 +240,23 @@ def vRainbownize(patternInput):
     canvas=patternInput["canvas"]
     canvas.mapFunction(shifter)
     return patternInput
-        
+
+@function('meanP')
+def meanPattern(pattern0, pattern1):
+    def meanP(patternInput):
+        patternOutput0 = pattern0(copy.deepcopy(patternInput))
+        patternOutput1 = pattern1(patternInput)
+        canvas0=patternOutput0['canvas']
+        canvas1=patternOutput1['canvas']
+        def meaner(rgb,y,x):
+            return tuple([sum(color)/2 for color in zip(canvas0[y,x], canvas1[y,x])])
+        canvas=patternInput['canvas']
+        canvas.mapFunction(meaner)
+        return patternInput
+    return meanP
+    
+    
+
 def hsvShifter(rgb,amount):
     h,s,v=colorsys.rgb_to_hsv(*rgb)
     h +=amount
@@ -243,6 +276,7 @@ def timechange(functionArray, timeArray, startTime):
             return functionArray[i]
     else:
         return lambda x: x #Should never happen
+
         
 
 def getCurrentTime():
