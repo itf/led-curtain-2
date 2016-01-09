@@ -21,7 +21,8 @@ from ScreenCanvasArray import Canvas
 """
 Usage Cli <height> <width> <host> <port>
 
-This class is a prototype with lots of poor choices(in my opinion)
+This file is a prototype with lots of poor choices(in my opinion)
+It is just something that was hacked together. The rest of the code doesn't reflect this file
 """
 
 SEND_RATE=30
@@ -40,7 +41,7 @@ class Completer(rlcompleter.Completer):
         pos=readline.get_begidx()
         line=readline.get_line_buffer()
         nQuotes=line[0:pos].count("'")
-        isR=len(line)>1 and line[0]=='r' and line[1]==' '
+        isR=len(line)>1 and line[0]=='r' and (line[1]==' ' or (len(line)>2 and line[1]=='r' and line[2]==' '))
         matches = []
         n = len(text)
         if(nQuotes%2==1 or isR):
@@ -103,6 +104,10 @@ def runCliCurtain(argv):
     readline.parse_and_bind('set blink-matching-paren on')
     completer=Completer(dictAll)
     completer.setPatternDict(Pattern.getPatternDic())
+    try:
+        readline.read_history_file('./.history')
+    except:
+        pass
     
     readline.set_completer(completer.complete)
     
@@ -115,7 +120,7 @@ def runCliCurtain(argv):
     patternInput = Pattern.PatternInput(height=height, width = width)
     canvas = Canvas(height=height, width=width)
     patternInput["canvas"]=canvas
-    patternInputContainer=[patternInput]
+    patternInputContainer=[patternInput, None, None]
     threadSender= threading.Thread(target=dataSender,
                                    args= (patternContainer,
                                           patternInputContainer,
@@ -125,43 +130,48 @@ def runCliCurtain(argv):
     completer.setParameterDictContainer(patternInputContainer)
     while(patternContainer[0]):
         try:
-            instruction = raw_input('Write pattern code, parameter(r), List (l), Save (s) or Safe Save (ss)\n')
-            if instruction:
-                if instruction=="r":
-                    parameter = input('Please input {\'parameterName\':value} \n')
-                    patternInput.update(parameter)
-                elif instruction =="l":
-                    print "PATTERNS:"
-                    patternDict=Pattern.getPatternDic()
-                    for pattern in patternDict.keys():
-                        print str(pattern) +" " + str(patternDict[pattern].func_doc)
+            instruction = raw_input('Write pattern code, parameter(r), recurrentParameter(rr), List (l), Save (s) or Safe Save (ss)\n')
+            readline.write_history_file('./.history')
 
-                    print "\nFUNCTIONS:"
-                    funcDict=Function.getFunctionDict()
-                    for function in funcDict.keys():
-                        print str(function) +" " + str(funcDict[function].func_doc)
+            try:
+                if instruction:
+                    if len(instruction)>1 and instruction[0]=="r" and instruction[1]==' ':
+                        command = instruction[2:]
+                        patternInputContainer[1]=command
+                    elif len(instruction)>2 and instruction[0]=="r" and instruction[1]=='r' and instruction[2]==' ':
+                        command = instruction[3:]
+                        patternInputContainer[2]=command
+                    elif instruction =="l":
+                        print "PATTERNS:"
+                        patternDict=Pattern.getPatternDic()
+                        for pattern in patternDict.keys():
+                            print str(pattern) +" " + str(patternDict[pattern].func_doc)
 
-                    print "\nMETA FUNCTIONS:"
-                    metaFuncDict=Function.getMetaFunctionDict()
-                    for function in metaFuncDict.keys():
-                        print str(function) +" " + str(metaFuncDict[function].func_doc)
-                elif instruction =="s" or instruction =="ss":
-                    name = raw_input('Name for previous pattern:\n')
-                    if instruction=="s":
-                        savePattern(name,patternString)
-                        globals()[name] = patternContainer[0]
+                        print "\nFUNCTIONS:"
+                        funcDict=Function.getFunctionDict()
+                        for function in funcDict.keys():
+                            print str(function) +" " + str(funcDict[function].func_doc)
+
+                        print "\nMETA FUNCTIONS:"
+                        metaFuncDict=Function.getMetaFunctionDict()
+                        for function in metaFuncDict.keys():
+                            print str(function) +" " + str(metaFuncDict[function].func_doc)
+                    elif instruction =="s" or instruction =="ss":
+                        name = raw_input('Name for previous pattern:\n')
+                        if instruction=="s":
+                            savePattern(name,patternString)
+                            globals()[name] = patternContainer[0]
+                        else:
+                            safeSavePattern(name,patternString)
+                            globals()[name] = isolateCanvas(patternContainer[0])
+                        
                     else:
-                        safeSavePattern(name,patternString)
-                        globals()[name] = isolateCanvas(patternContainer[0])
-                    
-                else:
-                    try:
-                        function = eval(instruction)
-                        patternString=instruction
-                        patternContainer[1]=patternContainer[0]
-                        patternContainer[0]=function
-                    except:
-                        traceback.print_exc(file=sys.stdout)
+                            function = eval(instruction)
+                            patternString=instruction
+                            patternContainer[1]=patternContainer[0]
+                            patternContainer[0]=function
+            except:
+                traceback.print_exc(file=sys.stdout)
 
 
                 
@@ -184,7 +194,22 @@ def dataSender(patternContainer, patternInputContainer, host, port):
     errorSleep= 3
     while patternContainer[0]:
             try:
-                patternInputContainer[0]=patternInput
+                if (patternInputContainer[1]):
+                    try:
+                        command = patternInputContainer[1]
+                        Function.execInPattern(command, patternInput)
+                        patternInputContainer[1]=None
+                    except:
+                        patternInputContainer[1]=None
+                        traceback.print_exc(file=sys.stdout)
+                if (patternInputContainer[2]):
+                    try:
+                        command = patternInputContainer[2]
+                        Function.execInPattern(command, patternInput)
+                    except:
+                        patternInputContainer[2]=None
+                        traceback.print_exc(file=sys.stdout)
+
                 pattern=patternContainer[0]
                 if(pattern!=previousPattern):
                     frame=0
@@ -197,6 +222,7 @@ def dataSender(patternContainer, patternInputContainer, host, port):
                 data=P.canvasToData(canvas)
                 clientSocket.sendData(data)
                 patternInput=newPatternInput
+                patternInputContainer[0]=patternInput
                 time.sleep(timeSleep)
             except:
                 traceback.print_exc(file=sys.stdout)

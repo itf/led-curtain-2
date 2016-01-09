@@ -302,15 +302,18 @@ import collections
 def arg(strInstructionToEval):
     @rFunctionize
     def updateArg(patternInput):
-        defaultDict =collections.defaultdict(int)
-        defaultDict['abs']=abs
-        defaultDict.update(math.__dict__)
-        exec strInstructionToEval in defaultDict, patternInput
+        execInPattern(strInstructionToEval, patternInput)
         return patternInput
     return updateArg
 
 def getArgDicts(patternInput):
     return patternInput
+
+def execInPattern(strInstructionToEval, patternInput):
+    defaultDict =collections.defaultdict(int)
+    defaultDict['abs']=abs
+    defaultDict.update(math.__dict__)
+    exec strInstructionToEval in defaultDict, patternInput
 
 def hsvShifter(rgb,amount):
     h,s,v=colorsys.rgb_to_hsv(*rgb)

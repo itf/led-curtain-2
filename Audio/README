@@ -2,3 +2,10 @@ Audio makes use of jackd for python
 Install following the instructions on https://jackclient-python.readthedocs.org/en/0.4.0/
 
 To connect the client, I recommend http://kxstudio.linuxaudio.org/Applications:Cadence. It will make your life a lot easier; you won't have to debug jackd error messages, and will only need to drag and drop connections.
+
+
+The audio will take a fucking lot of work to make it work. If you are using pypy, you need to use a version more recent than 2014, because we depend on this commit: https://bitbucket.org/cffi/cffi/commits/c5e17441bc96/
+
+Therefore, you cannot instal it from any of the ppa from debian, you have to download it from http://pypy.org/download.html#default-with-a-jit-compiler
+
+You don't need to install pyjac, you just need to put this on the path for audio: https://raw.githubusercontent.com/spatialaudio/jackclient-python/master/jack.py
