@@ -3,3 +3,46 @@ rainbowAuror
 r height=10
 r height=30
 r nVRainbows=0.3
+meanP(red,red)
+meanP(red,red)
+rainbowAurora
+rainbowAurora
+rainbowAurora
+meanP(red,constant(random),rainbow)
+mask(random,red,trivial)
+mask(random,red,rainbow)
+black
+meanP(red,black)
+meanP(black,rainbowAurora)
+meanP(black,softRainbow)
+meanP(black,step(rainbow,trivial))
+meanP(black,step(rainbow,trivial))
+meanP(black,step(rainbow,trivial))
+meanP(black,step(rainbow,trivial))
+meanP(black,step(rainbow,trivial))
+meanP(black,step(rainbow,trivial))
+meanP(black,step(rainbow,trivial))
+meanP(black,step(rainbow,trivial))
+meanP(red,black,step(rainbow,trivial))
+green
+blue
+green
+red
+bl
+blue
+black
+meanP(green,red)
+meanP(green,red,blue)
+meanP(green,red,blue,black)
+meanP(green,red,blue,black,bl)
+meanP(green,red,blue,black,black)
+meanP(green,red,blue,black,black,black)
+meanP(green,red,black,black,black)
+meanP(green,black,black,black)
+meanP(black,black,black, green)
+meanP(black,black, green)
+meanP(black, green)
+softRainbow
+meanP(black,black,black, green)
+timeChanger([red,blue,green],[1,2,1],10)
+timeChanger([red,blue,green],[1,2,1],10)

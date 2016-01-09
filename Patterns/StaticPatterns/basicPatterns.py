@@ -35,6 +35,42 @@ def redPattern(PatternInput):
 def _getRedColor(value, y, x):
     return (1,0,0)
 
+@P.pattern("blue")
+def bluePattern(PatternInput):
+    '''
+    (PatternInput) -> blueCanvas
+    '''
+    canvas=PatternInput['canvas']
+    canvas.mapFunction(_getBlueColor)
+    return PatternInput
+
+def _getBlueColor(value, y, x):
+    return (0,0,1)
+
+@P.pattern("green")
+def greenPattern(PatternInput):
+    '''
+    (PatternInput) -> greenCanvas
+    '''
+    canvas=PatternInput['canvas']
+    canvas.mapFunction(_getGreenColor)
+    return PatternInput
+
+def _getGreenColor(value, y, x):
+    return (0,1,0)
+
+@P.pattern("black")
+def blackPattern(PatternInput):
+    '''
+    (PatternInput) -> blackCanvas
+    '''
+    canvas=PatternInput['canvas']
+    canvas.mapFunction(_getBlackColor)
+    return PatternInput
+
+def _getBlackColor(value, y, x):
+    return (0,0,0)
+
 @P.pattern('rainbow')
 def rainbow(PatternInput):
     width=PatternInput["width"]

@@ -260,18 +260,22 @@ def vRainbownize(patternInput):
     return patternInput
 
 
-def combineTwoCanvas(colorCombiner):
-    def combineFunction(pattern0, pattern1):
+def combineCanvas(colorCombiner):
+    def combineFunction(*patterns):
         def combinedPattern(patternInput):
-            patternOutput0 = pattern0(copy.deepcopy(patternInput))
-            patternOutput1 = pattern1(copy.deepcopy(patternInput))
-            canvas0=patternOutput0['canvas']
-            canvas1=patternOutput1['canvas']
+            patternOutputs=[]
+            for pattern in patterns:
+                patternOutputs.append(pattern(copy.deepcopy(patternInput)))
+            canvass=[]
+            for patternOutput in patternOutputs:
+                canvass.append(patternOutput['canvas'])
             def combiner(rgb,y,x):
-                return colorCombiner(canvas0[y,x], canvas1[y,x])
+                return colorCombiner(*[canvas[y,x] for canvas in canvass])
             canvas=patternInput['canvas']
-            patternInput.update(patternOutput0)
-            patternInput.update(patternOutput1)
+
+            for patternOutput in patternOutputs:
+                patternInput.update(patternOutput)
+                
             canvas.mapFunction(combiner)
             patternInput['canvas']=canvas
             return patternInput
@@ -280,18 +284,18 @@ def combineTwoCanvas(colorCombiner):
 
 
 @function('meanP')
-@combineTwoCanvas
-def meaner(color0, color1):
-    colorOutput= tuple([sum(color)/2 for color in zip(color0,color1)])
+@combineCanvas
+def meaner(*colors):
+    colorOutput= tuple([sum(color)/len(colors) for color in zip(*colors)])
     return colorOutput
 
 @function('mask')
-@combineTwoCanvas
-def masker(color0, color1):
+@combineCanvas
+def masker(color0, color1, color2):
     if any(color0):
         colorOutput= color1
     else:
-        colorOutput=(0,0,0)
+        colorOutput=color2
     return colorOutput
 
 
@@ -320,9 +324,10 @@ def hsvShifter(rgb,amount):
     h +=amount
     return colorsys.hsv_to_rgb(h,s,v)
 
+@function('timeChanger')
 def timechange(functionArray, timeArray, startTime):
     totalTime = sum(timeArray)
-    timeElapsed=(startTime-getCurrentTime)
+    timeElapsed=(startTime-getCurrentTime())
     
     while(timeElapsed>totalTime):
         timeElapse-=totalTime
