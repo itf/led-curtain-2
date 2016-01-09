@@ -116,6 +116,24 @@ def defaultArguments(**kwargs):
             return patternInput
     return runOnceApplyDefaultArguments
 
+def defaultArgsP(**kwargs):
+    '''
+    usage: defaultArgs(arg=value)(function) -> function
+    defaultArgs(arg=value)(function)(pattern) -> pattern
+    order of execution: function(pattern(applyDefaultArguments))
+    '''
+    hasRun=[False]
+
+    @rFunctionize
+    def runOnceApplyDefaultArguments(patternInput):
+        if hasRun[0]==False or any([not patternInput.has_key(key) for key in kwargs.keys()]):
+            hasRun[0]=True
+            patternInput.update(kwargs)
+            return patternInput
+        else:
+            return patternInput
+    return runOnceApplyDefaultArguments
+
 @metaFunction('constArgs')
 def constantArguments(**kwargs):
     '''

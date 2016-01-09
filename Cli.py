@@ -74,10 +74,11 @@ class Completer(rlcompleter.Completer):
         self.parameterDictContainer=pDictContainer
 
 def savePattern(name, code):
+    realCode ='\n' + name + ' = Pattern.pattern(\''+name+'\')('+ code+')'
     with open("SavedPatterns.py", "a") as savedFunctions:
-        savedFunctions.write('\n' + name + ' = Pattern.pattern(\''+name+'\')('+ code+')')
+        savedFunctions.write(realCode)
         savedFunctions.close()
-
+    return realCode
 def safeSavePattern(name, code):
     savePattern(name, 'isolateCanvas('+code+')')
 
@@ -159,11 +160,14 @@ def runCliCurtain(argv):
                     elif instruction =="s" or instruction =="ss":
                         name = raw_input('Name for previous pattern:\n')
                         if instruction=="s":
-                            savePattern(name,patternString)
+                            exec savePattern(name,patternString)
                             globals()[name] = patternContainer[0]
+                            dictAll[name]=globals()[name]
+                            
                         else:
-                            safeSavePattern(name,patternString)
+                            exec safeSavePattern(name,patternString)
                             globals()[name] = isolateCanvas(patternContainer[0])
+                            dictAll[name]=globals()[name]
                         
                     else:
                             function = eval(instruction)

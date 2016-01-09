@@ -46,3 +46,25 @@ softRainbow
 meanP(black,black,black, green)
 timeChanger([red,blue,green],[1,2,1],10)
 timeChanger([red,blue,green],[1,2,1],10)
+mask(black,red,blue)
+mask(red,red,blue)
+circle
+circle
+circle
+circle
+circle
+rr cRadius=sin(frame)*15
+rr cRadius=sin(frame/100.)*15
+rr cRadius=abs(frame%20-10)*15
+rr cRadius=abs(frame%20-20)*15
+rr cRadius=abs(frame%20-10)*15
+rr cRadius=abs(frame%20-10)
+mask(circle,softRainbow,black)
+arg('cRadius=abs(frame%20-10)')(circle)
+s
+_pulsatingCircle
+s
+__pulsatingCircle
+s
+___pulsatingCircle
+___pulsatingCircle

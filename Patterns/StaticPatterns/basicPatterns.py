@@ -97,3 +97,20 @@ def fractal(PatternInput):
     return PatternInput
 
 
+@P.pattern('circle')
+@F.defaultArgsP(cRadius=10)
+def circle(PatternInput):
+    width = PatternInput["width"]
+    height = PatternInput["height"]
+    mWidth=width/2
+    mHeight=height/2
+    cRadius=PatternInput['cRadius']
+    sCRadius=cRadius**2
+    def mapper(rgb,y,x):
+        if (mWidth-x)**2 +(mHeight-y)**2 > sCRadius:
+            return (0,0,0)
+        else:
+            return (1,0,0)
+    canvas=PatternInput["canvas"]
+    canvas.mapFunction(mapper)
+    return PatternInput

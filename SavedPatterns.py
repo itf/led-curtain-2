@@ -21,3 +21,5 @@ prettyDiagonalRainbow=Pattern.pattern('prettyDiagonalRainbow')(defaultArgs(hueFr
 softRainbow=Pattern.pattern('softRainbow')(movingHue(meanP(movingColors,rainbow)))
 
 rainbowAurora = Pattern.pattern('rainbowAurora')(isolateCanvas(movingHue(meanP(step(softRainbow,vRainbownize(trivial)),softRainbow))))
+
+_pulsatingCircle = Pattern.pattern('_pulsatingCircle')(arg('cRadius=abs(frame%20-10)')(circle))
