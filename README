@@ -31,6 +31,16 @@ pypy Cli.py
 
 This will make the code 2 to 4 times more efficient for simple functions, and can give a N times performance improvement where N is the number of nested functions, apparently, for more complex code.
 
+
+===Running===
+CLI should run out of box with no problemon linux and mac
+If you use windows you will need the readline module.
+
+There are two ways of getting the readline module: install it or run inside pypy. Installing pypy is the preferred method, since it improves performance.
+If you want to install the module and run it in python, install it from here: https://pypi.python.org/pypi/readline	
+
+
+
 ====TODO===
 []Integrate audio
 []separate functions that are inside patterns to a separate file and organize them
@@ -41,7 +51,11 @@ This will make the code 2 to 4 times more efficient for simple functions, and ca
 [] Find a way to make it clear that certain functions take arguments
 [] split CLI in multiple files
 [] Mock audio processing
-[] Implement lazy evaluation for canvas
-[] Find the problems with pretty diagonal rainbow. Possible meta function problem?
-[] Improve parameter input in CLI
+[x] Implement lazy evaluation for canvas
+[x] Find the problems with pretty diagonal rainbow. Possible meta function problem?
+[] Improve parameter input in CLI  http://ironalbatross.net/wiki/index.php?title=Python_Readline_Completions
 [x] Improve compose performance (implent it in log n instead of N)
+[x] make function or meta function  F(arg)(function that takes pattern Input and changes arg). Need special syntax for that function -> http://stackoverflow.com/questions/13923091/how-do-you-do-a-python-eval-only-within-an-object-context + eval
+[x] implement Isolate in a better way
+[] frame update / audio update done outside the ui, so it can be called from isolate
+[] add previous pattern to pattern input

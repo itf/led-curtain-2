@@ -19,3 +19,5 @@ movingColors=Pattern.pattern('movingColors')(movingHue(red))
 prettyDiagonalRainbow=Pattern.pattern('prettyDiagonalRainbow')(defaultArgs(hueFrameRate=0.02, nVRainbows=3, nRainbows=2)(compose(movingHue,vRainbownize,rainbownize))(red))
 
 softRainbow=Pattern.pattern('softRainbow')(movingHue(meanP(movingColors,rainbow)))
+
+rainbowAurora = Pattern.pattern('rainbowAurora')(isolateCanvas(movingHue(meanP(step(softRainbow,vRainbownize(trivial)),softRainbow))))

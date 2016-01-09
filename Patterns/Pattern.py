@@ -200,4 +200,5 @@ class PatternInput(dict):
         self['frame']=frame
         self['params']=params
         self['canvas']=canvas
-    
+    def __getitem__(self, key):
+            return dict.__getitem__(self,key)

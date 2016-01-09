@@ -37,21 +37,40 @@ class Completer(rlcompleter.Completer):
         defined in self.namespace that match.
 
         """
+        pos=readline.get_begidx()
+        line=readline.get_line_buffer()
+        nQuotes=line[0:pos].count("'")
+        isR=len(line)>1 and line[0]=='r' and line[1]==' '
         matches = []
         n = len(text)
-        for nspace in [self.namespace]:
+        if(nQuotes%2==1 or isR):
+            nspace = self.parameterDictContainer[0]
             for word, val in nspace.items():
                 if word[:n] == text:
-                    matches.append(self._callable_postfix(val, word))
-        return matches
+                    matches.append(self._arg_postfix(self._callable_postfix(val, word)))
+            return matches
+        else:
+            for nspace in [self.namespace]:
+                for word, val in nspace.items():
+                    if word[:n] == text:
+                        matches.append(self._arg_postfix(self._callable_postfix(val, word)))
+            return matches
+
     
     def _callable_postfix(self, val, word):
         if hasattr(val, '__call__') and word not in self.patternDict:
             word = word + "("
         return word
+    def _arg_postfix(self, word):
+        if word=='arg(':
+            word = word + "' ')("
+        return word
     
     def setPatternDict(self,pDict):
         self.patternDict=pDict
+        
+    def setParameterDictContainer(self,pDictContainer):
+        self.parameterDictContainer=pDictContainer
 
 def savePattern(name, code):
     with open("SavedPatterns.py", "a") as savedFunctions:
@@ -63,13 +82,25 @@ def safeSavePattern(name, code):
 
 
 def runCliCurtain(argv):
+    print 
+    print "CLI to combine patterns"
+    print "Press TAB for completion and suggestions"
+    print "If running in Python press CTRL+A for all commands"
+    print 
+    
     dictAll={}
     dictAll.update(Pattern.getPatternDic())
     dictAll.update(Function.getFunctionDict())
     dictAll.update(Function.getMetaFunctionDict())
     importFunctionsFromDict(dictAll)
 
-    readline.parse_and_bind("tab: complete")
+    readline.parse_and_bind("tab: menu-complete")
+    readline.parse_and_bind('"\C-r": reverse-search-history')
+    readline.parse_and_bind('"\C-a" complete')
+    readline.parse_and_bind('set menu-complete-display-prefix on')
+    readline.parse_and_bind('set skip-completed-text on')
+    readline.parse_and_bind('set completion-ignore-case on')
+    readline.parse_and_bind('set blink-matching-paren on')
     completer=Completer(dictAll)
     completer.setPatternDict(Pattern.getPatternDic())
     
@@ -84,49 +115,53 @@ def runCliCurtain(argv):
     patternInput = Pattern.PatternInput(height=height, width = width)
     canvas = Canvas(height=height, width=width)
     patternInput["canvas"]=canvas
+    patternInputContainer=[patternInput]
     threadSender= threading.Thread(target=dataSender,
                                    args= (patternContainer,
-                                          patternInput,
+                                          patternInputContainer,
                                           host,
                                           port))
     threadSender.start()
+    completer.setParameterDictContainer(patternInputContainer)
     while(patternContainer[0]):
         try:
             instruction = raw_input('Write pattern code, parameter(r), List (l), Save (s) or Safe Save (ss)\n')
-            if instruction=="r":
-                parameter = input('Please input {\'parameterName\':value} \n')
-                patternInput.update(parameter)
-            elif instruction =="l":
-                print "PATTERNS:"
-                patternDict=Pattern.getPatternDic()
-                for pattern in patternDict.keys():
-                    print str(pattern) +" " + str(patternDict[pattern].func_doc)
+            if instruction:
+                if instruction=="r":
+                    parameter = input('Please input {\'parameterName\':value} \n')
+                    patternInput.update(parameter)
+                elif instruction =="l":
+                    print "PATTERNS:"
+                    patternDict=Pattern.getPatternDic()
+                    for pattern in patternDict.keys():
+                        print str(pattern) +" " + str(patternDict[pattern].func_doc)
 
-                print "\nFUNCTIONS:"
-                funcDict=Function.getFunctionDict()
-                for function in funcDict.keys():
-                    print str(function) +" " + str(funcDict[function].func_doc)
+                    print "\nFUNCTIONS:"
+                    funcDict=Function.getFunctionDict()
+                    for function in funcDict.keys():
+                        print str(function) +" " + str(funcDict[function].func_doc)
 
-                print "\nMETA FUNCTIONS:"
-                metaFuncDict=Function.getMetaFunctionDict()
-                for function in metaFuncDict.keys():
-                    print str(function) +" " + str(metaFuncDict[function].func_doc)
-            elif instruction =="s" or instruction =="ss":
-                name = raw_input('Name for previous pattern:\n')
-                if instruction=="s":
-                    savePattern(name,patternString)
-                    globals()[name] = patternContainer[0]
+                    print "\nMETA FUNCTIONS:"
+                    metaFuncDict=Function.getMetaFunctionDict()
+                    for function in metaFuncDict.keys():
+                        print str(function) +" " + str(metaFuncDict[function].func_doc)
+                elif instruction =="s" or instruction =="ss":
+                    name = raw_input('Name for previous pattern:\n')
+                    if instruction=="s":
+                        savePattern(name,patternString)
+                        globals()[name] = patternContainer[0]
+                    else:
+                        safeSavePattern(name,patternString)
+                        globals()[name] = isolateCanvas(patternContainer[0])
+                    
                 else:
-                    safeSavePattern(name,patternString)
-                    globals()[name] = isolateCanvas(patternContainer[0])
-            else:
-                try:
-                    function = eval(instruction)
-                    patternString=instruction
-                    patternContainer[1]=patternContainer[0]
-                    patternContainer[0]=function
-                except:
-                    traceback.print_exc(file=sys.stdout)
+                    try:
+                        function = eval(instruction)
+                        patternString=instruction
+                        patternContainer[1]=patternContainer[0]
+                        patternContainer[0]=function
+                    except:
+                        traceback.print_exc(file=sys.stdout)
 
 
                 
@@ -135,10 +170,11 @@ def runCliCurtain(argv):
             threadSender.join()
             print "threads successfully closed"
 
-def dataSender(patternContainer, patternInput, host, port):
+def dataSender(patternContainer, patternInputContainer, host, port):
+    patternInput = patternInputContainer[0]
     height = patternInput["height"]
     width = patternInput["width"]
-    canvas = Canvas(height,width)
+    canvas = Canvas(height,width) 
     patternInput["canvas"]=canvas
     frame=0
     previousPattern=patternContainer[0]
@@ -148,6 +184,7 @@ def dataSender(patternContainer, patternInput, host, port):
     errorSleep= 3
     while patternContainer[0]:
             try:
+                patternInputContainer[0]=patternInput
                 pattern=patternContainer[0]
                 if(pattern!=previousPattern):
                     frame=0

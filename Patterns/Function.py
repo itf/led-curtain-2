@@ -215,6 +215,7 @@ def movingHue(patternInput):
     canvas.mapFunction(shifter)
     return patternInput
 
+
 @function('hueShift')
 @defaultArguments(hue=0.01)
 @functionize
@@ -258,24 +259,58 @@ def vRainbownize(patternInput):
     canvas.mapFunction(shifter)
     return patternInput
 
+
+def combineTwoCanvas(colorCombiner):
+    def combineFunction(pattern0, pattern1):
+        def combinedPattern(patternInput):
+            patternOutput0 = pattern0(copy.deepcopy(patternInput))
+            patternOutput1 = pattern1(copy.deepcopy(patternInput))
+            canvas0=patternOutput0['canvas']
+            canvas1=patternOutput1['canvas']
+            def combiner(rgb,y,x):
+                return colorCombiner(canvas0[y,x], canvas1[y,x])
+            canvas=patternInput['canvas']
+            patternInput.update(patternOutput0)
+            patternInput.update(patternOutput1)
+            canvas.mapFunction(combiner)
+            patternInput['canvas']=canvas
+            return patternInput
+        return combinedPattern
+    return combineFunction
+
+
 @function('meanP')
-def meanPattern(pattern0, pattern1):
-    def meanP(patternInput):
-        patternOutput0 = pattern0(copy.deepcopy(patternInput))
-        patternOutput1 = pattern1(copy.deepcopy(patternInput))
-        canvas0=patternOutput0['canvas']
-        canvas1=patternOutput1['canvas']
-        def meaner(rgb,y,x):
-            return tuple([sum(color)/2 for color in zip(canvas0[y,x], canvas1[y,x])])
-        canvas=patternInput['canvas']
-        patternInput.update(patternOutput0)
-        patternInput.update(patternOutput1)
-        canvas.mapFunction(meaner)
-        patternInput['canvas']=canvas
+@combineTwoCanvas
+def meaner(color0, color1):
+    colorOutput= tuple([sum(color)/2 for color in zip(color0,color1)])
+    return colorOutput
+
+@function('mask')
+@combineTwoCanvas
+def masker(color0, color1):
+    if any(color0):
+        colorOutput= color1
+    else:
+        colorOutput=(0,0,0)
+    return colorOutput
+
+
+import math
+import collections
+
+@function('arg')
+def arg(strInstructionToEval):
+    @rFunctionize
+    def updateArg(patternInput):
+        defaultDict =collections.defaultdict(int)
+        defaultDict['abs']=abs
+        defaultDict.update(math.__dict__)
+        exec strInstructionToEval in defaultDict, patternInput
         return patternInput
-    return meanP
-    
-    
+    return updateArg
+
+def getArgDicts(patternInput):
+    return patternInput
 
 def hsvShifter(rgb,amount):
     h,s,v=colorsys.rgb_to_hsv(*rgb)
