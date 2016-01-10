@@ -96,7 +96,7 @@ def runCliCurtain(argv):
     dictAll.update(Function.getMetaFunctionDict())
     importFunctionsFromDict(dictAll)
 
-    readline.parse_and_bind("tab: menu-complete")
+    readline.parse_and_bind("tab: complete")
     readline.parse_and_bind('"\C-r": reverse-search-history')
     readline.parse_and_bind('"\C-a" complete')
     readline.parse_and_bind('set menu-complete-display-prefix on')

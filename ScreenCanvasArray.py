@@ -18,6 +18,8 @@ class Canvas:
             self.mapFunctionApply()
         width=self.width
         y,x = arg
+        y=y%self.height
+        x=x%self.width
         pos=(y*width+x)*3
         return self._array[pos],self._array[pos+1],self._array[pos+2]
 
@@ -64,4 +66,5 @@ class Canvas:
         width=self.width
         newColorarray=copy.deepcopy(self._array)
         newone=Canvas(self.height,self.width,newColorarray)
+        newone.pendingMappingFunctions=[]
         return newone

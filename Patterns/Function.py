@@ -307,6 +307,12 @@ def meaner(*colors):
     colorOutput= tuple([sum(color)/len(colors) for color in zip(*colors)])
     return colorOutput
 
+@function('addP')
+@combineCanvas
+def addPattern(*colors):
+    colorOutput= tuple([sum(color) for color in zip(*colors)])
+    return colorOutput
+
 @function('mask')
 @combineCanvas
 def masker(color0, color1, color2):
@@ -343,23 +349,73 @@ def hsvShifter(rgb,amount):
     return colorsys.hsv_to_rgb(h,s,v)
 
 @function('timeChanger')
-def timechange(functionArray, timeArray, startTime):
+def timechange(patternnArray, timeArray):
     totalTime = sum(timeArray)
-    timeElapsed=(startTime-getCurrentTime())
-    
-    while(timeElapsed>totalTime):
-        timeElapse-=totalTime
+    startTime=getCurrentTime()
 
-    for i in xrange(len(timeArray)):
-        if timeElapsed>time:
-            timeElapsed = timeElapsed-time
-        else:
-            return functionArray[i]
-    else:
+    def timeChangedPattern(patternInput):
+        timeElapsed=(getCurrentTime()-startTime)
+    
+        timeElapsed%=totalTime
+
+        for i in xrange(len(timeArray)):
+            time=timeArray[i]
+            if timeElapsed>time:
+                timeElapsed = timeElapsed-time
+            else:
+                return patternnArray[i](patternInput)
         return lambda x: x #Should never happen
+    return timeChangedPattern
 
         
 
+import time
 def getCurrentTime():
-    raise Exception("Not Implemented")
+    return time.time()
 
+
+
+@function('translate')
+@defaultArguments(xTranslate=0, yTranslate=0)
+@functionize
+def translate(patternInput):
+    '''
+    percentage translator. args('xTranslate=0; yTranslate=0')
+    '''
+    height=patternInput["height"]
+    width=patternInput["width"]
+    xTranslate=patternInput["xTranslate"]
+    yTranslate=patternInput["yTranslate"]
+
+    xTranslate = round(xTranslate*width)
+    yTranslate = round(yTranslate*height)
+    oldcanvas = copy.deepcopy(patternInput["canvas"])
+
+    def translator(rgb,y,x):
+        positionY=int((y+yTranslate)%height)
+        positionX=int((x+xTranslate)%width)
+        color = oldcanvas[positionY, positionX]
+        return color
+    canvas=patternInput["canvas"]
+    canvas.mapFunction(translator)
+    patternInput['canvas']=canvas
+    return patternInput
+
+
+
+@function('blur')
+@functionize
+def blur(patternInput):
+    '''
+    blures image
+    '''
+
+    oldcanvas = copy.deepcopy(patternInput["canvas"])
+
+    def blurer(rgb,y,x):
+        color =tuple([sum(color)/9 for color in zip(*[oldcanvas[y+i,x+j] for i in [-1,0,1] for j in [-1,0,1]])])
+        return color
+    canvas=patternInput["canvas"]
+    canvas.mapFunction(blurer)
+    patternInput['canvas']=canvas
+    return patternInput
