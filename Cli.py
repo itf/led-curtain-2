@@ -136,6 +136,15 @@ def runCliCurtain(argv):
 
             try:
                 if instruction:
+                    leftP = instruction.count('(')
+                    rightP = instruction.count(')')
+                    if(leftP > rightP):
+                        print "Attempting to fix mismatched left parenthesis"
+                        instruction=instruction+ ')'*(leftP-rightP)
+                    elif (rightP>leftP):
+                        print "Attempting to fix mismatched right parenthesis"
+                        instruction='('*(rightP-leftP) +instruction
+
                     if len(instruction)>1 and instruction[0]=="r" and instruction[1]==' ':
                         command = instruction[2:]
                         patternInputContainer[1]=command
