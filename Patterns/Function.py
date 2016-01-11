@@ -104,17 +104,18 @@ def defaultArguments(**kwargs):
     order of execution: function(pattern(applyDefaultArguments))
     '''
     hasRun=[False]
-
-    @rMetaFunctionize
-    @rFunctionize
-    def runOnceApplyDefaultArguments(patternInput):
-        if hasRun[0]==False or any([not patternInput.has_key(key) for key in kwargs.keys()]):
-            hasRun[0]=True
-            patternInput.update(kwargs)
-            return patternInput
-        else:
-            return patternInput
-    return runOnceApplyDefaultArguments
+    def metaFunction(function):
+        def functionOfPatterns(*patterns):
+            def runOnceApplyDefaultArguments(patternInput):
+                if hasRun[0]==False or any([not patternInput.has_key(key) for key in kwargs.keys()]):
+                    hasRun[0]=True
+                    patternInput.update(kwargs)
+                    return patternInput
+                else:
+                    return patternInput
+            return compose(function(*patterns),runOnceApplyDefaultArguments)
+        return functionOfPatterns
+    return metaFunction
 
 def defaultArgsP(**kwargs):
     '''
@@ -312,6 +313,23 @@ def meaner(*colors):
 def addPattern(*colors):
     colorOutput= tuple([sum(color) for color in zip(*colors)])
     return colorOutput
+
+
+@function('weightedMean2P')
+@defaultArguments(weightedMeanWeight=0.5)
+def weightedMeanP(*patterns):
+    def weighter(patternInput):
+        weight=patternInput['weightedMeanWeight']
+        @combineCanvas
+        def meaner(color0, color1):
+            colorOutput= tuple([color[0]*weight+color[1]*(1-weight) for color in zip(color0, color1)])
+            return colorOutput
+        return meaner(*patterns)(patternInput)
+    return weighter
+
+
+
+
 
 @function('mask')
 @combineCanvas

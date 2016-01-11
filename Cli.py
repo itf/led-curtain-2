@@ -80,8 +80,8 @@ def savePattern(name, code):
         savedFunctions.close()
     return realCode
 def safeSavePattern(name, code):
-    savePattern(name, 'isolateCanvas('+code+')')
-
+    realCode=savePattern(name, 'isolateCanvas('+code+')')
+    return realCode
 
 def runCliCurtain(argv):
     print 

@@ -26,3 +26,7 @@ _pulsatingCircle = Pattern.pattern('_pulsatingCircle')(arg('cRadius=abs(frame%20
 
 _explosionRed = Pattern.pattern('_explosionRed')(arg('cRadius = sin(frame/30.)*20; hue=0.05')(mask(circle,hueShift(trivial),meanP(red,trivial))))
 meteorRainbow = Pattern.pattern('meteorRainbow')(arg('xTranslate= cos(frame/37.); yTranslate = sin(frame/60.)*2 ')(mask(translate(circle),meanP(softRainbow,trivial),blur(trivial))))
+_mesmerezingMeteor = Pattern.pattern('_mesmerezingMeteor')(isolateCanvas(hueShift((arg('xTranslate= cos(frame/37.); yTranslate = sin(frame/60.)*2; weightedMeanWeight=0.03; hue=0.021')(mask(translate(circle),prettyDiagonalRainbow, weightedMean2P(black,blur(trivial))))))))
+_mesmerezingMeteor = Pattern.pattern('_mesmerezingMeteor')(hueShift((arg('xTranslate= cos(frame/37.); yTranslate = sin(frame/60.)*2; weightedMeanWeight=0.03; hue=0.021')(mask(translate(circle),prettyDiagonalRainbow, weightedMean2P(black,blur(trivial)))))))
+_mesmerezingMeteor = Pattern.pattern('_mesmerezingMeteor')(isolateCanvas(hueShift((arg('xTranslate= cos(frame/37.); yTranslate = sin(frame/60.)*2; weightedMeanWeight=0.03; hue=0.021')(mask(translate(circle),prettyDiagonalRainbow, weightedMean2P(black,blur(trivial))))))))
+_mesmerezingMeteor = Pattern.pattern('_mesmerezingMeteor')(isolateCanvas(hueShift((arg('xTranslate= cos(frame/37.); yTranslate = sin(frame/60.)*2; weightedMeanWeight=0.03; hue=0.021')(mask(translate(circle),prettyDiagonalRainbow, weightedMean2P(black,blur(trivial))))))))
