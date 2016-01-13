@@ -98,13 +98,14 @@ def fractal(PatternInput):
 
 
 @P.pattern('circle')
-@F.defaultArgsP(cRadius=10)
+@F.defaultArgsP(cRadius=0.333)
 def circle(PatternInput):
     width = PatternInput["width"]
     height = PatternInput["height"]
     mWidth=width/2
     mHeight=height/2
     cRadius=PatternInput['cRadius']
+    cRadius = round(cRadius * min(width, height))
     sCRadius=cRadius**2
     def mapper(rgb,y,x):
         if (mWidth-x)**2 +(mHeight-y)**2 > sCRadius:
