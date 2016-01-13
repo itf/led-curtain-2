@@ -107,7 +107,7 @@ def defaultArguments(**kwargs):
     def metaFunction(function):
         def functionOfPatterns(*patterns):
             def runOnceApplyDefaultArguments(patternInput):
-                if hasRun[0]==False or any([not patternInput.has_key(key) for key in kwargs.keys()]):
+                if any([not patternInput.has_key(key) for key in kwargs.keys()]):
                     hasRun[0]=True
                     patternInput.update(kwargs)
                     return patternInput
@@ -340,17 +340,29 @@ def masker(color0, color1, color2):
         colorOutput=color2
     return colorOutput
 
+@function('weightedMask')
+@combineCanvas
+def weightedMasker(color0, color1, color2):
+    weight = color0[0]
+    colorOutput=tuple([color[0]*weight+color[1]*(1-weight) for color in zip(color1, color2)])
+    return colorOutput
+
 
 import math
 import collections
 
 @function('arg')
 def arg(strInstructionToEval):
-    @rFunctionize
-    def updateArg(patternInput):
-        execInPattern(strInstructionToEval, patternInput)
-        return patternInput
-    return updateArg
+    def updaterArg(pattern):
+        def updateArg(patternInput):
+            oldPatternInput = copy.copy(patternInput)
+            oldPatternInput.pop('canvas')
+            execInPattern(strInstructionToEval, patternInput)
+            newPatternInput=pattern(patternInput)
+            newPatternInput.update(oldPatternInput)
+            return newPatternInput
+        return updateArg
+    return updaterArg
 
 def getArgDicts(patternInput):
     return patternInput
@@ -435,5 +447,94 @@ def blur(patternInput):
         return color
     canvas=patternInput["canvas"]
     canvas.mapFunction(blurer)
+    patternInput['canvas']=canvas
+    return patternInput
+
+
+@function('gameOfLife')
+@defaultArguments(lifeSurviveRange=[2,3], lifeBornRange=[3], lifeOtherSurviveRatio=0.5, lifeNeighborDistance=1)
+@functionize
+def gameOfLife(patternInput):
+    '''
+    Games of life with colors
+    #http://www.mirekw.com/ca/ca_gallery2.html#LIFE
+    '''
+
+    oldcanvas = copy.deepcopy(patternInput["canvas"])
+    aliveRange = patternInput['lifeSurviveRange']
+    deadRange = patternInput['lifeBornRange']
+    otherColorRatio= patternInput['lifeOtherSurviveRatio']
+    lifeNeighborDistance=patternInput['lifeNeighborDistance']
+    neighborRange= range(-lifeNeighborDistance,lifeNeighborDistance+1)
+    def isAlive(aliveMe, aliveN, aliveNOtherColor):
+        keepAlive = (aliveMe and (aliveN+aliveNOtherColor*otherColorRatio in aliveRange))
+        becomeAlive = not aliveMe and (aliveN in deadRange)
+        return keepAlive or becomeAlive
+    def gamerOfLife(rgb,y,x):
+        aliveAll = [int(sum(map(lambda x: x>0.5,color))) for color in zip(*[oldcanvas[y+i,x+j] for i in neighborRange for j in neighborRange])]
+        aliveMe = [color>0.5 for color in rgb]
+        aliveNeighbor = [aliveAll[i]- aliveMe[i] for i in xrange(3)]
+        aliveNAll = sum(aliveNeighbor)
+        aliveNOtherColor = [aliveNAll - aliveNeighbor[i] for i in xrange(3)]
+        color = tuple([ isAlive(aliveMe[i],aliveNeighbor[i], aliveNOtherColor[i]) for i in xrange(3)])
+        return color
+    canvas=patternInput["canvas"]
+    canvas.mapFunction(gamerOfLife)
+    patternInput['canvas']=canvas
+    return patternInput
+
+
+@function('gameOfGeneration')
+@defaultArguments(generationSurviveRange=[3,4,5], generationBornRange=[2], generationStates=4, generationNeighborDistance=1)
+@functionize
+def gameOfGeneration(patternInput):
+    '''
+    Games of generation
+    #http://www.mirekw.com/ca/ca_gallery2.html#LIFE
+    '''
+
+    oldcanvas = copy.deepcopy(patternInput["canvas"])
+    surviveRange = patternInput['generationSurviveRange']
+    bornRange = patternInput['generationBornRange']
+    neighborDistance=patternInput['generationNeighborDistance']
+    neighborRange= range(-neighborDistance,neighborDistance+1)
+    numberOfStates = patternInput['generationStates']
+    states = [(0,0,0)]+[colorsys.hsv_to_rgb(float(h)/numberOfStates,1,1) for h in xrange(numberOfStates)]
+
+    # 0=dead, 1= new, >1 = decaying
+    def getState(color):
+        if not any ([channel>0.4 for channel in color]):
+            return 0
+        else:
+            h,s,v = colorsys.rgb_to_hsv(*color)
+            return (int(h*numberOfStates)%numberOfStates)+1
+
+    #1= new, 2 = decaying
+    def oldOrNew(newNeigh):
+        if newNeigh in surviveRange:
+            return 1
+        else:
+            return 2
+
+    def gamerOfGeneration(rgb,y,x):
+        stateMe = getState(rgb)
+        if (stateMe>1): #decay
+            newState = (stateMe+1)
+        else:
+            newAll = sum([getState(oldcanvas[y+i, x+j])==1 for i in neighborRange for j in neighborRange])
+            newMe = int(stateMe==1)
+            newNeigh = newAll-newMe
+
+            if newMe:
+                newState=oldOrNew(newNeigh)
+            elif newNeigh in bornRange:
+                newState=1
+            else:
+                newState=0
+
+        newState = newState% (numberOfStates+1)            
+        return states[newState]
+    canvas=patternInput["canvas"]
+    canvas.mapFunction(gamerOfGeneration)
     patternInput['canvas']=canvas
     return patternInput
