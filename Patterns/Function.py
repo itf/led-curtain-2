@@ -174,7 +174,8 @@ def step(pattern0, pattern1):
     '''
     step = [False]
     def steppedPattern(patternInput):
-        if step[0]==False:
+        frame = patternInput['frame']
+        if step[0]==False or frame==0:
             step[0]=True
             return pattern0(patternInput)
         else:
@@ -499,8 +500,8 @@ def gameOfGeneration(patternInput):
     neighborDistance=patternInput['generationNeighborDistance']
     neighborRange= range(-neighborDistance,neighborDistance+1)
     numberOfStates = patternInput['generationStates']
-    states = [(0,0,0)]+[colorsys.hsv_to_rgb(float(h)/numberOfStates,1,1) for h in xrange(numberOfStates)]
-
+    epsilon = 0.001
+    states = [(0,0,0)]+[colorsys.hsv_to_rgb(float(h)/numberOfStates +epsilon,1,1) for h in xrange(numberOfStates)]
     # 0=dead, 1= new, >1 = decaying
     def getState(color):
         if not any ([channel>0.4 for channel in color]):
