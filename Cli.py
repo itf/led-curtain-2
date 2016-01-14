@@ -7,8 +7,8 @@ import rlcompleter
 import readline
 import traceback
 
-
-import Transportation.Protocol.SimpleProtocol as P
+import Config
+P = Config.Protocol
 import Transportation.Sockets.ClientSocketUDP as Client
 import Patterns.Pattern as Pattern
 import Patterns.Function as Function
@@ -119,8 +119,6 @@ def runCliCurtain(argv):
     patternContainer=[basicPattern.randomPattern, None]
     patternString="random"
     patternInput = Pattern.PatternInput(height=height, width = width)
-    canvas = Canvas(height=height, width=width)
-    patternInput["canvas"]=canvas
     patternInputContainer=[patternInput, None, None]
     threadSender= threading.Thread(target=dataSender,
                                    args= (patternContainer,
@@ -204,7 +202,6 @@ def dataSender(patternContainer, patternInputContainer, host, port):
 
     clientSocket = Client.ClientSocketUDP(host,port)
     timeSleep = 1.0/SEND_RATE
-    errorSleep= 3
     while patternContainer[0]:
             try:
                 if (patternInputContainer[1]):
@@ -252,7 +249,11 @@ def main(argv):
     if len(argv)==4:
         runCliCurtain(argv)
     elif len(argv)==0:
-        argv=[30,60,'localhost',5000]   
+        height = Config.height
+        width = Config.width
+        host = Config.host
+        port = Config.port
+        argv=[height, width, host, port]   
         runCliCurtain(argv)
     else:
         print "Usage Cli <height> <width> <host> <port> "
