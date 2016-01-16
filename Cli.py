@@ -17,6 +17,8 @@ import SavedPatterns
 
 
 import Patterns.StaticPatterns.basicPatterns as basicPattern
+import Patterns.ExtraPatterns.SimpleText
+
 from ScreenCanvasArray import Canvas
 
 """

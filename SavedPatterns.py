@@ -1,6 +1,7 @@
 import Patterns.Pattern as Pattern
 import Patterns.Function as Function
 import Patterns.StaticPatterns.basicPatterns
+import Patterns.ExtraPatterns.SimpleText
 
 
 def importFunctionsFromDict(dictionary):
@@ -29,3 +30,5 @@ meteorRainbow = Pattern.pattern('meteorRainbow')(arg('xTranslate= cos(frame/37.)
 _mesmerezingMeteor = Pattern.pattern('_mesmerezingMeteor')(isolateCanvas(hueShift((arg('xTranslate= cos(frame/37.); yTranslate = sin(frame/60.)*2; weightedMeanWeight=0.05; hue=0.021')(mask(translate(circle),prettyDiagonalRainbow, weightedMean2P(black,blur(trivial))))))))
 
 cloudsRainbow = Pattern.pattern('cloudsRainbow')(arg('generationBornRange=[3,4]; generationSurviveRange=[1,2,3]; generationStates=48; generationNeighborDistance=1 ')(isolate(step(circle,gameOfGeneration(trivial)))))
+
+spaaceMoving = Pattern.pattern('spaaceMoving')(arg('textHeight=0.2; textPos=0.5; xTranslate= frame%17/17.; yTranslate=frame%33/33.; weightedMeanWeight=0 if frame%10==0 else 1')(step(black,mask(isolateCanvas(step(black,weightedMean2P(trivial,translate(text)))),softRainbow,arg('weightedMeanWeight=0.1 ')(weightedMean2P(black,blur(trivial)))))))

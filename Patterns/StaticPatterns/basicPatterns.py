@@ -1,5 +1,4 @@
 import random
-import ScreenCanvas
 import Patterns.Pattern as P
 import Patterns.Function as F
 

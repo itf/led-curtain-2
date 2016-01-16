@@ -1,4 +1,4 @@
-curtain = "old"
+curtain = "local"
 
 if curtain=="old":
     width = 15
