@@ -3,7 +3,8 @@ import sys
 from Transportation.Sockets.ServerSocketUDP import ServerSocketUDP
 from Display.Pygame.pgCurtain import PygameCurtain
 import Transportation.Protocol.SimpleProtocol as P
-
+from ColorManager import convertColorByteToS
+from Config import LocalDisplayConfig as Config
 
 def testServer(host, port, height, width):
     server=ServerSocketUDP(host,port)
@@ -11,6 +12,16 @@ def testServer(host, port, height, width):
     while(1):
         data = server.getData()
         colorArray=P.dataToColorArray(data)
+        if Config.linearColorProfileCorretion:
+            colorArray=map(lambda y: map(lambda x:convertColorByteToS(x),y),colorArray)
+        if Config.normalize:
+            brightest= max ([1]+[c for row in colorArray  for color in row for c in color ])
+            def normalize((r,g,b)):
+                r = int(r*255./brightest)
+                g = int(g*255./brightest)
+                b = int(b*255./brightest)
+                return tuple([r,g,b])
+            colorArray=map(lambda y: map(lambda x: normalize(x) ,y), colorArray)
         curtain.sendColorArray(colorArray)
 
 def main(argv):
@@ -23,7 +34,7 @@ def main(argv):
         testServer(host, int(port), int(height), int(width))
     elif len(argv)==0:
         host =''
-        testServer(host, 5000, 30, 60)
+        testServer(host, Config.port, Config.height, Config.width)
     else:
         print "Usage Cli [host] <height> <width> <port> "
 

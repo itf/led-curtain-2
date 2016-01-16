@@ -10,7 +10,7 @@ BROKEN_PIXELS_GREEN = []
 BROKEN_PIXELS_BLUE = []
 
 DEFAULT_WINDOWS_SIZE=300,300
-CELL_PADDING_RATIO = 6 
+CELL_PADDING_RATIO = 6
 class Cell(object):
     def __init__(self, position, size, padding):
         self.position = position

@@ -1,4 +1,4 @@
-curtain = "local"
+curtain = "old"
 
 if curtain=="old":
     width = 15
@@ -7,6 +7,8 @@ if curtain=="old":
     port=6038
     import Transportation.Protocol.OldProtocol as P
     Protocol = P
+    import ColorManager as C
+    convertColor = C.convertColorToLin #Converts the color profile to linear
 else: #Assume local
     width = 60
     height = 30
@@ -14,3 +16,12 @@ else: #Assume local
     port=5000
     import Transportation.Protocol.SimpleProtocol as P
     Protocol = P
+    import ColorManager as C
+    convertColor = C.convertColorToLin  #Converts the color profile to linear
+
+class LocalDisplayConfig:
+    width = 60
+    height = 30
+    port = 5000
+    normalize = True
+    linearColorProfileCorretion = True

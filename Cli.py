@@ -9,6 +9,7 @@ import traceback
 
 import Config
 P = Config.Protocol
+colorConverter= Config.convertColor
 import Transportation.Sockets.ClientSocketUDP as Client
 import Patterns.Pattern as Pattern
 import Patterns.Function as Function
@@ -228,7 +229,10 @@ def dataSender(patternContainer, patternInputContainer, host, port):
                     frame = frame+1
                 patternInput["frame"]=frame
                 newPatternInput=pattern(patternInput)
-                canvas=newPatternInput["canvas"]
+                canvas=copy.deepcopy(newPatternInput["canvas"])
+                globalBrightness = newPatternInput['globalBrightness']
+                if colorConverter:
+                    canvas.mapFunction(lambda rgb,y,x: colorConverter(rgb,globalBrightness))
                 data=P.canvasToData(canvas)
                 clientSocket.sendData(data)
                 patternInput=newPatternInput

@@ -193,12 +193,15 @@ class PatternInput(dict):
                  audioData=None,
                  frame=0,
                  params=None,
-                 canvas=None):
+                 canvas=None,
+                 globalBrightness=0.1):
         self['width']=width
         self['height']=height
         self['audioData']=audioData
         self['frame']=frame
         self['params']=params
         self['canvas']=canvas
+        self['globalBrightness']=globalBrightness
+        
     def __getitem__(self, key):
             return dict.__getitem__(self,key)

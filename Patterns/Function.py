@@ -371,6 +371,9 @@ def getArgDicts(patternInput):
 def execInPattern(strInstructionToEval, patternInput):
     defaultDict =collections.defaultdict(int)
     defaultDict['abs']=abs
+    defaultDict['max']=max
+    defaultDict['min']=min
+
     defaultDict.update(math.__dict__)
     exec strInstructionToEval in defaultDict, patternInput
 
