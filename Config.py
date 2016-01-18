@@ -1,4 +1,5 @@
 curtain = "local"
+useImages = True
 
 if curtain=="old":
     width = 15

@@ -354,8 +354,12 @@ def arg(strInstructionToEval):
         def updateArg(patternInput):
             oldPatternInput = copy.copy(patternInput)
             oldPatternInput.pop('canvas')
-            execInPattern(strInstructionToEval, patternInput)
-            newPatternInput=pattern(patternInput)
+            try:
+                execInPattern(strInstructionToEval, patternInput)
+                newPatternInput=pattern(patternInput)
+            except:
+                newPatternInput=pattern(patternInput)
+                execInPattern(strInstructionToEval, newPatternInput)
             newPatternInput.update(oldPatternInput)
             return newPatternInput
         return updateArg
@@ -369,6 +373,12 @@ def execInPattern(strInstructionToEval, patternInput):
     defaultDict['abs']=abs
     defaultDict['max']=max
     defaultDict['min']=min
+    defaultDict['str']=str
+    defaultDict['float']=float
+    defaultDict['int']=int
+    defaultDict['len']=len
+
+
 
     defaultDict.update(math.__dict__)
     exec strInstructionToEval in defaultDict, patternInput

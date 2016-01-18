@@ -1,6 +1,7 @@
 *.pyc
 *.pyo
 config_local.py
+testing.py
 venv/
 *\~
 *\#

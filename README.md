@@ -11,6 +11,17 @@ Getting started with Iron Curtain 2 development.
 * Run: python LocalDisplay.py 
 * Run: pypy Cli.py
 
+Using images:
+* install pillow on pypy:
+* First way:
+	* Download https://github.com/python-pillow/Pillow
+	* Run: pypy setup.py install from that directory
+* Second way:
+	* Install pip in pypy :
+	*  Download pip from [wget] https://bootstrap.pypa.io/get-pip.py 
+	* [sudo]  pypy get-pip.py
+	* [sudo] pypy -m pip install pillow
+
 ##Cli pattern programming language
 
 The Command Line interface has its own programming language to combine patterns. 

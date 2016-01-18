@@ -16,7 +16,8 @@ def textPattern(PatternInput):
     canvasWidth = PatternInput['width']
     canvasHeight = PatternInput['height']
 
-    conversionFactor = float(canvasHeight*textHeight/textRealHeight)
+    epsilon=0.001
+    conversionFactor = max(float(canvasHeight*textHeight/textRealHeight),epsilon)
 
     spaceWidth = letters.letters[' '].width+1
     realSpaceWidth = spaceWidth*conversionFactor
@@ -48,11 +49,15 @@ def simpleCached(cacheSize):
         return cachedFunction
     return cacheFunction
 
-            
 @simpleCached(4)
-def createScaledText(canvas, text, textPos, conversionFactor):
+def getLetters(text):
     text= letters.sanitize_str(text)
     myletters = [letters.letters[c] for c in text]
+    return myletters
+
+@simpleCached(4)
+def createScaledText(canvas, text, textPos, conversionFactor):
+    myletters = getLetters(text)
     textWidth = sum(let.width + 1 for let in myletters)
 
     textWPos = textPos*textWidth

@@ -18,6 +18,8 @@ import SavedPatterns
 
 import Patterns.StaticPatterns.basicPatterns as basicPattern
 import Patterns.ExtraPatterns.SimpleText
+import Patterns.ExtraPatterns.Image
+
 
 from ScreenCanvasArray import Canvas
 
@@ -242,7 +244,21 @@ def dataSender(patternContainer, patternInputContainer, host, port):
                 time.sleep(timeSleep)
             except:
                 traceback.print_exc(file=sys.stdout)
-                patternContainer[0]=patternContainer[1]
+                if patternContainer[1]:
+                    patternContainer[0]=patternContainer[1]
+                    patternContainer[1]=None
+                else:
+                    if patternContainer[0]==black:
+                        patternContainer[0]=None
+                    height = patternInput["height"]
+                    width = patternInput["width"]
+                    patternInput = Pattern.PatternInput(height=height, width = width)
+                    canvas = Canvas(height,width)
+                    patternInput["canvas"]=canvas
+                    patternInputContainer[0]=patternInput
+                    patternInputContainer[1]=None
+                    patternInputContainer[2]=None
+                    patternContainer[0]=black
 
 
 
