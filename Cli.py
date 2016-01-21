@@ -10,6 +10,9 @@ import traceback
 import Config
 P = Config.Protocol
 colorConverter= Config.convertColor
+if Config.useAudio:
+    import Audio.AudioClientLib as Audio
+
 import Transportation.Sockets.ClientSocketUDP as Client
 import Patterns.Pattern as Pattern
 import Patterns.Function as Function
@@ -50,10 +53,11 @@ class Completer(rlcompleter.Completer):
         matches = []
         n = len(text)
         if(nQuotes%2==1 or isR):
-            nspace = self.parameterDictContainer[0]
+            nspace = copy.copy(self.parameterDictContainer[0])
+            nspace.pop('canvas')
             for word, val in nspace.items():
                 if word[:n] == text:
-                    matches.append(self._arg_postfix(self._callable_postfix(val, word)))
+                    matches.append(word)
             return matches
         else:
             for nspace in [self.namespace]:
@@ -205,6 +209,12 @@ def dataSender(patternContainer, patternInputContainer, host, port):
     frame=0
     previousPattern=patternContainer[0]
 
+    if Config.useAudio:
+        audio = Audio.AudioInfo()
+        patternInput["beat"] = audio.getBeat
+        patternInput["totalBeats"] = audio.getTotalBeats
+        patternInput["bpm"] = audio.getBPM
+
     clientSocket = Client.ClientSocketUDP(host,port)
     timeSleep = 1.0/SEND_RATE
     while patternContainer[0]:
@@ -259,7 +269,9 @@ def dataSender(patternContainer, patternInputContainer, host, port):
                     patternInputContainer[1]=None
                     patternInputContainer[2]=None
                     patternContainer[0]=black
-
+        
+    if Config.useAudio:
+        audio.running=False
 
 
 def importFunctionsFromDict(dictionary):

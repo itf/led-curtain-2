@@ -7,7 +7,7 @@ Getting started with Iron Curtain 2 development.
 ##Quick Start
 
 * Install pygame
-* Install pypy
+* Install pypy (Or download it to the same directory and run it)
 * Run: python LocalDisplay.py 
 * Run: pypy Cli.py
 
@@ -21,6 +21,30 @@ Using images:
 	*  Download pip from [wget] https://bootstrap.pypa.io/get-pip.py 
 	* [sudo]  pypy get-pip.py
 	* [sudo] pypy -m pip install pillow
+Change Images to True in config.py
+
+Using Audio:
+Making the audio work is non-trivial. If you still want to do so, follow the following instructions!
+* Install jack
+	* Instaling jack is hard. That is a fact. So try this step before the others.
+	* To install on windows, read here http://jackaudio.org/faq/jack_on_windows.html	
+	* To install on ubuntu, install jack2 and then pulseaudio-module-jack and reset.
+	* TO install on Mac, good luck.
+* install pyjack on cpython (sudo python -m pip install pyjack /  pip install pyjack / download pyjack and run setup.py
+* install a jack patchbay. I recommend kxstudio Cadence/Claudia  for Ubuntu or Windows
+	* It is easier to simply use a patchbay to redirect output than to do it programatically, when writting crossplatform code
+* Install Numpy. 
+	* pip install numpy should do. Otherwise http://docs.scipy.org/doc/numpy-1.10.1/user/install.html
+* Install aubio  https://aubio.org/download
+* Install python bindings for aubio
+	* Download https://github.com/aubio/aubio/tree/master/python
+	* run [python] setup.py install
+* Change Audio to True in config.py
+
+* Start the audio server. 
+	* Run: AudioServer.py
+* Run your jack patchbay and connect the output from jack sink to the ledaudio node
+* Use 'beat' on your patterns
 
 ##Cli pattern programming language
 
@@ -37,6 +61,8 @@ The only argument that functions take are patterns, with the exception of the fu
 The easiest way to learn how to use the CLI is by examples. Example of patterns on the CLI:
 
 To modify the parameters of the functions use the function arg('')(
+
+To modify the parameters without using arg, write r to set the values of the parameters once, or rr to modify the values continuosly
 
 * red ->  outputs a red pattern
 * rainbownize(red) ->  horizontally HUE shifts red to turn it into a rainbow
@@ -117,7 +143,7 @@ If you want to install the module and run it in python, install it from here: ht
 
 
 ##TODO
-[]Integrate audio
+[x]Integrate audio
 
 []separate functions that are inside patterns to a separate file and organize them
 
@@ -133,7 +159,7 @@ If you want to install the module and run it in python, install it from here: ht
 
 [] split CLI in multiple files
 
-[] Mock audio processing
+[x] Mock audio processing
 
 [x] Implement lazy evaluation for canvas
 
@@ -151,3 +177,9 @@ function -> http://stackoverflow.com/questions/13923091/how-do-you-do-a-python-e
 [] frame update / audio update done outside the ui, so it can be called from isolate
 
 [] add previous pattern to pattern input
+
+[] add code to run on a raspberry pi, communicating with the LED strips
+
+[] create save with arguments and default arguments
+
+[] make it possible to save functions.

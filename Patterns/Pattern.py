@@ -190,18 +190,27 @@ class PatternInput(dict):
     def __init__(self,
                  height,
                  width,
-                 audioData=None,
                  frame=0,
                  params=None,
                  canvas=None,
                  globalBrightness=0.1):
         self['width']=width
         self['height']=height
-        self['audioData']=audioData
         self['frame']=frame
         self['params']=params
         self['canvas']=canvas
         self['globalBrightness']=globalBrightness
         
     def __getitem__(self, key):
-            return dict.__getitem__(self,key)
+        item = dict.__getitem__(self,key)
+        if  hasattr(item, '__call__'):
+            return item()
+        else:
+            return item
+        
+    def __deepcopy__(self,memo):
+        #needed in order to copy the functions properly 
+        newone = copy.copy(self)
+        newone['canvas'] = copy.deepcopy(self['canvas'])
+        return newone
+

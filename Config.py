@@ -1,5 +1,6 @@
 curtain = "local"
 useImages = True
+useAudio = True
 
 if curtain=="old":
     width = 15
@@ -26,3 +27,11 @@ class LocalDisplayConfig:
     port = 5000
     normalize = True
     linearColorProfileCorretion = True
+
+
+class AudioServerConfig:
+    port = 5001
+    host = 'localhost'
+    delay = -0.03
+    alpha = 0.95
+    maxBPS = 6
