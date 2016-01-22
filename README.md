@@ -145,11 +145,11 @@ If you want to install the module and run it in python, install it from here: ht
 ##TODO
 [x]Integrate audio
 
-[]separate functions that are inside patterns to a separate file and organize them
+[x]separate functions that are inside patterns to a separate file and organize them
 
 [x]Write saver and importer
 
-[]Standardize the input to functions
+[x]Standardize the input to functions
 
 [x]Decorator to make functions that take patternInputs and extra parameters  take patterns and extra parameters
 

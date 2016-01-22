@@ -3,7 +3,8 @@ This file defines functions to be used for creating patterns, and
 defines the PatternInput
 
 Patterns are functions that take a PatternInput and return a PatternInput
-The patternInput has a Canvas inside it.
+The patternInput has a Canvas inside it and all the parameters related
+to the pattern.
 
 '''
 
@@ -45,93 +46,6 @@ that returns a canvas into a pattern.
     return builder
 
 
-def intCache(intFunctionCondition):
-    '''
-    Takes a function that returns an int or boolean, and then a function
-    to be cached and returns the cached function
-    The cached function when called will evaluate the intFunction->N and then
-    run the function N times (in case it has side effects),
-    and return the result.
-    If N <1, it will return the previous result and not run the function
-    again.
-
-    Example usage:
-    @intCache(lambda x: x>1)
-    def test(x):
-			return x
-      
-    prints the previous value of x if x<=1
-
-    '''
-    def buildFunctionWithIntCache(function):
-        cache=[None]
-        @wraps(function) #preserves __name__ and __doc__
-        def cachedFunction(*args, **kwargs):
-            if cache[0]!=None:
-                numberOfRuns=intFunctionCondition(*args, **kwargs)
-                for i in xrange(numberOfRuns):
-                    cache[0]=function(*args, **kwargs)
-            else:
-                cache[0]=function(*args, **kwargs)
-            return cache[0]
-        return cachedFunction
-    return buildFunctionWithIntCache
-
-@F.function("updateRate")
-def timedPattern(frameRate=30):
-    '''
-    Caches the output and updates it with the specified frameRate
-    timedPattern(frameRate)(pattern)->pattern
-    '''
-
-    '''
-    Returns a pattern that will only be called on the determined frameRate
-    Example usage:
-
-    @timedPattern(30)
-    def test(x):
-	return x
-
-    for i in xrange(1000):
-	test(i)
-
-    Will print 0 untill 1/30 of a second has passed
-    and then will print the value of i right after 1/30 of a second.
-    '''
-    PREVIOUS_TIME = [None]
-    miliseconds=1000
-    def timeFrames(patternInput):
-        rate=frameRate
-        if patternInput.has_key('frameRate'):
-            rate=patternInput['frameRate']
-        thisTime=time.time()*miliseconds
-        if(PREVIOUS_TIME[0]!=None):
-            frames = int((thisTime - PREVIOUS_TIME[0])/miliseconds*rate)
-            if(frames>0):
-                PREVIOUS_TIME[0]=thisTime
-        else:
-            frames=0
-            PREVIOUS_TIME[0]=time.time()*miliseconds
-        return frames
-    return lambda function:intCache(timeFrames)(function)
-
-
-@F.function("frameRate")
-def frameRate(rate=30):
-    '''
-    Changes the frame of the patternInput at the specified rate
-    '''
-    miliseconds=1000
-    START_TIME = time.time()*miliseconds
-    @F.rFunctionize
-    def frameRated(patternInput):
-        fRate=rate
-        if patternInput.has_key('frameRate'):
-            fRate=patternInput['frameRate']
-        thisTime = time.time()*miliseconds
-        patternInput['frame']= int((thisTime - START_TIME)/miliseconds*fRate)
-        return patternInput
-    return frameRated
 
 def framePattern(intFunction = lambda patternInput:patternInput["frame"]):
     '''

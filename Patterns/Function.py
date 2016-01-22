@@ -185,6 +185,7 @@ def step(pattern0, pattern1):
 End of meta functions
 '''
 
+
 @function('isolate')
 def isolate(pattern):
     '''
@@ -388,7 +389,8 @@ def hsvShifter(rgb,amount):
     h +=amount
     return colorsys.hsv_to_rgb(h,s,v)
 
-@function('timeChanger')
+
+@function('timeChangerArrays')
 def timechange(patternnArray, timeArray):
     totalTime = sum(timeArray)
     startTime=getCurrentTime()
@@ -407,7 +409,23 @@ def timechange(patternnArray, timeArray):
         return lambda x: x #Should never happen
     return timeChangedPattern
 
+
+@function('timeChanger')
+@defaultArguments(timeChangerTime =6)
+def timechanger(*patterns):
+    startTime=getCurrentTime()
+    lenPat = len(patterns)
+    frameContainer=[0]
+    previousIndexContainer=[0]
+    def timeChangedPattern(patternInput):
+        timeTransition=patternInput["timeChangerTime"]
+        timeElapsed=(getCurrentTime()-startTime)
+        totalTime = lenPat*timeTransition
+        timeElapsed%=totalTime
+        index = int(timeElapsed/timeTransition)
+        return patterns[index](patternInput)
         
+    return timeChangedPattern
 
 import time
 def getCurrentTime():
@@ -548,3 +566,98 @@ def gameOfGeneration(patternInput):
     canvas.mapFunction(gamerOfGeneration)
     patternInput['canvas']=canvas
     return patternInput
+
+
+
+@function("frameRate")
+@defaultArguments(frameRate=30)
+def frameRate(pattern):
+    '''
+    Changes the frame of the patternInput at the specified rate
+    '''
+    miliseconds=1000
+    START_TIME = time.time()*miliseconds
+    def frameRated(patternInput):
+        fRate=patternInput['frameRate']
+        thisTime = time.time()*miliseconds
+        patternInput['frame']= int((thisTime - START_TIME)/miliseconds*fRate)
+        return pattern(patternInput)
+    return frameRated
+
+
+#############
+#Code that needs to be made more clear
+
+
+def intCache(intFunctionCondition):
+    '''
+    Takes a function that returns an int or boolean, and then a function
+    to be cached and returns the cached function
+    The cached function when called will evaluate the intFunction->N and then
+    run the function N times (in case it has side effects),
+    and return the result.
+    If N <1, it will return the previous result and not run the function
+    again.
+
+    Example usage:
+    @intCache(lambda x: x>1)
+    def test(x):
+			return x
+      
+    prints the previous value of x if x<=1
+
+    '''
+    def buildFunctionWithIntCache(function):
+        cache=[None]
+        @wraps(function) #preserves __name__ and __doc__
+        def cachedFunction(*args, **kwargs):
+            if cache[0]!=None:
+                numberOfRuns=intFunctionCondition(*args, **kwargs)
+                for i in xrange(numberOfRuns):
+                    cache[0]=function(*args, **kwargs)
+            else:
+                cache[0]=function(*args, **kwargs)
+            return cache[0]
+        return cachedFunction
+    return buildFunctionWithIntCache
+
+@function("updateRate")
+@defaultArguments(updateRate=30)
+def timedPattern(pattern):
+    '''
+    Caches the output and updates it with the specified frameRate
+    timedPattern(frameRate)(pattern)->pattern
+    '''
+
+    '''
+    Returns a pattern that will only be called on the determined frameRate
+    Example usage:
+
+    @timedPattern(30)
+    def test(x):
+	return x
+
+    for i in xrange(1000):
+	test(i)
+
+    Will print 0 untill 1/30 of a second has passed
+    and then will print the value of i right after 1/30 of a second.
+    '''
+    PREVIOUS_TIME = [None]
+    miliseconds=1000
+    def timeFrames(patternInput):
+        rate=patternInput['updateRate']
+        thisTime=time.time()*miliseconds
+        if(PREVIOUS_TIME[0]!=None):
+            frames = int((thisTime - PREVIOUS_TIME[0])/miliseconds*rate)
+            if(frames>0):
+                PREVIOUS_TIME[0]=thisTime
+        else:
+            frames=0
+            PREVIOUS_TIME[0]=time.time()*miliseconds
+        return frames
+    return intCache(timeFrames)(pattern)
+
+
+#End of code that needs to be made more clear
+#############
