@@ -1,3 +1,6 @@
+'''
+Copied and modified from Miles (mlsteele) https://github.com/mlsteele/curtain/blob/master/letters.py
+'''
 pixel_lists = {
     'A': [(1, 0), (0, 1), (0, 2), (0, 3), (0, 4), (2, 1), (2, 2), (2, 3), (2, 4), (1, 2)],
     'B': [(0, 0), (1, 0), (0, 1), (2, 1), (0, 2), (1, 2), (0, 3), (2, 3), (0, 4), (1, 4)],
