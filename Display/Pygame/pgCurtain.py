@@ -1,3 +1,10 @@
+'''
+Credits,  
+@mlsteele
+@seveneightn9ne 
+@igutekunst 
+Source: https://github.com/mlsteele/curtain/blob/master/pygame_curtain.py
+'''
 import pygame
 import sys
 import math
