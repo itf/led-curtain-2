@@ -417,13 +417,30 @@ def timechanger(*patterns):
     lenPat = len(patterns)
     frameContainer=[0]
     previousIndexContainer=[0]
+    numberOfCyclesContainer=[0]
     def timeChangedPattern(patternInput):
         timeTransition=patternInput["timeChangerTime"]
         timeElapsed=(getCurrentTime()-startTime)
         totalTime = lenPat*timeTransition
+        numberOfCycles = int(timeElapsed/totalTime)
+        if not numberOfCyclesContainer[0] == numberOfCycles:
+            #If just completed a full cycle, reset frame
+            #Useful if there is only one pattern in the timeChaner
+            #And this pattern uses the frame count
+            
+            numberOfCyclesContainer[0]=numberOfCycles
+            frameContainer[0]=0
+            
         timeElapsed%=totalTime
         index = int(timeElapsed/timeTransition)
-        return patterns[index](patternInput)
+
+        if not previousIndexContainer[0] == index:
+            previousIndexContainer[0]=index
+            frameContainer[0]=0
+        thisPatternInput = copy.copy(patternInput)
+        thisPatternInput['frame']=frameContainer[0]
+        frameContainer[0]+=1
+        return patterns[index](thisPatternInput)
         
     return timeChangedPattern
 

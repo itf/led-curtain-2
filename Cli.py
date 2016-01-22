@@ -17,6 +17,7 @@ import Transportation.Sockets.ClientSocketUDP as Client
 import Patterns.Pattern as Pattern
 import Patterns.Function as Function
 import SavedPatterns
+import SavedFunctions
 
 
 import Patterns.StaticPatterns.basicPatterns as basicPattern
@@ -92,11 +93,24 @@ def safeSavePattern(name, code):
     realCode=savePattern(name, 'isolateCanvas('+code+')')
     return realCode
 
+def saveFunction(name,code):
+    realFunctionCode = \
+                     '@Function.function(\'' + name + '\')\n'\
+                     'def '+ name + '(pattern):'\
+                     '  return '+ code
+    exec realFunctionCode in globals(), globals()
+    with open("SavedFunctions.py", "a") as savedFunctions:
+        savedFunctions.write(realFunctionCode)
+        savedFunctions.close()
+    return realFunctionCode
+
+
 def runCliCurtain(argv):
     print 
     print "CLI to combine patterns"
     print "Press TAB for completion and suggestions"
     print "If running in Python press CTRL+A for all commands"
+    print 'Write pattern code, parameter(r), recurrentParameter(rr), List (l), Save (s) or Safe Save (ss)'
     print 
     
     dictAll={}
@@ -138,7 +152,7 @@ def runCliCurtain(argv):
     completer.setParameterDictContainer(patternInputContainer)
     while(patternContainer[0]):
         try:
-            instruction = raw_input('Write pattern code, parameter(r), recurrentParameter(rr), List (l), Save (s) or Safe Save (ss)\n')
+            instruction = raw_input('Pattern code, parameter(r), recurrentParameter(rr), List (l), \nSave (s), Safe Save (ss), Save W/ args (srr), saveFunction (sf)\n')
             readline.write_history_file('./.history')
 
             try:
@@ -173,18 +187,36 @@ def runCliCurtain(argv):
                         metaFuncDict=Function.getMetaFunctionDict()
                         for function in metaFuncDict.keys():
                             print str(function) +" " + str(metaFuncDict[function].func_doc)
-                    elif instruction =="s" or instruction =="ss":
+                    elif instruction =="s" or instruction =="ss" \
+                         or instruction == "srr":
                         name = raw_input('Name for previous pattern:\n')
-                        if instruction=="s":
-                            exec savePattern(name,patternString)
-                            globals()[name] = patternContainer[0]
-                            dictAll[name]=globals()[name]
-                            
-                        else:
-                            exec safeSavePattern(name,patternString)
-                            globals()[name] = isolateCanvas(patternContainer[0])
-                            dictAll[name]=globals()[name]
-                        
+                        if name:
+                            if instruction=="s":
+                                exec savePattern(name,patternString)
+                                globals()[name] = patternContainer[0]
+                                dictAll[name]=globals()[name]
+                                
+                            elif instruction=="ss":
+                                exec safeSavePattern(name,patternString)
+                                globals()[name] = isolateCanvas(patternContainer[0])
+                                dictAll[name]=globals()[name]
+                                
+                            elif instruction=="srr":
+                                newPatternString = "arg('''"+\
+                                                   patternInputContainer[2] +\
+                                                   " ''')("+\
+                                                   patternString+\
+                                                   ")"
+                                exec savePattern(name,newPatternString)
+                                globals()[name] = eval(newPatternString)
+                                dictAll[name]=globals()[name]
+                    elif instruction =="sf":
+                        func = raw_input('Write Function. Use "pattern" as the input:\n')
+                        name = raw_input('Name for function:\n')
+                        if name:
+                            if saveFunction(name,func):
+                                dictAll[name]=globals()[name]
+                                                        
                     else:
                             function = eval(instruction)
                             patternString=instruction

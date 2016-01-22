@@ -44,7 +44,7 @@ Making the audio work is non-trivial. If you still want to do so, follow the fol
 * Start the audio server. 
 	* Run: AudioServer.py
 * Run your jack patchbay and connect the output from jack sink to the ledaudio node
-* Use 'beat' on your patterns
+* Use 'beat' or 'totalBeats' on your patterns
 
 ##Cli pattern programming language
 
@@ -176,10 +176,12 @@ function -> http://stackoverflow.com/questions/13923091/how-do-you-do-a-python-e
 
 [] frame update / audio update done outside the ui, so it can be called from isolate
 
-[] add previous pattern to pattern input
+[] add previous pattern to pattern input to implement nice transitions
 
 [] add code to run on a raspberry pi, communicating with the LED strips
 
-[] create save with arguments and default arguments
+[x] create save with arguments
 
-[] make it possible to save functions.
+[] create save with  default arguments
+
+[x] make it possible to save functions.

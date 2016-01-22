@@ -45,3 +45,4 @@ _nyanCat = Pattern.pattern('_nyanCat')(arg('imageName="nyanCatLarge" ')(image))
 _crazyNyanPacman = Pattern.pattern('_crazyNyanPacman')(arg('imageHeight=imageWidth=0.5; xTranslate=-frame/30.; yTranslate=sin(frame/30.) ')(translate(addP(_nyanCat, arg('xTranslate=0.5')(translate(_nyanCat)), arg('yTranslate=0.5')(translate(_nyanCat)), arg('xTranslate=-yTranslate ')(translate(image)), arg('yTranslate=-xTranslate ')(translate(image))))))
 
 _beatCircleRainbow = Pattern.pattern('_beatCircleRainbow')(arg('cRadius=(1-beat)*2;hue=totalBeats%4/4.;weightedMeanWeight=0.25')(hueShift(mask(circle, blue,weightedMean2P(rainbow,black)))))
+_beat4Rainbow = Pattern.pattern('_beat4Rainbow')(arg('''hue=totalBeats%4/4. ''')(hueShift(constant(rainbow))))
