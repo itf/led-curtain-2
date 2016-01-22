@@ -33,7 +33,7 @@ class AudioInfo:
         self.beatsPerSecond = 140./60
 
 
-        #self.lock = threading.RLock()
+        self.lock = threading.RLock()
         threadListener= threading.Thread(target=self._listenerFunction,
                                    args= ())
         threadListener.start()
@@ -53,7 +53,7 @@ class AudioInfo:
     
     
     def _tap(self):
-        #self.lock.acquire()
+        self.lock.acquire()
         if DEBUG:
             print "beat"
             print self.beatsPerSecond
@@ -64,35 +64,57 @@ class AudioInfo:
             self.beatsPerSecond = self.beatsPerSecond*alpha+beatsPerSecond*(1-alpha)
             self.previousBeatTime = now
             self.totalBeats+=1
-        #self.lock.release()
+        self.lock.release()
 
-    def getBeat(self):
+    def getBeat(self, update=True):
         self.curTime = time.time()
         currentBeat = self._getCurrentBeat(self.curTime, self.delay)
 
         if currentBeat>self.previousBeat or (self.previousBeat>0.5 and currentBeat<self.previousBeat-0.5):
-            self.previousBeat = currentBeat%1
+            pass
         else:
-            currentBeat=self.previousBeat
+            expectedPrevious= self._getCurrentBeat(self.previousTime)
+            change = (currentBeat-expectedPrevious)
+            newCurrent = change/2 + self.previousBeat
+            if newCurrent > self.previousBeat:
+                currentBeat=newCurrent
+            else:
+                currentBeat=self.previousBeat
 
         self.previousTime = self.curTime
-        return currentBeat%1
+        self.previousBeat = currentBeat%1
+        return self.previousBeat
 
     def getTotalBeats(self):
+        self.lock.acquire()
         self.curTime = time.time()
         totalBeats= self._getCurrentBeat(self.curTime)+self.totalBeats
         if totalBeats > self._previousTotalBeats:
             self._previousTotalBeats = totalBeats
-            return totalBeats
         else:
-            beats = self._previousTotalBeats = totalBeats
-            self._previousTotalBeats = totalBeats # if there is a problem it will last only for one frame
-            return self._previousTotalBeats
+            #this means that beat detection is working and therefore self._getCurrentBeat<1
+            if self.totalBeats<int(self._previousTotalBeats)-2:
+                self.lock.acquire()
+                self.totalBeats = int(self._previousTotalBeats)
+                self.lock.release()
+
+            currentBeat = self._getCurrentBeat(self.curTime, self.delay)
+            expectedPrevious= self._getCurrentBeat(self.previousTime)
+            change = (currentBeat-expectedPrevious)
+            newCurrent = change/2 + self.previousBeat+self.totalBeats
+            if newCurrent > self._previousTotalBeats:
+                totalBeats=newCurrent
+            else:
+                totalBeats=self._previousTotalBeats
+            self.previousTime = self.curTime
+            self._previousTotalBeats = totalBeats
+        self.lock.release()
+        return self._previousTotalBeats
     def getBPM(self):
         return self.beatsPerSecond*60
                 
     def _getCurrentBeat(self, currentTime, delay=0):
-        #self.lock.acquire()
+        self.lock.acquire()
         result = (currentTime - self.previousBeatTime-delay) * self.beatsPerSecond
-        #self.lock.release()
+        self.lock.release()
         return result
