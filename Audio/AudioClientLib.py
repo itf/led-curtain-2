@@ -73,9 +73,9 @@ class AudioInfo:
         if currentBeat>self.previousBeat or (self.previousBeat>0.5 and currentBeat<self.previousBeat-0.5):
             pass
         else:
-            expectedPrevious= self._getCurrentBeat(self.previousTime)
+            expectedPrevious= self._getCurrentBeat(self.previousTime, self.delay)
             change = (currentBeat-expectedPrevious)
-            newCurrent = change/2 + self.previousBeat
+            newCurrent = change/4 + self.previousBeat
             if newCurrent > self.previousBeat:
                 currentBeat=newCurrent
             else:
@@ -99,9 +99,9 @@ class AudioInfo:
                 self.lock.release()
 
             currentBeat = self._getCurrentBeat(self.curTime, self.delay)
-            expectedPrevious= self._getCurrentBeat(self.previousTime)
-            change = (currentBeat-expectedPrevious)
-            newCurrent = change/2 + self.previousBeat+self.totalBeats
+            expectedPrevious= self._getCurrentBeat(self.previousTime, self.delay)
+            change = (currentBeat-expectedPrevious)%1
+            newCurrent = change/4 + self.previousBeat+self.totalBeats
             if newCurrent > self._previousTotalBeats:
                 totalBeats=newCurrent
             else:
