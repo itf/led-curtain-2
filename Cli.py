@@ -93,15 +93,20 @@ def safeSavePattern(name, code):
     realCode=savePattern(name, 'isolateCanvas('+code+')')
     return realCode
 
-def saveFunction(name,code):
+def saveFunction(name,code, patternInput):
     realFunctionCode = \
                      '@Function.function(\'' + name + '\')\n'\
                      'def '+ name + '(pattern):'\
                      '  return '+ code
     exec realFunctionCode in globals(), globals()
-    with open("SavedFunctions.py", "a") as savedFunctions:
-        savedFunctions.write(realFunctionCode)
-        savedFunctions.close()
+    try:
+        testPatternInput = copy.deepcopy(patternInput)
+        globals()[name](trivial)(testPatternInput)
+        with open("SavedFunctions.py", "a") as savedFunctions:
+            savedFunctions.write(realFunctionCode)
+            savedFunctions.close()
+    except:
+        traceback.print_exc(file=sys.stdout)
     return realFunctionCode
 
 
@@ -214,7 +219,7 @@ def runCliCurtain(argv):
                         func = raw_input('Write Function. Use "pattern" as the input:\n')
                         name = raw_input('Name for function:\n')
                         if name:
-                            if saveFunction(name,func):
+                            if saveFunction(name,func, patternInputContainer[0]):
                                 dictAll[name]=globals()[name]
                                                         
                     else:

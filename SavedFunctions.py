@@ -17,3 +17,5 @@ importFunctionsFromDict(Function.getMetaFunctionDict())
 
 @Function.function('__hueShift4Beat')
 def __hueShift4Beat(pattern):  return arg('hue=totalBeats%4/4.')(hueShift(pattern))
+@Function.function('__gameOfLiferizer')
+def __gameOfLiferizer(pattern):  return step(pattern, gameOfLife(trivial))
