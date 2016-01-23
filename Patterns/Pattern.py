@@ -111,7 +111,6 @@ class PatternInput(dict):
         self['width']=width
         self['height']=height
         self['frame']=frame
-        self['params']=params
         self['canvas']=canvas
         self['globalBrightness']=globalBrightness
         

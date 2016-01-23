@@ -4,3 +4,6 @@ class DisplayInterface:
 
     def sendColorArray(self,colorArray):
         raise Exception("Not Implemented")
+
+    def sendCanvas(self,canvas):
+        raise Exception("Not Implemented")

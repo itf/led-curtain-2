@@ -47,6 +47,6 @@ _crazyNyanPacman = Pattern.pattern('_crazyNyanPacman')(arg('imageHeight=imageWid
 _beatCircleRainbow = Pattern.pattern('_beatCircleRainbow')(arg('cRadius=(1-beat)*2;hue=totalBeats%4/4.;weightedMeanWeight=0.25')(hueShift(mask(circle, blue,weightedMean2P(rainbow,black)))))
 _beat4Rainbow = Pattern.pattern('_beat4Rainbow')(arg('''hue=totalBeats%4/4. ''')(hueShift(constant(rainbow))))
 _blueExplosion = Pattern.pattern('_blueExplosion')(arg('''gradientPos=-frame/30. ''')(radialHueGradient))
-_beatBlueGradient = Pattern.pattern('_beatBlueGradient')(arg('''gradientPos=-beat; gradientColor0=0x0a000F; gradientColor1=0x0ffff ''')(radialHueGradient))
+_beatBlueGradient = Pattern.pattern('_beatBlueGradient')(arg('''radialGradientPos=-beat; radialGradientColor0=0x0a000F; radialGradientColor1=0x0ffff ''')(radialHueGradient))
 _gameOfLife = Pattern.pattern('_gameOfLife')(isolateCanvas(step(random, gameOfLife(trivial))))
 _gameOfGenerations = Pattern.pattern('_gameOfGenerations')(isolateCanvas(step(random,gameOfGeneration(trivial))))
