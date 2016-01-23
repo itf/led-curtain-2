@@ -145,7 +145,7 @@ def runCliCurtain(argv):
     height = int(height)
     width = int(width)
     port = int(port)
-    patternContainer=[basicPattern.randomPattern, None]
+    patternContainer=[basicPattern.randomPattern, None,None]
     patternString="random"
     patternInput = Pattern.PatternInput(height=height, width = width)
     patternInputContainer=[patternInput, None, None]
@@ -228,6 +228,8 @@ def runCliCurtain(argv):
                             patternString=instruction
                             patternContainer[1]=patternContainer[0]
                             patternContainer[0]=function
+                            patternContainer[2]="resetFrame"
+
             except:
                 traceback.print_exc(file=sys.stdout)
 
@@ -277,8 +279,12 @@ def dataSender(patternContainer, patternInputContainer, host, port):
                 if(pattern!=previousPattern):
                     frame=0
                     previousPattern=pattern
+                    patternContainer[2]==None
                 else:
                     frame = frame+1
+                if patternContainer[2]== "resetFrame":
+                    frame=0
+                    patternContainer[2]=None
                 patternInput["frame"]=frame
                 newPatternInput=pattern(patternInput)
                 canvas=copy.deepcopy(newPatternInput["canvas"])
