@@ -97,7 +97,8 @@ def saveFunction(name,code, patternInput):
     realFunctionCode = \
                      '@Function.function(\'' + name + '\')\n'\
                      'def '+ name + '(pattern):'\
-                     '  return '+ code
+                     '  return '+ code\
+                     +'\n'
     exec realFunctionCode in globals(), globals()
     try:
         testPatternInput = copy.deepcopy(patternInput)

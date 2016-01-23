@@ -245,6 +245,23 @@ def movingHue(patternInput):
     canvas.mapFunction(shifter)
     return patternInput
 
+@function('colorize')
+@defaultArguments(colorizeHue=1, colorizeAmount=0.5)
+@functionize
+def colorizeHue(patternInput):
+    colorizeHue=patternInput["colorizeHue"]
+    colorizeAmount=patternInput["colorizeAmount"]
+    def colorizer(rgb,y,x):
+        h,s,v = colorsys.rgb_to_hsv(*rgb)
+        difference = colorizeHue-h
+        if difference  > abs(colorizeHue-h-1):
+            difference = (colorizeHue-h-1)%1
+        h=colorizeAmount*difference + h
+        return colorsys.hsv_to_rgb(h,s,v)
+    canvas=patternInput["canvas"]
+    canvas.mapFunction(colorizer)
+    return patternInput
+
 @function('rainbownize')
 @defaultArguments(nRainbows=1)
 @functionize
@@ -593,12 +610,16 @@ def frameRate(pattern):
     Changes the frame of the patternInput at the specified rate
     '''
     miliseconds=1000
-    START_TIME = time.time()*miliseconds
+    previousTimeContainer = [time.time()*miliseconds]
+    previousFrameContainer = [0]
     def frameRated(patternInput):
         fRate=patternInput['frameRate']
         thisTime = time.time()*miliseconds
-        patternInput['frame']= int((thisTime - START_TIME)/miliseconds*fRate)
-        return pattern(patternInput)
+        newPatternInput = copy.copy(patternInput)
+        previousFrameContainer[0]+= (thisTime - previousTimeContainer[0])/miliseconds*fRate
+        newPatternInput['frame']=int(previousFrameContainer[0])
+        previousTimeContainer[0]=thisTime
+        return pattern(newPatternInput)
     return frameRated
 
 
