@@ -155,7 +155,7 @@ If you want to install the module and run it in python, install it from here: ht
 
 [] list function list the name of the input variables to functions.
 
-[] Find a way to make it clear that certain functions take arguments
+[NOT] Find a way to make it clear that certain functions take arguments
 
 [] split CLI in multiple files
 
@@ -174,7 +174,9 @@ function -> http://stackoverflow.com/questions/13923091/how-do-you-do-a-python-e
 
 [x] implement Isolate in a better way
 
-[] frame update / audio update done outside the ui, so it can be called from isolate
+[] frame update done outside the UI, so it can be called from isolate
+
+[x]  audio update done outside the ui
 
 [] add previous pattern to pattern input to implement nice transitions
 

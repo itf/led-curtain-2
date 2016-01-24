@@ -130,7 +130,7 @@ def radialHueGradient(PatternInput):
     cRadius=PatternInput['radialGradientRadius']
     cRadius = round(cRadius * min(mWidth, mHeight))
     epsilon=0.001
-    cRadius=max(length,epsilon)
+    cRadius=max(cRadius,epsilon)
     sCRadius=cRadius**2
 
     gradientColor0 = PatternInput["radialGradientColor0"]
