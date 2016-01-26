@@ -187,3 +187,5 @@ function -> http://stackoverflow.com/questions/13923091/how-do-you-do-a-python-e
 [] create save with  default arguments
 
 [x] make it possible to save functions.
+
+[] Abstract the cli file to allow the creatipn of other UIs

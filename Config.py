@@ -35,3 +35,10 @@ class AudioServerConfig:
     delay = -0.03
     alpha = 0.95
     maxBPS = 6
+
+class PiDisplayConfig:
+    width = 60
+    height = 30
+    port = 5000
+    host = ''
+
