@@ -56,7 +56,7 @@ Pressing  <b>TAB</b>  inside args will suggest args for your pattern
 
 <b>Always press TAB</b>  to autocomplete your patterns and get suggestion for parameters.
 
-The only argument that functions take are patterns, with the exception of the function args  (and, until the moment, function UpdateRate, FrameRate and TimeChanger, which are still being adapted to the new syntax)
+The only argument that functions take are patterns, with the exception of the function args  (and, until the moment, function TimeChanger array, which are still being adapted to the new syntax)
 
 The easiest way to learn how to use the CLI is by examples. Example of patterns on the CLI:
 
@@ -103,6 +103,14 @@ To modify the parameters without using arg, write r to set the values of the par
 
 * s -> saves the pattern
 * ss ->safe saves the pattern, i.e. saves the pattern with an isolate canvas. Useful if the pattern makes use of trivial.
+* srr-> saves with the rr arguments you were using.
+
+Audio example:
+
+* hueShift(circle
+* rr cRadius=beat; hue = int(totalblBeats%4)/4.
+* see
+* name of this pattern
 
 ##Debian Install
 * For fake display.
@@ -189,3 +197,5 @@ function -> http://stackoverflow.com/questions/13923091/how-do-you-do-a-python-e
 [x] make it possible to save functions.
 
 [] Abstract the cli file to allow the creatipn of other UIs
+
+
