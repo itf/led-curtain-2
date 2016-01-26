@@ -699,3 +699,65 @@ def timedPattern(pattern):
 
 #End of code that needs to be made more clear
 #############
+
+
+####################
+#Start of transitions, i.e. functions that use the previousPattern
+
+import Config
+import random
+TransitionMask = Config.Canvas
+
+
+@function('transitionRandom')
+@defaultArguments(transitionRandomPixels=10)
+def transitionRandom(pattern):
+    transitionMaskContainer = [None]
+    randomGenerator=[None]
+    doneContainer=[False]
+    previousPatternContainer=[None]
+    def transitioner(patternInput):
+        height = patternInput['height']
+        width = patternInput['width']
+        transitionRandomPixels = patternInput['transitionRandomPixels']
+        done = doneContainer[0]
+        if previousPatternContainer[0]==None:
+            previousPattern = patternInput['previousPattern']
+            previousPatternContainer[0]=previousPattern
+        previousPattern = previousPatternContainer[0]
+        if not done:
+            if previousPattern:
+                if transitionMaskContainer[0]==None:
+                    transitionMaskContainer[0]= TransitionMask(height=height, width=width)
+                if randomGenerator[0]==None:
+                    heightR = range(height)
+                    widthR = range(width)
+                    coordinates= [(x,y) for y in heightR for x in widthR]
+                    random.shuffle(coordinates)
+                    generator = (x for x in coordinates)
+                    randomGenerator[0]=generator
+                try:
+                    generator=randomGenerator[0]
+                    transitionMask=transitionMaskContainer[0]
+                    for i in xrange(transitionRandomPixels):
+                        x,y = generator.next()
+                        transitionMask[y,x] = (1,0,0)
+                    transitionInput = copy.copy(patternInput)
+                    transitionInput['canvas'] = transitionMask
+                    transitionPattern = lambda *args:transitionInput
+                    return masker(transitionPattern, pattern, previousPattern)(patternInput)
+                except:
+                    done=True
+                    doneContainer[0]=done
+                    #Frees memory
+                    transitionMaskContainer[0] = None
+                    randomGenerator[0] = None
+                    previousPatternContainer[0]= None 
+                    return pattern(patternInput)
+            else:
+                done=True
+                doneContainer[0]=done
+                return pattern(patternInput)
+        else:
+            return pattern(patternInput)
+    return transitioner

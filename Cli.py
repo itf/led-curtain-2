@@ -25,7 +25,7 @@ import Patterns.ExtraPatterns.SimpleText
 import Patterns.ExtraPatterns.Image
 
 
-from ScreenCanvasArray import Canvas
+Canvas = Config.Canvas
 
 """
 Usage Cli <height> <width> <host> <port>
@@ -277,14 +277,18 @@ def dataSender(patternContainer, patternInputContainer, host, port):
 
                 pattern=patternContainer[0]
                 if(pattern!=previousPattern):
+                    patternInput['previousPattern'] = Function.isolate(previousPattern)
+                    patternInput['previousPattern'](patternInput)
                     frame=0
                     previousPattern=pattern
-                    patternContainer[2]==None
-                else:
-                    frame = frame+1
-                if patternContainer[2]== "resetFrame":
+                    patternContainer[2]=None
+                elif patternContainer[2]== "resetFrame":
+                    patternInput['previousPattern'] = Function.isolate(previousPattern)
+                    patternInput['previousPattern'](patternInput)
                     frame=0
                     patternContainer[2]=None
+                else:
+                    frame = frame+1
                 patternInput["frame"]=frame
                 newPatternInput=pattern(patternInput)
                 canvas=copy.deepcopy(newPatternInput["canvas"])

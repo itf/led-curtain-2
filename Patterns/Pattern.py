@@ -107,16 +107,20 @@ class PatternInput(dict):
                  frame=0,
                  params=None,
                  canvas=None,
-                 globalBrightness=0.1):
+                 globalBrightness=0.1,
+                 previousPattern=None):
         self['width']=width
         self['height']=height
         self['frame']=frame
         self['canvas']=canvas
+        self['previousPattern']=previousPattern
         self['globalBrightness']=globalBrightness
         
     def __getitem__(self, key):
         item = dict.__getitem__(self,key)
-        if  hasattr(item, '__call__'):
+        if key == 'previousPattern':
+            return item
+        elif  hasattr(item, '__call__'):
             return item()
         else:
             return item

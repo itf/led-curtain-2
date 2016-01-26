@@ -1,6 +1,8 @@
 curtain = "local"
 useImages = True
 useAudio = True
+import ScreenCanvasArray 
+Canvas = ScreenCanvasArray.Canvas
 
 if curtain=="old":
     width = 15
