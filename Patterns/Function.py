@@ -106,11 +106,12 @@ def defaultArguments(**kwargs):
     def metaFunction(function):
         def functionOfPatterns(*patterns):
             def runOnceApplyDefaultArguments(patternInput):
-                if any([not patternInput.has_key(key) for key in kwargs.keys()]):
-                    patternInput.update(kwargs)
-                    return patternInput
-                else:
-                    return patternInput
+                for key in kwargs.keys():
+                    if not patternInput.has_key(key):
+                        patternInput[key]=kwargs[key]
+                    else:
+                        pass
+                return patternInput
             return compose(function(*patterns),runOnceApplyDefaultArguments)
         return functionOfPatterns
     return metaFunction
@@ -185,7 +186,7 @@ def step(pattern0, pattern1):
 End of meta functions
 '''
 
-
+#Isolate shouldn't change the parameters of the input, only the canvas??
 @function('isolate')
 def isolate(pattern):
     '''
@@ -199,7 +200,10 @@ def isolate(pattern):
             previousInput[0] = copy.deepcopy(patternInput)
         else:
             previousInput[0]['frame']+=1
-        return copy.deepcopy(pattern(previousInput[0]))
+        previousInput[0]=pattern(previousInput[0])
+        canvas = copy.deepcopy(previousInput[0]['canvas'])
+        patternInput['canvas']=canvas
+        return patternInput
     return isolated
 
 @function('isolateCanvas')
@@ -378,6 +382,7 @@ def arg(strInstructionToEval):
             except:
                 newPatternInput=pattern(patternInput)
                 execInPattern(strInstructionToEval, newPatternInput)
+                newPatternInput=pattern(newPatternInput)
             newPatternInput.update(oldPatternInput)
             return newPatternInput
         return updateArg
@@ -446,12 +451,14 @@ def timechanger(*patterns):
             #And this pattern uses the frame count
             
             numberOfCyclesContainer[0]=numberOfCycles
-            frameContainer[0]=0
+            previousIndexContainer[0]=-1
             
         timeElapsed%=totalTime
         index = int(timeElapsed/timeTransition)
 
         if not previousIndexContainer[0] == index:
+            patternInput["previousPattern"] = patterns[previousIndexContainer[0]]
+            patternInput["previousFrame"] = frameContainer[0]
             previousIndexContainer[0]=index
             frameContainer[0]=0
         thisPatternInput = copy.copy(patternInput)
@@ -708,6 +715,133 @@ import Config
 import random
 TransitionMask = Config.Canvas
 
+def transitionAbstract(transitionFunction, init, isDone):
+    def transitionPattern(pattern):
+        doneContainer=[False]
+        previousPatternContainer=[None]
+        recursionLock = [0]
+        transitionPatternContainer=[None]
+        transitionDict={}
+        def transitioner(patternInput):
+            if recursionLock[0] >= 2:
+                return pattern(patternInput)
+            recursionLock[0]+=1
+            frame =  patternInput['frame']
+            if frame ==0 :
+                doneContainer[0] = False
+                previousPatternContainer[0]= None
+                transitionPatternContainer[0]=None
+                transitionDict.clear()
+            done = doneContainer[0]
+            if not done:
+                transition = transitionPatternContainer[0]
+                if transition == None:
+                    transitionPatternContainer[0] = transitionFunction
+                    transition = transitionPatternContainer[0]
+                    init(transitionDict)
+                if previousPatternContainer[0]==None:
+                    previousPattern = isolate(patternInput['previousPattern'])
+                    oldPatternInputInitializer = copy.copy(patternInput)
+                    oldPatternInputInitializer['frame']=oldPatternInputInitializer['previousFrame']
+                    try:
+                        previousPattern(oldPatternInputInitializer)
+                        previousPatternContainer[0]=previousPattern
+                    except:
+                        pass
+                previousPattern = previousPatternContainer[0]
+                if previousPattern:
+                    if not isDone(transitionDict):
+                        newPatternInput = transitionFunction(previousPattern, pattern, patternInput, transitionDict)
+                    else:
+                        done=True
+                        doneContainer[0]=done
+                        previousPatternContainer[0]=None
+                        newPatternInput= pattern(patternInput)
+                else:
+                    done=True
+                    doneContainer[0]=done
+                    newPatternInput= pattern(patternInput)
+            else:
+                newPatternInput= pattern(patternInput)
+            recursionLock[0]-=1
+            return newPatternInput
+        return transitioner
+    return transitionPattern
+
+def transitionFadeFunction(previousPattern, pattern, patternInput, transitionDict):
+    transitionStep = patternInput['transitionFadeStep']
+    if transitionDict['weight']==None:
+        transitionDict['weight']= 0
+    weight = transitionDict['weight']
+    if weight <1:
+        weight += transitionStep
+        transitionDict['weight'] = weight
+        oldWeight=None
+        try:
+            oldWeight = patternInput['weightedMeanWeight']
+        except:
+            pass
+        patternInput['weightedMeanWeight']=weight
+        newPatternInput = weightedMeanP(pattern, previousPattern)(patternInput)
+        if oldWeight!=None:
+            newPatternInput['weightedMeanWeight']=oldWeight
+        else:
+            newPatternInput.pop('weightedMeanWeight')
+        newPatternInput= newPatternInput
+    else:
+        done=True
+        doneContainer[0]=done
+        previousPatternContainer[0]=None
+        newPatternInput= pattern(patternInput)
+    return newPatternInput
+
+def transitionFadeInit(transitionDict):
+    transitionDict['weight']=None
+
+@function('transitionFade')
+@defaultArguments(transitionFadeStep=0.005)
+def transitionFade(pattern):
+    return transitionAbstract(transitionFadeFunction, transitionFadeInit, lambda transitionDict: transitionDict['weight']>=1)(pattern)
+
+
+def transitionRandomFunction(previousPattern, pattern, patternInput, transitionDict):
+    height = patternInput['height']
+    width = patternInput['width']
+    transitionRandomPixels = patternInput['transitionRandomPixels']
+    if transitionDict['transitionMask']==None:
+        transitionDict['transitionMask']= TransitionMask(height=height, width=width)
+    if transitionDict['randomGenerator']==None:
+        heightR = range(height)
+        widthR = range(width)
+        coordinates= [(x,y) for y in heightR for x in widthR]
+        random.shuffle(coordinates)
+        generator = (x for x in coordinates)
+        transitionDict['randomGenerator']=generator
+    try:
+        generator=transitionDict['randomGenerator']
+        transitionMask=transitionDict['transitionMask']
+        for i in xrange(transitionRandomPixels):
+            x,y = generator.next()
+            transitionMask[y,x] = (1,0,0)
+        transitionInput = copy.copy(patternInput)
+        transitionInput['canvas'] = transitionMask
+        transitionPattern = lambda *args:transitionInput
+        newPatternInput = masker(transitionPattern, pattern, previousPattern)(patternInput)
+    except:
+        transitionDict['done']=True
+        newPatternInput = pattern(patternInput)
+    return newPatternInput
+
+def transitionRandomInit(transitionDict):
+    transitionDict['transitionMask']=None
+    transitionDict['randomGenerator']=None
+    transitionDict['done']=False
+
+@function('transitionRandom2')
+@defaultArguments(transitionRandomPixels=10)
+def transitionRandom2(pattern):
+    return transitionAbstract(transitionRandomFunction, transitionRandomInit, lambda transitionDict: transitionDict['done'])(pattern)
+
 
 @function('transitionRandom')
 @defaultArguments(transitionRandomPixels=10)
@@ -716,16 +850,29 @@ def transitionRandom(pattern):
     randomGenerator=[None]
     doneContainer=[False]
     previousPatternContainer=[None]
+    recursionLock = [0]
     def transitioner(patternInput):
+        if recursionLock[0] >=2:
+            return pattern(patternInput)
+        recursionLock[0]+=1
         height = patternInput['height']
         width = patternInput['width']
         transitionRandomPixels = patternInput['transitionRandomPixels']
+        frame =  patternInput['frame']
+        if frame ==0:# and doneContainer[0] ==True:
+            transitionMaskContainer[0] = None
+            doneContainer[0] = False
+            randomGenerator[0] = None
+            previousPatternContainer[0]=None
         done = doneContainer[0]
-        if previousPatternContainer[0]==None:
-            previousPattern = patternInput['previousPattern']
-            previousPatternContainer[0]=previousPattern
-        previousPattern = previousPatternContainer[0]
         if not done:
+            if previousPatternContainer[0]==None:
+                previousPattern = isolate(patternInput['previousPattern'])
+                oldPatternInputInitializer = copy.copy(patternInput)
+                oldPatternInputInitializer['frame']=oldPatternInputInitializer['previousFrame']
+                previousPattern(oldPatternInputInitializer)
+                previousPatternContainer[0]=previousPattern
+            previousPattern = previousPatternContainer[0]
             if previousPattern:
                 if transitionMaskContainer[0]==None:
                     transitionMaskContainer[0]= TransitionMask(height=height, width=width)
@@ -745,7 +892,7 @@ def transitionRandom(pattern):
                     transitionInput = copy.copy(patternInput)
                     transitionInput['canvas'] = transitionMask
                     transitionPattern = lambda *args:transitionInput
-                    return masker(transitionPattern, pattern, previousPattern)(patternInput)
+                    newPatternInput = masker(transitionPattern, pattern, previousPattern)(patternInput)
                 except:
                     done=True
                     doneContainer[0]=done
@@ -753,11 +900,14 @@ def transitionRandom(pattern):
                     transitionMaskContainer[0] = None
                     randomGenerator[0] = None
                     previousPatternContainer[0]= None 
-                    return pattern(patternInput)
+                    newPatternInput= pattern(patternInput)
             else:
                 done=True
                 doneContainer[0]=done
-                return pattern(patternInput)
+                newPatternInput= pattern(patternInput)
         else:
-            return pattern(patternInput)
+            newPatternInput= pattern(patternInput)
+        recursionLock[0]-=1
+        return newPatternInput
     return transitioner
+

@@ -108,12 +108,14 @@ class PatternInput(dict):
                  params=None,
                  canvas=None,
                  globalBrightness=0.1,
-                 previousPattern=None):
+                 previousPattern=None,
+                 previousFrame = 0):
         self['width']=width
         self['height']=height
         self['frame']=frame
         self['canvas']=canvas
         self['previousPattern']=previousPattern
+        self['previousFrame']=previousFrame
         self['globalBrightness']=globalBrightness
         
     def __getitem__(self, key):

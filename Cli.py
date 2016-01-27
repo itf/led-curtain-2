@@ -277,14 +277,14 @@ def dataSender(patternContainer, patternInputContainer, host, port):
 
                 pattern=patternContainer[0]
                 if(pattern!=previousPattern):
-                    patternInput['previousPattern'] = Function.isolate(previousPattern)
-                    patternInput['previousPattern'](patternInput)
+                    patternInput['previousPattern'] = previousPattern
+                    patternInput['previousFrame']=frame
                     frame=0
                     previousPattern=pattern
                     patternContainer[2]=None
                 elif patternContainer[2]== "resetFrame":
-                    patternInput['previousPattern'] = Function.isolate(previousPattern)
-                    patternInput['previousPattern'](patternInput)
+                    patternInput['previousPattern'] = previousPattern
+                    patternInput['previousFrame']=frame
                     frame=0
                     patternContainer[2]=None
                 else:
