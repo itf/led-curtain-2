@@ -837,77 +837,7 @@ def transitionRandomInit(transitionDict):
     transitionDict['randomGenerator']=None
     transitionDict['done']=False
 
-@function('transitionRandom2')
+@function('transitionRandom')
 @defaultArguments(transitionRandomPixels=10)
 def transitionRandom2(pattern):
     return transitionAbstract(transitionRandomFunction, transitionRandomInit, lambda transitionDict: transitionDict['done'])(pattern)
-
-
-@function('transitionRandom')
-@defaultArguments(transitionRandomPixels=10)
-def transitionRandom(pattern):
-    transitionMaskContainer = [None]
-    randomGenerator=[None]
-    doneContainer=[False]
-    previousPatternContainer=[None]
-    recursionLock = [0]
-    def transitioner(patternInput):
-        if recursionLock[0] >=2:
-            return pattern(patternInput)
-        recursionLock[0]+=1
-        height = patternInput['height']
-        width = patternInput['width']
-        transitionRandomPixels = patternInput['transitionRandomPixels']
-        frame =  patternInput['frame']
-        if frame ==0:# and doneContainer[0] ==True:
-            transitionMaskContainer[0] = None
-            doneContainer[0] = False
-            randomGenerator[0] = None
-            previousPatternContainer[0]=None
-        done = doneContainer[0]
-        if not done:
-            if previousPatternContainer[0]==None:
-                previousPattern = isolate(patternInput['previousPattern'])
-                oldPatternInputInitializer = copy.copy(patternInput)
-                oldPatternInputInitializer['frame']=oldPatternInputInitializer['previousFrame']
-                previousPattern(oldPatternInputInitializer)
-                previousPatternContainer[0]=previousPattern
-            previousPattern = previousPatternContainer[0]
-            if previousPattern:
-                if transitionMaskContainer[0]==None:
-                    transitionMaskContainer[0]= TransitionMask(height=height, width=width)
-                if randomGenerator[0]==None:
-                    heightR = range(height)
-                    widthR = range(width)
-                    coordinates= [(x,y) for y in heightR for x in widthR]
-                    random.shuffle(coordinates)
-                    generator = (x for x in coordinates)
-                    randomGenerator[0]=generator
-                try:
-                    generator=randomGenerator[0]
-                    transitionMask=transitionMaskContainer[0]
-                    for i in xrange(transitionRandomPixels):
-                        x,y = generator.next()
-                        transitionMask[y,x] = (1,0,0)
-                    transitionInput = copy.copy(patternInput)
-                    transitionInput['canvas'] = transitionMask
-                    transitionPattern = lambda *args:transitionInput
-                    newPatternInput = masker(transitionPattern, pattern, previousPattern)(patternInput)
-                except:
-                    done=True
-                    doneContainer[0]=done
-                    #Frees memory
-                    transitionMaskContainer[0] = None
-                    randomGenerator[0] = None
-                    previousPatternContainer[0]= None 
-                    newPatternInput= pattern(patternInput)
-            else:
-                done=True
-                doneContainer[0]=done
-                newPatternInput= pattern(patternInput)
-        else:
-            newPatternInput= pattern(patternInput)
-        recursionLock[0]-=1
-        return newPatternInput
-    return transitioner
-
