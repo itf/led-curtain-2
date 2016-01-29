@@ -44,4 +44,4 @@ class Curtain(DisplayInterface):
                 i+=1
             isReversed=not isReversed
 
-        strip.show()
+        self.strip.show()
