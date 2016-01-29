@@ -13,7 +13,8 @@ if curtain=="old":
     Protocol = P
     import ColorManager as C
     convertColor = C.convertColorToLin #Converts the color profile to linear
-else: #Assume local
+
+elif curtain=='local': #Assume local
     width = 60
     height = 30
     host='localhost'
@@ -22,6 +23,26 @@ else: #Assume local
     Protocol = P
     import ColorManager as C
     convertColor = C.convertColorToLin  #Converts the color profile to linear
+
+elif curtain=='new': #New LED panel
+    width = 60
+    height = 30
+    host='ironcurtain.mit.edu'
+    port=5000
+    import Transportation.Protocol.SimpleProtocol as P
+    Protocol = P
+    import ColorManager as C
+    convertColor = C.convertColorToLin
+
+elif curtain=='other': #???
+    width = 60
+    height = 30
+    host=''#write host here
+    port=5000
+    import Transportation.Protocol.SimpleProtocol as P
+    Protocol = P
+    import ColorManager as C
+    convertColor = C.convertColorToLin
 
 class LocalDisplayConfig:
     width = 60

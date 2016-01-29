@@ -235,7 +235,7 @@ def runCliCurtain(argv):
 
 
                 
-        except KeyboardInterrupt:
+        except:
             patternContainer[0]=None
             threadSender.join()
             print "threads successfully closed"

@@ -7,7 +7,7 @@ from Config import PiDisplayConfig as Config
 
 def runDisplay(host, port, height, width):
     server=ServerSocketUDP(host,port)
-    curtain = PygameCurtain(width,height)
+    curtain = Curtain(width,height)
     while(1):
         data = server.getData()
         colorArray=P.dataToColorArray(data)
