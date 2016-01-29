@@ -11,7 +11,7 @@ class Curtain(DisplayInterface):
     def __init__(self, width, height, LED_DMA=5, LED_PIN = 18):
         self.width = width
         self.height = height
-
+        self.colors=[0]*width*height
 
         LED_CHANNEL    = 0
         LED_COUNT      = width*height        # How many LEDs to light.
@@ -31,19 +31,21 @@ class Curtain(DisplayInterface):
         self.strip.begin()
     
     def sendColorCanvas(self, canvas):
+        canvas=bytearray(canvas)
         isReversed = RIGHT_FIRST
         i=0
         height = self.height
         width = self.width
         for y in xrange(height):
             for x in xrange(width):
-                if isReversed:
-                    r,g,b= canvas[y,width-x-1]
-                else:
-                    r,g,b= canvas[y,x]
-                r=int(r);g=int(g);b=int(b)
-                self.strip.setPixelColor(i,neopixel.Color(r,g,b))
-                i+=1
+               if isReversed:
+                   pos=(y*width+width-x-1)*3
+                   r,g,b= canvas[pos:pos+3]        
+               else:
+                    pos=3*(y*width+x)
+                    r,g,b= canvas[pos:pos+3]
+               self.colors[i]=(neopixel.Color(r,g,b))
+               i+=1
             isReversed=not isReversed
-
+        self.strip.setPixelColors(self.colors)
         self.strip.show()

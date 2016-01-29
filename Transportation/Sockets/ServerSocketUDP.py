@@ -11,4 +11,4 @@ class ServerSocketUDP(ServerInterface):
 
         
     def getData(self):
-        return self.sock.recvfrom(32768)[0]
+        return self.sock.recvfrom(16384)[0]
