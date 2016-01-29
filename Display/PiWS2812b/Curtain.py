@@ -38,9 +38,11 @@ class Curtain(DisplayInterface):
         for y in xrange(height):
             for x in xrange(width):
                 if isReversed:
-                    self.strip.setPixelColor(i,neopixel.Color(canvas[y,width-x-1] & 255))
+                    r,g,b= canvas[y,width-x-1]
                 else:
-                    self.strip.setPixelColor(i,neopixel.Color(canvas[y,x] & 255))
+                    r,g,b= canvas[y,x]
+                r=int(r);g=int(g);b=int(b)
+                self.strip.setPixelColor(i,neopixel.Color(r,g,b))
                 i+=1
             isReversed=not isReversed
 
