@@ -1,4 +1,4 @@
-import ScreenCanvas as Canvas
+import ScreenCanvasArray as Canvas
 
 def commandToString(command, data):
     return command + '#' + data

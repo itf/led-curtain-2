@@ -8,7 +8,7 @@ ZIGZAG = True
 RIGHT_FIRST = True
 TOP_FIRST = True
 class Curtain(DisplayInterface):
-    def __init__(self, width, height, LED_DMA=5, LED_PIN        = 18):
+    def __init__(self, width, height, LED_DMA=5, LED_PIN = 18):
         self.width = width
         self.height = height
 

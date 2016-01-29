@@ -10,7 +10,7 @@ def runDisplay(host, port, height, width):
     curtain = Curtain(width,height)
     while(1):
         data = server.getData()
-        colorArray=P.dataToColorArray(data)
+        colorArray=P.dataToCanvas(data)
         curtain.sendColorCanvas(colorArray)
 
 def main(argv):
