@@ -31,8 +31,10 @@ class Curtain(DisplayInterface):
         self.strip.begin()
     
     def sendColorCanvas(self, canvas):
-        isReversed=RIGHT_FIRST
+        isReversed = RIGHT_FIRST
         i=0
+        height = self.height
+        width = self.width
         for y in xrange(height):
             for x in xrange(width):
                 if isReversed:

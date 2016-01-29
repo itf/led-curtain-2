@@ -37,7 +37,7 @@ elif curtain=='new': #New LED panel
 elif curtain=='other': #???
     width = 60
     height = 30
-    host=''#write host here
+    host='18.238.5.197'#write host here
     port=5000
     import Transportation.Protocol.SimpleProtocol as P
     Protocol = P

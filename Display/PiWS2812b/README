@@ -2,3 +2,6 @@ How to install:
 
 Download: https://github.com/jgarff/rpi_ws281x 
 And install the python bindings.
+
+needs swig
+need python-dev
