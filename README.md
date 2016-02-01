@@ -198,9 +198,9 @@ function -> http://stackoverflow.com/questions/13923091/how-do-you-do-a-python-e
 
 [x]  audio update done outside the ui
 
-[] add previous pattern to pattern input to implement nice transitions
+[x] add previous pattern to pattern input to implement nice transitions
 
-[] add code to run on a raspberry pi, communicating with the LED strips
+[x] add code to run on a raspberry pi, communicating with the LED strips
 
 [x] create save with arguments
 
