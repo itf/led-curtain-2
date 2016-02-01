@@ -11,6 +11,12 @@ Getting started with Iron Curtain 2 development.
 * Run: python LocalDisplay.py 
 * Run: pypy Cli.py
 
+If you are on windows you will have to run everything under cpython and there will be a performance problem:
+
+* Install pygame
+* Run: python LocalDisplay.py 
+* Run: python Cli.py
+* 
 Using images:
 * install pillow on pypy:
 * First way:
@@ -45,6 +51,12 @@ Making the audio work is non-trivial. If you still want to do so, follow the fol
 	* Run: AudioServer.py
 * Run your jack patchbay and connect the output from jack sink to the ledaudio node
 * Use 'beat' or 'totalBeats' on your patterns
+
+
+#Installing on the raspberry pi to control
+I use the python bindings for rpi_ws281x; however, I had to modify the code to improve its performance. Check it out on
+https://github.com/itf/rpi_ws281x.
+You will need to install, swig and python-dev to compile it.
 
 ##Cli pattern programming language
 

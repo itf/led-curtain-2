@@ -9,9 +9,12 @@ def runDisplay(host, port, height, width):
     server=ServerSocketUDP(host,port)
     curtain = Curtain(width,height)
     while(1):
-        data = server.getData()
-#        colorArray=P.dataToCanvas(data)
-        curtain.sendColorCanvas(data)
+        try:
+            data = server.getData()
+            curtain.sendColorCanvas(data)
+        except:
+            pass
+
 
 def main(argv):
     if len(argv)==4:

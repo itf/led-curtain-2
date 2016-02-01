@@ -4,6 +4,7 @@ import Patterns.Function as Function
 import Patterns.StaticPatterns.basicPatterns
 import Patterns.ExtraPatterns.SimpleText
 import Patterns.ExtraPatterns.Image
+import SavedPatterns
 
 
 

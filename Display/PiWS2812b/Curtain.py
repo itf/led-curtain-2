@@ -36,6 +36,7 @@ class Curtain(DisplayInterface):
         i=0
         height = self.height
         width = self.width
+        colors=[]
         for y in xrange(height):
             for x in xrange(width):
                if isReversed:

@@ -98,6 +98,7 @@ def fractal(PatternInput):
     return PatternInput
 
 
+
 @P.pattern('circle')
 @F.defaultArgsP(cRadius=0.666)
 def circle(PatternInput):

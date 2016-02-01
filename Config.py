@@ -1,4 +1,4 @@
-curtain = "local"
+curtain = "new"
 useImages = True
 useAudio = True
 import ScreenCanvasArray 
@@ -27,20 +27,32 @@ elif curtain=='local': #Assume local
 elif curtain=='new': #New LED panel
     width = 60
     height = 30
-    host='ironcurtain.mit.edu'
+    host=''
     port=5000
     import Transportation.Protocol.SimpleProtocol as P
     Protocol = P
+    P.canvasToData = P.canvasToRawData
     import ColorManager as C
     convertColor = C.convertColorToLin
 
 elif curtain=='other': #???
     width = 60
     height = 30
-    host='18.238.5.197'#write host here
+    host=''#write host here
     port=5000
     import Transportation.Protocol.SimpleProtocol as P
     Protocol = P
+    import ColorManager as C
+    convertColor = C.convertColorToLin
+
+elif curtain=='otherPi': #???
+    width = 60
+    height = 30
+    host=''#write host here
+    port=5000
+    import Transportation.Protocol.SimpleProtocol as P
+    Protocol = P
+    P.canvasToData = P.canvasToRawData
     import ColorManager as C
     convertColor = C.convertColorToLin
 

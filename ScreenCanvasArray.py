@@ -21,7 +21,7 @@ class Canvas:
         y=y%self.height
         x=x%self.width
         pos=(y*width+x)*3
-        return self._array[pos],self._array[pos+1],self._array[pos+2]
+        return self._array[pos:pos+3]
 
     def __setitem__(self,arg,value):
         if self.pendingMappingFunctions:
@@ -48,7 +48,7 @@ class Canvas:
             y+=int(x)/width
             x%=width
             pos =3*i
-            r,g,b = myArray[pos], myArray[pos+1], myArray[pos+2]
+            r,g,b = myArray[pos:pos+3]
             for function in self.pendingMappingFunctions:
                 r,g,b= function((r,g,b), y, x)
             myArray[pos], myArray[pos+1], myArray[pos+2] = r,g,b

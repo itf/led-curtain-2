@@ -34,6 +34,10 @@ def canvasToData(canvas):
     data = str(width)+'#'+str(height)+'#'+(''.join(canvasToString(canvas)))
     return data
 
+def canvasToRawData(canvas):
+    data = ''.join(canvasToString(canvas))
+    return data
+
 def canvasToString(canvas):
     convert = lambda x: chr(max(min(255,int(round(255*x))),0))
     height = canvas.height
