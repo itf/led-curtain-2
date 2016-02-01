@@ -56,4 +56,4 @@ _hypnoCalm = Pattern.pattern('_hypnoCalm')(arg('''radialGradientRadius=(sin(fram
 _mazeGame = Pattern.pattern('_mazeGame')(arg('lifeSurviveRange=[2,3,4]; lifeBornRange=[3]')(_gameOfLife))
 _beatCircleColor = Pattern.pattern('_beatCircleColor')(__hueShift4Beat(_beatBlueGradient))
 
-_demo = Pattern.pattern('_demo')(arg('textHeight=0.3;timeChangerTime=20; transitionRandomPixels=10 ')(mask(vladTheImpaler,green,timeChanger(cloudsRainbow, transitionRandom(_mesmerezingMeteor), transitionRandom(rainbowAurora), _gameOfLife, transitionFade(_hypnoCalm), transitionRandom(arg('xTranslate = -frame/60. ')(translate(_nyanCat))), transitionFade(coolRandom),transitionRandom(_beatBlueGradient)))))
+_demo = Pattern.pattern('_demo')(arg('textHeight=0.3;timeChangerTime=30; transitionRandomPixels=10 ')(mask(vladTheImpaler,green,timeChanger(cloudsRainbow, transitionRandom(_mesmerezingMeteor), transitionRandom(rainbowAurora), _gameOfLife, transitionFade(_hypnoCalm), transitionRandom(arg('xTranslate = -frame/60. ')(translate(_nyanCat))), transitionFade(coolRandom),transitionRandom(_beatBlueGradient)))))

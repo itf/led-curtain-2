@@ -8,6 +8,10 @@ import readline
 import traceback
 
 import Config
+try:
+    import LocalConfig as Config
+except:
+    pass
 P = Config.Protocol
 colorConverter= Config.convertColor
 if Config.useAudio:
@@ -257,6 +261,7 @@ def dataSender(patternContainer, patternInputContainer, host, port):
 
     clientSocket = Client.ClientSocketUDP(host,port)
     timeSleep = 1.0/SEND_RATE
+    previousTime = time.time()
     while patternContainer[0]:
             try:
                 if (patternInputContainer[1]):
@@ -299,7 +304,9 @@ def dataSender(patternContainer, patternInputContainer, host, port):
                 clientSocket.sendData(data)
                 patternInput=newPatternInput
                 patternInputContainer[0]=patternInput
-                time.sleep(timeSleep)
+                while previousTime+timeSleep > time.time():
+                    time.sleep(timeSleep/20.) #sleeps for a bit
+                previousTime=time.time()
             except:
                 traceback.print_exc(file=sys.stdout)
                 if patternContainer[1]:
