@@ -19,8 +19,9 @@ If you are on windows you will have to run everything under cpython and there wi
 * Install pygame  if you want to develop locally
 * Run: python LocalDisplay.py 
 * Run: python Cli.py
-* 
-Using images:
+ 
+###Using images:
+
 * install pillow on pypy (or cPython):
 * First way:
 	* Download https://github.com/python-pillow/Pillow
@@ -34,7 +35,8 @@ Using images:
 	* Or, for python, pip install pillow
 Change Images to True in config.py
 
-Using Audio:
+###Using Audio:
+
 Making the audio work is non-trivial. If you still want to do so, follow the following instructions!
 * Install jack
 	* Instaling jack is hard. That is a fact. So try this step before the others.
