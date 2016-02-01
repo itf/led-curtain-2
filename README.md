@@ -11,7 +11,9 @@ Getting started with Iron Curtain 2 development.
 * Run: python LocalDisplay.py 
 * Run: pypy Cli.py
 * Copy Config.py to LocalConfig.py, and modify it.
- ##Quick Start Windows
+
+ ##Quick Start Windows
+
 If you are on windows you will have to run everything under cpython and there will be a performance problem:
 * Install pyReadline https://pypi.python.org/pypi/pyreadline
 * Install pygame  if you want to develop locally
