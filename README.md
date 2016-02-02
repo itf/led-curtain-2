@@ -4,33 +4,39 @@ Getting started with Iron Curtain 2 development.
 ![screenshot](https://raw.githubusercontent.com/Donlanes/iron-curtain-2/master/docs/mesmerizingMeteor.png)
 ![screenshot](https://raw.githubusercontent.com/Donlanes/iron-curtain-2/master/docs/rainbowAurora.png)
 
-##Quick Start
+##Quick Start UNIX
 
-* Install pygame
+* Install pygame if you want to develop locally
 * Install pypy (Or download it to the same directory and run it)
 * Run: python LocalDisplay.py 
 * Run: pypy Cli.py
-
 * Copy Config.py to LocalConfig.py, and modify it.
-If you are on windows you will have to run everything under cpython and there will be a performance problem:
 
-* Install pygame
+ ##Quick Start Windows
+
+If you are on windows you will have to run everything under cpython and there will be a performance problem:
+* Install pyReadline https://pypi.python.org/pypi/pyreadline
+* Install pygame  if you want to develop locally
 * Run: python LocalDisplay.py 
 * Run: python Cli.py
-* 
-Using images:
-* install pillow on pypy:
+ 
+###Using images:
+
+* install pillow on pypy (or cPython):
 * First way:
 	* Download https://github.com/python-pillow/Pillow
 	* Run: pypy setup.py install from that directory
+	* Or for python: python setup.py install from that directory
 * Second way:
 	* Install pip in pypy :
 	*  Download pip from [wget] https://bootstrap.pypa.io/get-pip.py 
 	* [sudo]  pypy get-pip.py
 	* [sudo] pypy -m pip install pillow
+	* Or, for python, pip install pillow
 Change Images to True in config.py
 
-Using Audio:
+###Using Audio:
+
 Making the audio work is non-trivial. If you still want to do so, follow the following instructions!
 * Install jack
 	* Instaling jack is hard. That is a fact. So try this step before the others.
@@ -121,8 +127,8 @@ To modify the parameters without using arg, write r to set the values of the par
 Audio example:
 
 * hueShift(circle
-* rr cRadius=beat; hue = int(totalblBeats%4)/4.
-* see
+* rr cRadius=beat; hue = int(totalBeats%4)/4.
+* serr
 * name of this pattern
 
 ##Debian Install
