@@ -8,29 +8,17 @@ https://gist.github.com/BigglesZX/4016539
 import Patterns.Pattern as P
 import Patterns.Function as F
 import Config
-
+try:
+    import LocalConfig as Config
+except:
+    pass
 if Config.useImages:
     from PIL import Image
     from os import listdir
     imagePath = "Patterns/ExtraPatterns/images/"
     import glob
 
-def simpleCached(cacheSize):
-    cache={}
-    def cacheFunction(function):
-        def cachedFunction(*args):
-            tArgs=tuple(args)
-            if tArgs in cache:
-                return cache[tArgs]
-            else:
-                answer=function(*args)
-                if len(cache)>cacheSize:
-                    cache.popitem()
-                    cache.popitem()
-                cache[tArgs]=answer
-                return answer
-        return cachedFunction
-    return cacheFunction
+
 
 
 
@@ -72,7 +60,7 @@ def imagePattern(PatternInput):
 ###################################
 #Slightly modified BiggleZX code, found on
 #https://gist.github.com/BigglesZX/4016539
-@simpleCached(5)
+@F.simpleCached(5)
 def getGifFrames(imagePath, height, width):
     '''
     Iterate the GIF, extracting each frame.
@@ -115,7 +103,7 @@ def getGifFrames(imagePath, height, width):
         return frames
         pass
 
-@simpleCached(5)
+@F.simpleCached(5)
 def analyseImage(path):
     '''
     Pre-process pass over the image to determine the mode (full or additive).
