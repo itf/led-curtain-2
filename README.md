@@ -14,6 +14,7 @@ Getting started with Iron Curtain 2 development.
 * Ctrl-c to close
 
 Everything is run from the terminal
+
  ##Quick Start Windows
 
 If you are on windows you will have to run everything under cpython and there will be a performance problem:
