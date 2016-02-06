@@ -1,4 +1,4 @@
-curtain = "new"
+curtain = ""
 useImages = False
 useAudio = True
 import ScreenCanvasArray 

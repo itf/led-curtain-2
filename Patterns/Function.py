@@ -39,6 +39,24 @@ def getFunctionDict():
 def getMetaFunctionDict():
     return _dict_of_meta_functions
 
+def simpleCached(cacheSize):
+    cache={}
+    def cacheFunction(function):
+        def cachedFunction(*args):
+            tArgs=tuple(args)
+            if tArgs in cache:
+                return cache[tArgs]
+            else:
+                answer=function(*args)
+                if len(cache)>cacheSize:
+                    cache.popitem()
+                    cache.popitem()
+                cache[tArgs]=answer
+                return answer
+        return cachedFunction
+    return cacheFunction
+
+
 @metaFunction("compose")
 def compose(*functions):
     '''
