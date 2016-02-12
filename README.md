@@ -73,6 +73,7 @@ I use the python bindings for rpi_ws281x; however, I had to modify the code to i
 https://github.com/itf/rpi_ws281x.
 You will need to install, swig and python-dev to compile it.
 
+Also, remember to run piUdpBuffer.sh, to remove lag caused by the UDP buffer
 ##Cli pattern programming language
 
 The Command Line interface has its own programming language to combine patterns. 

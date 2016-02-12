@@ -66,4 +66,7 @@ _beatBlueGradient3 = Pattern.pattern('_beatBlueGradient3')(defaultArgsP(radialGr
 _exampleEquationPlotter = Pattern.pattern('_exampleEquationPlotter')(arg('''equationAngle0=abs(sin(frame/90.)) ''')(equationxyPlotter))
 _beatLinearHue3Circle = Pattern.pattern('_beatLinearHue3Circle')(arg('''linearGradientAngle=totalBeats/2.; linearGradientPos=beat ''')(mask(_beat3rgbCircle,linearHueGradient,black)))
 
-_beatSinwave = Pattern.pattern('_beatSinwave')(arg('''equationX=str(2*(abs(1-totalBeats%2)-0.5))+'*sin(x)'; equationXxmin-=0.1; equationXxmax=equationXxmin+6 ''')(equationxPlotter))
+_beatSinwave = Pattern.pattern('_beatSinwave')(arg('''equationX=str(2*(abs(1-totalBeats%2)-0.5))+'*sin(x)'; equationXxmin=-0.1*frame;  equationXxmax=equationXxmin+6 ''')(equationxPlotter))
+
+_beatSinWaveTrail = Pattern.pattern('_beatSinWaveTrail')(isolateCanvas(arg('weightedMeanWeight=0.1 ')(addP(__beatInt4Hue(_beatSinwave),blur(weightedMean2P(black,trivial))))))
+_beatSinWaveTrailBeat = Pattern.pattern('_beatSinWaveTrailBeat')(isolateCanvas(arg('weightedMeanWeight=0 +0.4 - 0.5*beat ')(addP(__beatInt4Hue(_beatSinwave),blur(weightedMean2P(black,trivial))))))

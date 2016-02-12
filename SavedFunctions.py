@@ -22,3 +22,5 @@ def __hueShift4Beat(pattern):  return arg('hue=totalBeats%4/4.')(hueShift(patter
 def __gameOfLiferizer(pattern):  return step(pattern, gameOfLife(trivial))
 @Function.function('__bluerizer')
 def __bluerizer(pattern):  return arg('colorizeHue=0.7')(colorize(pattern))
+@Function.function('__beatInt4Hue')
+def __beatInt4Hue(pattern):  return arg('hue=int(totalBeats)/4. ')(hueShift(pattern))
