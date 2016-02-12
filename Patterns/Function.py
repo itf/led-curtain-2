@@ -258,13 +258,25 @@ def movingHue(patternInput):
 @function('hueShift')
 @defaultArguments(hue=0.01)
 @functionize
-def movingHue(patternInput):
+def hueShift(patternInput):
     hue=patternInput["hue"]
     def shifter(rgb,y,x):
         amount=hue
         return hsvShifter(rgb,amount)
     canvas=patternInput["canvas"]
     canvas.mapFunction(shifter)
+    return patternInput
+
+@function('brightness')
+@defaultArguments(brightness=1)
+@functionize
+def brightness(patternInput):
+    brightness=patternInput["brightness"]
+    def brighter(rgb,y,x):
+        rgb = [min(color * brightness,1) for color in rgb]
+        return rgb
+    canvas=patternInput["canvas"]
+    canvas.mapFunction(brighter)
     return patternInput
 
 @function('colorize')
@@ -348,7 +360,7 @@ def meaner(*colors):
 @function('addP')
 @combineCanvas
 def addPattern(*colors):
-    colorOutput= tuple([sum(color) for color in zip(*colors)])
+    colorOutput= tuple([min(sum(color),1) for color in zip(*colors)])
     return colorOutput
 
 
@@ -359,7 +371,7 @@ def weightedMeanP(*patterns):
         weight=patternInput['weightedMeanWeight']
         @combineCanvas
         def meaner(color0, color1):
-            colorOutput= tuple([color[0]*weight+color[1]*(1-weight) for color in zip(color0, color1)])
+            colorOutput= tuple([min(color[0]*weight+color[1]*(1-weight),1) for color in zip(color0, color1)])
             return colorOutput
         return meaner(*patterns)(patternInput)
     return weighter
