@@ -224,4 +224,16 @@ function -> http://stackoverflow.com/questions/13923091/how-do-you-do-a-python-e
 
 [] Abstract the cli file to allow the creatipn of other UIs
 
+[] Equation Plotter 
 
+[] Remove empty spaces when saving
+
+[] Scale function
+
+[] Brightness function
+
+[] Pixel Art pattern
+
+[] Snake or something similar, function
+
+[] Create Preview and a Gui

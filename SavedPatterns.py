@@ -57,3 +57,13 @@ _mazeGame = Pattern.pattern('_mazeGame')(arg('lifeSurviveRange=[2,3,4]; lifeBorn
 _beatCircleColor = Pattern.pattern('_beatCircleColor')(__hueShift4Beat(_beatBlueGradient))
 
 _demo = Pattern.pattern('_demo')(arg('textHeight=0.3;timeChangerTime=30; transitionRandomPixels=10 ')(mask(vladTheImpaler,green,timeChanger(cloudsRainbow, transitionRandom(_mesmerezingMeteor), transitionRandom(rainbowAurora), _gameOfLife, transitionFade(_hypnoCalm), transitionRandom(arg('xTranslate = -frame/60. ')(translate(_nyanCat))), transitionFade(coolRandom),transitionRandom(_beatBlueGradient)))))
+
+_nyanOnFire = Pattern.pattern('_nyanOnFire')(arg('weightedMeanWeight=0.65')(weightedMean2P(arg('imageName="fire"')(image),arg('imageName="nyanC";xTranslate=-frame/90. ')(translate(image)))))
+_nyanFadeFire = Pattern.pattern('_nyanFadeFire')(arg('transitionRandomPixels=3; timeChangerTime=35; weightedMeanWeight=0.65')(weightedMean2P(arg('imageName="fire"')(timeChanger(image,image,transitionRandom(black))) ,arg('imageName="nyanC";xTranslate=-frame/90. ')(timeChanger(translate(image),translate(transitionRandom(black)), black)))))
+_3rgbCircle = Pattern.pattern('_3rgbCircle')(defaultArgsP(trans0=0,trans1=0.333, trans2= -0.333, c0=0.666, c1=0.666, c2 =0.666)((addP(arg('xTranslate=trans0; cRadius=c0')(translate(circle)), arg('xTranslate=trans1; hue=0.333;cRadius=c1')(hueShift(translate(circle))),arg('xTranslate=trans2;hue=0.667;cRadius=c2')(hueShift(translate(circle)))))))
+_beat3rgbCircle = Pattern.pattern('_beat3rgbCircle')(arg('''c1=(beat-.5)*2.;c0=beat*2.; c2=(beat-0.5)*2 ''')(defaultArgsP(trans0=0,trans1=0.333, trans2= -0.333, c0=0.666, c1=0.666, c2 =0.666)((addP(arg('xTranslate=trans0; cRadius=c0')(translate(circle)), arg('xTranslate=trans1; hue=0.333;cRadius=c1')(hueShift(translate(circle))),arg('xTranslate=trans2;hue=0.667;cRadius=c2')(hueShift(translate(circle))))))))
+_beatBlueGradient3 = Pattern.pattern('_beatBlueGradient3')(defaultArgsP(radialGradientRadius=2)(mask(_beat3rgbCircle,_beatBlueGradient,black)))
+_exampleEquationPlotter = Pattern.pattern('_exampleEquationPlotter')(arg('''equationAngle0=abs(sin(frame/90.)) ''')(equationxyPlotter))
+_beatLinearHue3Circle = Pattern.pattern('_beatLinearHue3Circle')(arg('''linearGradientAngle=totalBeats/2.; linearGradientPos=beat ''')(mask(_beat3rgbCircle,linearHueGradient,black)))
+
+_beatSinwave = Pattern.pattern('_beatSinwave')(arg('''equationX=str(2*(abs(1-totalBeats%2)-0.5))+'*sin(x)'; equationXxmin-=0.1; equationXxmax=equationXxmin+6 ''')(equationxPlotter))

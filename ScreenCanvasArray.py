@@ -28,6 +28,8 @@ class Canvas:
             self.mapFunctionApply()
         width=self.width
         y,x = arg
+        y=y%self.height
+        x=x%self.width
         pos=(y*width+x)*3
         self._array[pos],self._array[pos+1],self._array[pos+2] = value[0],value[1],value[2]
 

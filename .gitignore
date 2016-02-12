@@ -7,4 +7,4 @@ venv/
 *\#
 .history
 dependencyTests
-LlocalConfig.py
+LocalConfig.py
