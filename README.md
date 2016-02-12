@@ -50,7 +50,8 @@ Making the audio work is non-trivial. If you still want to do so, follow the fol
 	* To install on windows, read here http://jackaudio.org/faq/jack_on_windows.html	
 	* To install on ubuntu, install jack2 and then pulseaudio-module-jack and reset.
 	* TO install on Mac, good luck.
-* install pyjack on cpython (sudo python -m pip install pyjack /  pip install pyjack / download pyjack and run setup.py
+* install pyjack on cpython (sudo python -m pip install pyjack /  pip install pyjack / download pyjack and run setup.py)
+* DO NOT INSTALL JACK.py (pip intall jack), because it is incompatible with pyjack
 * install a jack patchbay. I recommend kxstudio Cadence/Claudia  for Ubuntu or Windows
 	* It is easier to simply use a patchbay to redirect output than to do it programatically, when writting crossplatform code
 * Install Numpy. 
