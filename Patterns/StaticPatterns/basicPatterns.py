@@ -74,6 +74,9 @@ def _getBlackColor(value, y, x):
 
 @P.pattern('rainbow')
 def rainbow(PatternInput):
+    '''
+    rainbow
+    '''
     width=PatternInput["width"]
     xHueShift =1./width
     def shifter(rgb,y,x):
@@ -113,7 +116,7 @@ rotatedPlane=[]
                 )
 def equation(PatternInput):
     '''
-    Not well tested
+    Not well tested. Creates a 3d equation plot that can be rotated
     '''
     width = PatternInput["width"]
     height = PatternInput["height"]
@@ -225,12 +228,21 @@ def circle(PatternInput):
     canvas.mapFunction(mapper)
     return PatternInput
 
+
+
 @P.pattern('radialHueGradient')
 @F.defaultArgsP(radialGradientRadius=0.666,
                 radialGradientColor0 = 0x6495ed,
                 radialGradientColor1=0x0ffff,
                 radialGradientPos=0)
 def radialHueGradient(PatternInput):
+    '''
+    Radial Hue gradient.
+    Depends on radialGradientRadius,
+                radialGradientColor0,
+                radialGradientColor1,
+                radialGradientPos
+    '''
     width = PatternInput["width"]
     height = PatternInput["height"]
     mWidth=width/2
@@ -277,6 +289,15 @@ def radialHueGradient(PatternInput):
                 linearGradientPos=0.5,
                 linearGradientAngle=0)
 def linearHueGradient(PatternInput):
+    '''
+    Linear Gradient.
+    Depends on:
+        linearGradientLength,
+        linearGradientColor0,
+        linearGradientColor1,
+        linearGradientPos,
+        linearGradientAngle
+    '''
     width = PatternInput["width"]
     height = PatternInput["height"]
     mWidth=width/2
@@ -335,6 +356,9 @@ patternDefaultDict = F.getEvalDefaultDict()
                 equationXxmax = 3,
                 )
 def equationX(PatternInput):
+    '''
+    2 dimensional equation plotter
+    '''
     width = PatternInput["width"]
     height = PatternInput["height"]
     equation=PatternInput["equationX"]

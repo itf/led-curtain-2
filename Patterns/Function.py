@@ -141,6 +141,7 @@ def defaultArguments(**kwargs):
     order of execution: function(pattern(applyDefaultArguments))
     '''
     def metaFunction(function):
+        @wraps(function) #preserves __name__ and __doc__
         def functionOfPatterns(*patterns):
             def runOnceApplyDefaultArguments(patternInput):
                 for key in kwargs.keys():
@@ -161,14 +162,16 @@ def defaultArgsP(**kwargs):
     defaultArgs(arg=value)(function)(pattern) -> pattern
     order of execution: function(pattern(applyDefaultArguments))
     '''
-    @rFunctionize
-    def runOnceApplyDefaultArguments(patternInput):
-        if any([not patternInput.has_key(key) for key in kwargs.keys()]):
-            patternInput.update(kwargs)
-            return patternInput
-        else:
-            return patternInput
-    return runOnceApplyDefaultArguments
+    def defaultArgPFunction(pattern):
+        @wraps(pattern)
+        def runOnceApplyDefaultArguments(patternInput):
+            if any([not patternInput.has_key(key) for key in kwargs.keys()]):
+                patternInput.update(kwargs)
+                return pattern(patternInput)
+            else:
+                return pattern(patternInput)
+        return runOnceApplyDefaultArguments
+    return defaultArgPFunction
 
 @metaFunction('constArgs')
 def constantArguments(**kwargs):
