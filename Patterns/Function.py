@@ -34,15 +34,26 @@ def metaFunction(name):
     return builder
 
 def getFunctionDict():
+    '''
+    Returns the dictionary of functions
+    '''
     return _dict_of_functions
 
 def getMetaFunctionDict():
+    '''
+    Returns the dictionary of metafunctions
+    '''
     return _dict_of_meta_functions
 
 ########################3333
 #Helper functions - Helps constructing functions
 
 def simpleCached(cacheSize):
+    '''
+    A simple cache. Use like:
+    @simpleCache(cachesize)
+    def function:
+    '''
     cache={}
     def cacheFunction(function):
         def cachedFunction(*args):
@@ -124,6 +135,7 @@ def rMetaFunctionize(myMetaFunction):
 @metaFunction('defaultArgs')
 def defaultArguments(**kwargs):
     '''
+    Adds default arguments to the function. See hueShift function for example.
     usage: defaultArgs(arg=value)(function) -> function
     defaultArgs(arg=value)(function)(pattern) -> pattern
     order of execution: function(pattern(applyDefaultArguments))
@@ -144,6 +156,7 @@ def defaultArguments(**kwargs):
 @function('defaultArgsP')
 def defaultArgsP(**kwargs):
     '''
+    Adds default arguments to patterns. Same behavior as defaultArguments
     usage: defaultArgs(arg=value)(function) -> function
     defaultArgs(arg=value)(function)(pattern) -> pattern
     order of execution: function(pattern(applyDefaultArguments))
@@ -238,8 +251,8 @@ def constant(pattern):
 @function('step')
 def step(pattern0, pattern1):
     '''
-    On first run it runs pattern0. On every
-    following run it runs pattern1
+    On frame0 it runs pattern0. On every
+    following frame it runs pattern1
     '''
     step = [False]
     def steppedPattern(patternInput):
@@ -312,6 +325,9 @@ def hsvShifter(rgb,amount):
 @defaultArguments(hueFrameRate=0.01)
 @functionize
 def movingHue(patternInput):
+    '''
+    Changes the hue at every frame
+    '''
     hueFrameRate=patternInput["hueFrameRate"]
     def shifter(rgb,y,x):
         amount=patternInput["frame"]*hueFrameRate
@@ -325,6 +341,9 @@ def movingHue(patternInput):
 @defaultArguments(hue=0.01)
 @functionize
 def hueShift(patternInput):
+    '''
+    Shifts the hue by the specified amount
+    '''
     hue=patternInput["hue"]
     def shifter(rgb,y,x):
         amount=hue
@@ -337,6 +356,9 @@ def hueShift(patternInput):
 @defaultArguments(nRainbows=1)
 @functionize
 def rainbownize(patternInput):
+    '''
+    Shifts the hue in a "rainbown" way
+    '''
     numberOfRainbows=patternInput["nRainbows"]
     width=patternInput["width"]
     xHueShift =1./width
@@ -368,6 +390,9 @@ def vRainbownize(patternInput):
 @defaultArguments(colorizeHue=1, colorizeAmount=0.5)
 @functionize
 def colorizeHue(patternInput):
+    '''
+    Colorizes a canvas by changing its hue
+    '''
     colorizeHue=patternInput["colorizeHue"]
     colorizeAmount=patternInput["colorizeAmount"]
     def colorizer(rgb,y,x):
@@ -386,6 +411,9 @@ def colorizeHue(patternInput):
 @defaultArguments(brightness=1)
 @functionize
 def brightness(patternInput):
+    '''
+    Changes the brightness. Allows values >1
+    '''
     brightness=patternInput["brightness"]
     def brighter(rgb,y,x):
         rgb = [min(color * brightness,1) for color in rgb]
@@ -401,6 +429,10 @@ def brightness(patternInput):
 #Functions that combine patterns
 
 def combineCanvas(colorCombiner):
+    '''
+    Helper function to combines patterns together.
+    See meaner and addPattern
+    '''
     def combineFunction(*patterns):
         def combinedPattern(patternInput):
             patternOutputs=[]
@@ -426,12 +458,18 @@ def combineCanvas(colorCombiner):
 @function('meanP')
 @combineCanvas
 def meaner(*colors):
+    '''
+    Takes the mean of 2 patterns
+    '''
     colorOutput= tuple([sum(color)/len(colors) for color in zip(*colors)])
     return colorOutput
 
 @function('addP')
 @combineCanvas
 def addPattern(*colors):
+    '''
+    Adds patterns together
+    '''
     colorOutput= tuple([min(sum(color),1) for color in zip(*colors)])
     return colorOutput
 
@@ -439,6 +477,9 @@ def addPattern(*colors):
 @function('weightedMean2P')
 @defaultArguments(weightedMeanWeight=0.5)
 def weightedMeanP(*patterns):
+    '''
+    Takes the weighted mean of 2 patterns
+    '''
     def weighter(patternInput):
         weight=patternInput['weightedMeanWeight']
         @combineCanvas
@@ -453,6 +494,9 @@ def weightedMeanP(*patterns):
 @function('mask')
 @combineCanvas
 def masker(color0, color1, color2):
+    '''
+    Uses the first pattern as a mask for the other 2 patterns
+    '''
     if any(color0):
         colorOutput= color1
     else:
@@ -462,6 +506,9 @@ def masker(color0, color1, color2):
 @function('weightedMask')
 @combineCanvas
 def weightedMasker(color0, color1, color2):
+    '''
+    Uses the red channel of the first pattern as a weighted mask for the other 2 patterns
+    '''
     weight = color0[0]
     colorOutput=tuple([color[0]*weight+color[1]*(1-weight) for color in zip(color1, color2)])
     return colorOutput
@@ -494,6 +541,10 @@ def timechange(patternnArray, timeArray):
 @function('timeChanger')
 @defaultArguments(timeChangerTime =6)
 def timechanger(*patterns):
+    '''
+    Takes as input and arbitrary number of patterns.
+    Changes between those patterns every timeChangerTime seconds
+    '''
     startTime=getCurrentTime()
     lenPat = len(patterns)
     frameContainer=[0]
@@ -540,6 +591,7 @@ def getCurrentTime():
 @functionize
 def translate(patternInput):
     '''
+    Translates the pattern by the the specified percentage
     percentage translator. args('xTranslate=0; yTranslate=0')
     '''
     height=patternInput["height"]
@@ -594,7 +646,7 @@ def blur(patternInput):
 def gameOfLife(patternInput):
     '''
     Games of life with colors
-    #http://www.mirekw.com/ca/ca_gallery2.html#LIFE
+    Based on #http://www.mirekw.com/ca/ca_gallery2.html#LIFE
     '''
 
     oldcanvas = copy.deepcopy(patternInput["canvas"])
@@ -627,7 +679,7 @@ def gameOfLife(patternInput):
 def gameOfGeneration(patternInput):
     '''
     Games of generation
-    #http://www.mirekw.com/ca/ca_gallery2.html#LIFE
+    Based on #http://www.mirekw.com/ca/ca_gallery2.html#LIFE
     '''
 
     oldcanvas = copy.deepcopy(patternInput["canvas"])
@@ -781,7 +833,34 @@ import Config
 import random
 TransitionMask = Config.Canvas
 
+
 def transitionAbstract(transitionFunction, init, isDone):
+    MAXIMUM_RECURSION_DEPTH=2
+    '''
+    Helper function to create transitions.
+    A transition is defined by 3 things:
+    1- a transition function, i.e. a function that takes:
+        (previousPattern, pattern, patternInput, transitionDict)
+
+        It modifies the transition dict as desired, and uses the previousPattern
+        and the new pattern, and the patternInput to return a new pattern input.
+        The transition dict is a dict used for the transition to save its state.
+
+    2- A init function, i.e. a function that takes
+        (transitionDict)
+        The init function is the function responsible for initializing/restarting the transitionDict
+        So that the transitionFunction has a working transitionDict that it can use/ so that
+        the transitionFunction can be restarted.
+
+    3- A IsDone function, i.e. a function that takes
+        (transitionDict)
+        And decides if the transition is finished.
+
+    The transitionDict is the only place in the transition that should have a state. The rest of the
+    functions should be stateless.
+    
+    See Transition Fade
+    '''
     def transitionPattern(pattern):
         doneContainer=[False]
         previousPatternContainer=[None]
@@ -789,10 +868,13 @@ def transitionAbstract(transitionFunction, init, isDone):
         transitionPatternContainer=[None]
         transitionDict={}
         def transitioner(patternInput):
-            if recursionLock[0] >= 2:
+            #Prevents infinite recusion when transitioning from
+            #A to B, and back to A (A depends on B, that depends on A...)
+            if recursionLock[0] >= MAXIMUM_RECURSION_DEPTH:
                 return pattern(patternInput)
             recursionLock[0]+=1
             frame =  patternInput['frame']
+            #Resets the transition when the frame==0
             if frame ==0 :
                 doneContainer[0] = False
                 previousPatternContainer[0]= None
@@ -837,6 +919,10 @@ def transitionAbstract(transitionFunction, init, isDone):
 ####
 #Transition Fade
 def transitionFadeFunction(previousPattern, pattern, patternInput, transitionDict):
+    '''
+    Takes the weighted mean between the previousPattern and pattern, fading a pattern into the other
+    Modifies transitionDict to save the weight, and to show that it has finished
+    '''
     transitionStep = patternInput['transitionFadeStep']
     if transitionDict['weight']==None:
         transitionDict['weight']= 0
@@ -864,11 +950,18 @@ def transitionFadeFunction(previousPattern, pattern, patternInput, transitionDic
     return newPatternInput
 
 def transitionFadeInit(transitionDict):
+    '''
+    Initializes/restarts the dict for the fade transition
+    '''
     transitionDict['weight']=None
 
 @function('transitionFade')
 @defaultArguments(transitionFadeStep=0.005)
 def transitionFade(pattern):
+    '''
+    Fades from the previous pattern onto the new pattern.
+    The fade speed is controlled by transitionFadeStep
+    '''
     return transitionAbstract(transitionFadeFunction, transitionFadeInit, lambda transitionDict: transitionDict['weight']>=1)(pattern)
 
 ######
@@ -876,6 +969,11 @@ def transitionFade(pattern):
 #####
 #Transition Random
 def transitionRandomFunction(previousPattern, pattern, patternInput, transitionDict):
+    '''
+    Chooses random pixels to change from the previousPatttern to the new pattern in each input
+    Creates a generator that returns said pixels
+    Modifies the transitionDict to save this generator and to save that it has already finished the transition.
+    '''
     height = patternInput['height']
     width = patternInput['width']
     transitionRandomPixels = patternInput['transitionRandomPixels']
@@ -904,6 +1002,9 @@ def transitionRandomFunction(previousPattern, pattern, patternInput, transitionD
     return newPatternInput
 
 def transitionRandomInit(transitionDict):
+    '''
+    Restarts the transition dict for the transition random
+    '''
     transitionDict['transitionMask']=None
     transitionDict['randomGenerator']=None
     transitionDict['done']=False
@@ -911,6 +1012,10 @@ def transitionRandomInit(transitionDict):
 @function('transitionRandom')
 @defaultArguments(transitionRandomPixels=10)
 def transitionRandom2(pattern):
+    '''
+    Choses random pixels to transition from the previous pattern to the new pattern
+    The speed of the transition is controlled by transitionRandomPixels
+    '''
     return transitionAbstract(transitionRandomFunction, transitionRandomInit, lambda transitionDict: transitionDict['done'])(pattern)
 
 ####
@@ -926,14 +1031,13 @@ Canvas = Config.Canvas
 def scaler(pattern):
     '''
     Scales and Translate the canvas prior to the calculation of the pattern.
-    If applied to something that contains
-    Isolate or Isolate Canvas, it is just gonna scale the "view", rather
-    than the resulting pattern.
+    If applied to something that does not contain isolate, wil also modify the height
+    and width of the pattern prior to its calculation
     The view is the area of the pattern that is calculated
     '''
     def scale(patternInput):
         '''
-        percentage translator. percentage scaler
+        Percentage translator. percentage scaler
         '''
 
         height=patternInput["height"]
