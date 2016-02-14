@@ -88,7 +88,7 @@ class Completer(rlcompleter.Completer):
         self.parameterDictContainer=pDictContainer
 
 def savePattern(name, code):
-    realCode ='\n' + name + ' = Pattern.pattern(\''+name+'\')('+ code+')'
+    realCode ='\n' + name.replace(" ", "") + ' = Pattern.pattern(\''+name.replace(" ", "")+'\')('+ code+')'
     with open("SavedPatterns.py", "a") as savedFunctions:
         savedFunctions.write(realCode)
         savedFunctions.close()
@@ -99,8 +99,8 @@ def safeSavePattern(name, code):
 
 def saveFunction(name,code, patternInput):
     realFunctionCode = \
-                     '@Function.function(\'' + name + '\')\n'\
-                     'def '+ name + '(pattern):'\
+                     '@Function.function(\'' + name.replace(" ", "") + '\')\n'\
+                     'def '+ name.replace(" ", "") + '(pattern):'\
                      '  return '+ code\
                      +'\n'
     exec realFunctionCode in globals(), globals()
@@ -324,6 +324,7 @@ def dataSender(patternContainer, patternInputContainer, host, port):
                     patternInputContainer[1]=None
                     patternInputContainer[2]=None
                     patternContainer[0]=black
+                    time.sleep(0.1)
         
     if Config.useAudio:
         audio.running=False

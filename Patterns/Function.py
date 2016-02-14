@@ -39,6 +39,9 @@ def getFunctionDict():
 def getMetaFunctionDict():
     return _dict_of_meta_functions
 
+########################3333
+#Helper functions - Helps constructing functions
+
 def simpleCached(cacheSize):
     cache={}
     def cacheFunction(function):
@@ -55,7 +58,6 @@ def simpleCached(cacheSize):
                 return answer
         return cachedFunction
     return cacheFunction
-
 
 @metaFunction("compose")
 def compose(*functions):
@@ -114,6 +116,11 @@ def rMetaFunctionize(myMetaFunction):
         return compose(function,myMetaFunction)
     return metaFunction
 
+#############################
+
+#########################
+#Functions that modify the behavior of the arguments
+
 @metaFunction('defaultArgs')
 def defaultArguments(**kwargs):
     '''
@@ -165,7 +172,54 @@ def constantArguments(**kwargs):
         return newPatternInput
     return applyArguments
 
-            
+import math
+import collections
+
+@function('arg')
+def arg(strInstructionToEval):
+    '''
+    Evaluates the instruction on every frame update, modifying
+    the arguments to the functions and patterns
+    '''
+    def updaterArg(pattern):
+        def updateArg(patternInput):
+            oldPatternInput = copy.copy(patternInput)
+            oldPatternInput.pop('canvas')
+            try:
+                execInPattern(strInstructionToEval, patternInput)
+                newPatternInput=pattern(patternInput)
+            except:
+                newPatternInput=pattern(patternInput)
+                execInPattern(strInstructionToEval, newPatternInput)
+                newPatternInput=pattern(newPatternInput)
+            newPatternInput.update(oldPatternInput)
+            return newPatternInput
+        return updateArg
+    return updaterArg
+
+def execInPattern(strInstructionToEval, patternInput):
+    defaultDict =getEvalDefaultDict()
+    exec strInstructionToEval in defaultDict, patternInput
+
+def getEvalDefaultDict():
+    defaultDict =collections.defaultdict(int)
+    defaultDict['abs']=abs
+    defaultDict['max']=max
+    defaultDict['min']=min
+    defaultDict['str']=str
+    defaultDict['float']=float
+    defaultDict['int']=int
+    defaultDict['len']=len
+    defaultDict['random']=random.random
+    defaultDict.update(math.__dict__)
+    return defaultDict
+
+
+
+####################################
+
+######################
+#Functions that modify the execution of the patterns
 @function('constant')
 def constant(pattern):
     '''
@@ -198,13 +252,12 @@ def step(pattern0, pattern1):
     steppedPattern.__name__= "Stepped: " + str(pattern0.__name__) + "->"+str(pattern1.__name__)
     return steppedPattern
 
- 
+####################
 
-'''
-End of meta functions
-'''
 
-#Isolate shouldn't change the parameters of the input, only the canvas??
+#######################
+#Functions that isolate patterns
+
 @function('isolate')
 def isolate(pattern):
     '''
@@ -218,6 +271,7 @@ def isolate(pattern):
             previousInput[0] = copy.deepcopy(patternInput)
         else:
             previousInput[0]['frame']+=1
+        previousInput[0]['canvas'].updateArgs(patternInput['canvas'])
         previousInput[0]=pattern(previousInput[0])
         canvas = copy.deepcopy(previousInput[0]['canvas'])
         patternInput['canvas']=canvas
@@ -234,12 +288,24 @@ def isolateCanvas(pattern):
     def isolated(patternInput):
         if previousCanvas[0]==None:
             previousCanvas[0] = copy.deepcopy(patternInput['canvas'])
+        previousCanvas[0].updateArgs(patternInput['canvas'])
         isolatedPatternInput = copy.copy(patternInput)
         isolatedPatternInput['canvas']=previousCanvas[0]
         patternOutput = pattern(isolatedPatternInput)
         previousCanvas[0]=copy.deepcopy(patternOutput['canvas'])
         return patternOutput
     return isolated
+
+
+#################
+
+#############################
+#Hue, Color Brightness Functions
+
+def hsvShifter(rgb,amount):
+    h,s,v=colorsys.rgb_to_hsv(*rgb)
+    h +=amount
+    return colorsys.hsv_to_rgb(h,s,v)
 
 
 @function('movingHue')
@@ -265,35 +331,6 @@ def hueShift(patternInput):
         return hsvShifter(rgb,amount)
     canvas=patternInput["canvas"]
     canvas.mapFunction(shifter)
-    return patternInput
-
-@function('brightness')
-@defaultArguments(brightness=1)
-@functionize
-def brightness(patternInput):
-    brightness=patternInput["brightness"]
-    def brighter(rgb,y,x):
-        rgb = [min(color * brightness,1) for color in rgb]
-        return rgb
-    canvas=patternInput["canvas"]
-    canvas.mapFunction(brighter)
-    return patternInput
-
-@function('colorize')
-@defaultArguments(colorizeHue=1, colorizeAmount=0.5)
-@functionize
-def colorizeHue(patternInput):
-    colorizeHue=patternInput["colorizeHue"]
-    colorizeAmount=patternInput["colorizeAmount"]
-    def colorizer(rgb,y,x):
-        h,s,v = colorsys.rgb_to_hsv(*rgb)
-        difference = colorizeHue-h
-        if difference  > abs(colorizeHue-h-1):
-            difference = (colorizeHue-h-1)%1
-        h=colorizeAmount*difference + h
-        return colorsys.hsv_to_rgb(h,s,v)
-    canvas=patternInput["canvas"]
-    canvas.mapFunction(colorizer)
     return patternInput
 
 @function('rainbownize')
@@ -327,6 +364,41 @@ def vRainbownize(patternInput):
     canvas.mapFunction(shifter)
     return patternInput
 
+@function('colorize')
+@defaultArguments(colorizeHue=1, colorizeAmount=0.5)
+@functionize
+def colorizeHue(patternInput):
+    colorizeHue=patternInput["colorizeHue"]
+    colorizeAmount=patternInput["colorizeAmount"]
+    def colorizer(rgb,y,x):
+        h,s,v = colorsys.rgb_to_hsv(*rgb)
+        difference = colorizeHue-h
+        if difference  > abs(colorizeHue-h-1):
+            difference = (colorizeHue-h-1)%1
+        h=colorizeAmount*difference + h
+        return colorsys.hsv_to_rgb(h,s,v)
+    canvas=patternInput["canvas"]
+    canvas.mapFunction(colorizer)
+    return patternInput
+
+
+@function('brightness')
+@defaultArguments(brightness=1)
+@functionize
+def brightness(patternInput):
+    brightness=patternInput["brightness"]
+    def brighter(rgb,y,x):
+        rgb = [min(color * brightness,1) for color in rgb]
+        return rgb
+    canvas=patternInput["canvas"]
+    canvas.mapFunction(brighter)
+    return patternInput
+
+######################
+
+
+##########################
+#Functions that combine patterns
 
 def combineCanvas(colorCombiner):
     def combineFunction(*patterns):
@@ -378,8 +450,6 @@ def weightedMeanP(*patterns):
 
 
 
-
-
 @function('mask')
 @combineCanvas
 def masker(color0, color1, color2):
@@ -396,55 +466,10 @@ def weightedMasker(color0, color1, color2):
     colorOutput=tuple([color[0]*weight+color[1]*(1-weight) for color in zip(color1, color2)])
     return colorOutput
 
+##################################
 
-import math
-import collections
-
-@function('arg')
-def arg(strInstructionToEval):
-    def updaterArg(pattern):
-        def updateArg(patternInput):
-            oldPatternInput = copy.copy(patternInput)
-            oldPatternInput.pop('canvas')
-            try:
-                execInPattern(strInstructionToEval, patternInput)
-                newPatternInput=pattern(patternInput)
-            except:
-                newPatternInput=pattern(patternInput)
-                execInPattern(strInstructionToEval, newPatternInput)
-                newPatternInput=pattern(newPatternInput)
-            newPatternInput.update(oldPatternInput)
-            return newPatternInput
-        return updateArg
-    return updaterArg
-
-def getArgDicts(patternInput):
-    return patternInput
-
-def execInPattern(strInstructionToEval, patternInput):
-    defaultDict =getEvalDefaultDict()
-    exec strInstructionToEval in defaultDict, patternInput
-
-def getEvalDefaultDict():
-    defaultDict =collections.defaultdict(int)
-    defaultDict['abs']=abs
-    defaultDict['max']=max
-    defaultDict['min']=min
-    defaultDict['str']=str
-    defaultDict['float']=float
-    defaultDict['int']=int
-    defaultDict['len']=len
-
-
-
-    defaultDict.update(math.__dict__)
-    return defaultDict
-
-def hsvShifter(rgb,amount):
-    h,s,v=colorsys.rgb_to_hsv(*rgb)
-    h +=amount
-    return colorsys.hsv_to_rgb(h,s,v)
-
+##################################
+#Change patterns over time
 
 @function('timeChangerArrays')
 def timechange(patternnArray, timeArray):
@@ -506,8 +531,10 @@ import time
 def getCurrentTime():
     return time.time()
 
+#############################
 
-
+#############################
+#Movement and position functions
 @function('translate')
 @defaultArguments(xTranslate=0, yTranslate=0)
 @functionize
@@ -535,7 +562,10 @@ def translate(patternInput):
     return patternInput
 
 
+################################
 
+################################
+#Image Effects
 @function('blur')
 @functionize
 def blur(patternInput):
@@ -553,6 +583,10 @@ def blur(patternInput):
     patternInput['canvas']=canvas
     return patternInput
 
+###################################
+
+###################################
+#Finite automatas
 
 @function('gameOfLife')
 @defaultArguments(lifeSurviveRange=[2,3], lifeBornRange=[3], lifeOtherSurviveRatio=0.5, lifeNeighborDistance=1)
@@ -643,6 +677,8 @@ def gameOfGeneration(patternInput):
     return patternInput
 
 
+#############
+#Code that needs to be made more clear
 
 @function("frameRate")
 @defaultArguments(frameRate=30)
@@ -662,10 +698,6 @@ def frameRate(pattern):
         previousTimeContainer[0]=thisTime
         return pattern(newPatternInput)
     return frameRated
-
-
-#############
-#Code that needs to be made more clear
 
 
 def intCache(intFunctionCondition):
@@ -802,6 +834,8 @@ def transitionAbstract(transitionFunction, init, isDone):
         return transitioner
     return transitionPattern
 
+####
+#Transition Fade
 def transitionFadeFunction(previousPattern, pattern, patternInput, transitionDict):
     transitionStep = patternInput['transitionFadeStep']
     if transitionDict['weight']==None:
@@ -837,7 +871,10 @@ def transitionFadeInit(transitionDict):
 def transitionFade(pattern):
     return transitionAbstract(transitionFadeFunction, transitionFadeInit, lambda transitionDict: transitionDict['weight']>=1)(pattern)
 
+######
 
+#####
+#Transition Random
 def transitionRandomFunction(previousPattern, pattern, patternInput, transitionDict):
     height = patternInput['height']
     width = patternInput['width']
@@ -875,3 +912,55 @@ def transitionRandomInit(transitionDict):
 @defaultArguments(transitionRandomPixels=10)
 def transitionRandom2(pattern):
     return transitionAbstract(transitionRandomFunction, transitionRandomInit, lambda transitionDict: transitionDict['done'])(pattern)
+
+####
+
+
+#############################################
+#Functions that modify the canvas arguments
+
+Canvas = Config.Canvas
+
+@function('scaleAndTranslateCanvas')
+@defaultArguments(scaleX=1, scaleY=1, scaleTranslateX=0, scaleTranslateY=0)
+def scaler(pattern):
+    '''
+    Scales and Translate the canvas prior to the calculation of the pattern.
+    If applied to something that contains
+    Isolate or Isolate Canvas, it is just gonna scale the "view", rather
+    than the resulting pattern.
+    The view is the area of the pattern that is calculated
+    '''
+    def scale(patternInput):
+        '''
+        percentage translator. percentage scaler
+        '''
+
+        height=patternInput["height"]
+        width=patternInput["width"]
+        scaleX=patternInput["scaleX"]
+        scaleY=patternInput["scaleY"]
+        xTranslate=patternInput["scaleTranslateX"]
+        yTranslate=patternInput["scaleTranslateY"]
+        xTranslate = int(round(xTranslate*width))
+        yTranslate = int(round(yTranslate*height))
+
+        newWidth = int(round(scaleX*width))
+        newHeight = int(round(scaleY*height))
+
+        
+        patternInput["height"] = max(1,newHeight)
+        patternInput["width"] = max(1,newWidth)
+        canvas = patternInput["canvas"]
+        canvas.translateAndScale(x=xTranslate, y=yTranslate,
+                                 width=newWidth, height=newHeight)
+        newPatternInput = pattern(patternInput)
+        newCanvas = newPatternInput["canvas"]
+        newCanvas.restoreTranslateAndScale()
+        newPatternInput["height"] = height
+        newPatternInput["width"] = width
+        return newPatternInput
+    return scale
+
+###################
+

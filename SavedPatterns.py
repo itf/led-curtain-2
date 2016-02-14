@@ -70,3 +70,6 @@ _beatSinwave = Pattern.pattern('_beatSinwave')(arg('''equationX=str(2*(abs(1-tot
 
 _beatSinWaveTrail = Pattern.pattern('_beatSinWaveTrail')(isolateCanvas(arg('weightedMeanWeight=0.1 ')(addP(__beatInt4Hue(_beatSinwave),blur(weightedMean2P(black,trivial))))))
 _beatSinWaveTrailBeat = Pattern.pattern('_beatSinWaveTrailBeat')(isolateCanvas(arg('weightedMeanWeight=0 +0.4 - 0.5*beat ')(addP(__beatInt4Hue(_beatSinwave),blur(weightedMean2P(black,trivial))))))
+
+_beatWorm = Pattern.pattern('_beatWorm')(arg('''scaleTranslateX=frame/70.; scaleX= 0.5+(2*(abs(1-totalBeats%2)-0.5)*0.25) ''')(scaleAndTranslateCanvas(_beatSinwave)))
+_starWars = Pattern.pattern('_starWars')(arg('scaleTranslateX=frame/23.; scaleX=0.97;generationSurviveRange=[3,4,5]; generationBornRange=[2]; generationStates=4; generationNeighborDistance=1')(scaleAndTranslateCanvas(_gameOfGenerations)))

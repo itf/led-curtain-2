@@ -228,11 +228,11 @@ function -> http://stackoverflow.com/questions/13923091/how-do-you-do-a-python-e
 
 [x] Equation Plotter 
 
-[] Test Equation Plotter 3d and fix bugs
+[] Test Equation Plotter 3d and fix bugs on it
 
-[] Remove empty spaces when saving
+[x] Remove empty spaces when saving
 
-[] Scale function
+[x] Scale function
 
 [x] Brightness function
 
