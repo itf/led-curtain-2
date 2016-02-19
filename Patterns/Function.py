@@ -213,6 +213,23 @@ def arg(strInstructionToEval):
         return updateArg
     return updaterArg
 
+
+def applyArguments(**kwargs):
+    '''
+    similar to arg, but to be used inside the code
+    not in the user interface
+    '''
+    def updaterArg(pattern):
+        def updateArg(patternInput):
+            oldPatternInput = copy.copy(patternInput)
+            oldPatternInput.pop('canvas')
+            patternInput.update(kwargs)
+            newPatternInput=pattern(patternInput)
+            newPatternInput.update(oldPatternInput)
+            return newPatternInput
+        return updateArg
+    return updaterArg
+
 def execInPattern(strInstructionToEval, patternInput):
     defaultDict =getEvalDefaultDict()
     exec strInstructionToEval in defaultDict, patternInput
@@ -436,6 +453,7 @@ def combineCanvas(colorCombiner):
     Helper function to combines patterns together.
     See meaner and addPattern
     '''
+    @wraps(colorCombiner) #preserve docs and name
     def combineFunction(*patterns):
         def combinedPattern(patternInput):
             patternOutputs=[]
@@ -469,7 +487,7 @@ def meaner(*colors):
 
 @function('addP')
 @combineCanvas
-def addPattern(*colors):
+def addPatterns(*colors):
     '''
     Adds patterns together
     '''
@@ -545,7 +563,7 @@ def timechange(patternnArray, timeArray):
 @defaultArguments(timeChangerTime =6)
 def timechanger(*patterns):
     '''
-    Takes as input and arbitrary number of patterns.
+    Takes as input an arbitrary number of patterns.
     Changes between those patterns every timeChangerTime seconds
     '''
     startTime=getCurrentTime()
@@ -1031,7 +1049,7 @@ Canvas = Config.Canvas
 
 @function('scaleAndTranslateCanvas')
 @defaultArguments(scaleX=1, scaleY=1, scaleTranslateX=0, scaleTranslateY=0)
-def scaler(pattern):
+def scale(pattern):
     '''
     Scales and Translate the canvas prior to the calculation of the pattern.
     If applied to something that does not contain isolate, wil also modify the height
@@ -1049,12 +1067,19 @@ def scaler(pattern):
         scaleY=patternInput["scaleY"]
         xTranslate=patternInput["scaleTranslateX"]
         yTranslate=patternInput["scaleTranslateY"]
-        xTranslate = int(round(xTranslate*width))
-        yTranslate = int(round(yTranslate*height))
+        xTranslate = xTranslate*width
+        yTranslate = yTranslate*height
 
-        newWidth = int(round(scaleX*width))
-        newHeight = int(round(scaleY*height))
+        newWidth = scaleX*width
+        newHeight = scaleY*height
 
+        #To take into account that translate may change the width by +-1 because of division errors
+        # Also, make everythinG INTO ints
+        newWidth = int(round(newWidth+xTranslate))-int(round(xTranslate))
+        newHeight= int(round(newHeight+yTranslate))-int(round(yTranslate))
+
+        xTranslate = int(round(xTranslate))
+        yTranslate = int(round(yTranslate))
         
         patternInput["height"] = max(1,newHeight)
         patternInput["width"] = max(1,newWidth)
@@ -1068,6 +1093,76 @@ def scaler(pattern):
         newPatternInput["width"] = width
         return newPatternInput
     return scale
+
+@function('splitHorizontal')
+def splitHorizontally(*patterns):
+    '''
+    Split the canvas horizontally between the patterns
+    '''
+    lenP = len(patterns)
+    modifiedPatterns=[]
+    for i in xrange(lenP):
+        metaFunction = applyArguments(scaleX=1./lenP, scaleY=1, scaleTranslateX=float(i)/lenP, scaleTranslateY=0)
+        modifiedPatterns.append(metaFunction(scale(patterns[i])))
+    return(addPatterns(*modifiedPatterns))
+
+@function('splitVertical')
+def splitVertically(*patterns):
+    '''
+    Split the canvas vertically between the patterns
+    '''
+    lenP = len(patterns)
+    modifiedPatterns=[]
+    for i in xrange(lenP):
+        metaFunction = applyArguments(scaleX=1, scaleY=1./lenP, scaleTranslateX=0, scaleTranslateY=float(i)/lenP)
+        modifiedPatterns.append(metaFunction(scale(patterns[i])))
+    return(addPatterns(*modifiedPatterns))
+
+
+@function('splitRecursiveV')
+def splitRecursiveV(*patterns):
+    '''
+    Split the canvas in an alternating way (horizontally, vertically,..)
+    between the patterns, starting vertically
+    '''
+    return splitRecursive(False, *patterns)
+
+@function('splitRecursiveH')
+def splitRecursiveH(*patterns):
+    '''
+    Split the canvas in an alternating way (horizontally, vertically,..)
+    between the patterns, starting horizontally
+    '''
+    return splitRecursive(True, *patterns)
+
+def splitRecursive(isHorizontal, *patterns):
+    '''
+    Auxiliary function to divide the canvas in an alternating fashion;
+    horizontally->vertically->horizontally
+    '''
+    lenP = len(patterns)
+    modifiedPatterns=[]
+    translateX=-1+isHorizontal
+    translateY=-isHorizontal
+    scaleX=1.
+    scaleY=1.
+    for i in xrange(lenP-1):
+        if ((i+isHorizontal)%2)==1:
+            scaleX/=2.
+            translateY+=scaleY
+        else:
+            scaleY/=2.
+            translateX+=scaleX
+
+        metaFunction = applyArguments(scaleX=scaleX, scaleY=scaleY, scaleTranslateX=translateX, scaleTranslateY=translateY)
+        modifiedPatterns.append(metaFunction(scale(patterns[i])))
+    if((lenP-1+isHorizontal)%2==1):
+        translateY+=scaleY
+    else:
+        translateX+=scaleX
+    metaFunction = applyArguments(scaleX=scaleX, scaleY=scaleY, scaleTranslateX=translateX, scaleTranslateY=translateY)
+    modifiedPatterns.append(metaFunction(scale(patterns[lenP-1])))
+    return(addPatterns(*modifiedPatterns))   
 
 ###################
 

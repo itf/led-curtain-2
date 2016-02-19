@@ -245,3 +245,7 @@ function -> http://stackoverflow.com/questions/13923091/how-do-you-do-a-python-e
 [] Tap for beat when not using audio
 
 [] h functionName -> display the docs of the function to the user on the CLI
+
+[] Easy way to create patterns that contain an internal state [probably following the example of transition functions]
+
+[] Improve the Readme, explaining everything that the project does, and explaining the design choices.
