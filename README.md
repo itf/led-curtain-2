@@ -4,6 +4,9 @@ Getting started with Iron Curtain 2 development.
 ![screenshot](https://raw.githubusercontent.com/Donlanes/iron-curtain-2/master/docs/mesmerizingMeteor.png)
 ![screenshot](https://raw.githubusercontent.com/Donlanes/iron-curtain-2/master/docs/rainbowAurora.png)
 
+Demo of an earlier version of the code (the lag and statering was caused by sending the data over wifi, which was not reliable. Sending the data over etherned fixes the problem).
+https://www.youtube.com/watch?v=TaUksNn31NY
+
 ##Quick Start UNIX
 
 * Install pygame, if you want to develop locally
