@@ -1,4 +1,4 @@
-Getting started with Iron Curtain 2 development. 
+LED Matrix pattern generator and controller
 
 ![screenshot](https://raw.githubusercontent.com/Donlanes/iron-curtain-2/master/docs/cloudsRainbow.png)
 ![screenshot](https://raw.githubusercontent.com/Donlanes/iron-curtain-2/master/docs/mesmerizingMeteor.png)
@@ -6,6 +6,7 @@ Getting started with Iron Curtain 2 development.
 
 Demo of an earlier version of the code (the lag and statering was caused by sending the data over wifi, which was not reliable. Sending the data over etherned fixes the problem).
 https://www.youtube.com/watch?v=TaUksNn31NY
+
 
 ##Quick Start UNIX
 
