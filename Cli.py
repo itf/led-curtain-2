@@ -27,6 +27,8 @@ import SavedFunctions
 import Patterns.StaticPatterns.basicPatterns as basicPattern
 import Patterns.ExtraPatterns.SimpleText
 import Patterns.ExtraPatterns.Image
+import Patterns.ExtraPatterns.StatePatterns as StatePatterns
+
 
 
 Canvas = Config.Canvas
@@ -73,7 +75,9 @@ class Completer(rlcompleter.Completer):
 
     
     def _callable_postfix(self, val, word):
-        if hasattr(val, '__call__') and word not in self.patternDict:
+        if hasattr(val, '__call__') and word in self.statePatternDict:
+            word = word + "()"
+        elif hasattr(val, '__call__') and word not in self.patternDict:
             word = word + "("
         return word
     def _arg_postfix(self, word):
@@ -83,6 +87,9 @@ class Completer(rlcompleter.Completer):
     
     def setPatternDict(self,pDict):
         self.patternDict=pDict
+        
+    def setStatePatternDict(self,spDict):
+        self.statePatternDict=spDict
         
     def setParameterDictContainer(self,pDictContainer):
         self.parameterDictContainer=pDictContainer
@@ -127,6 +134,8 @@ def runCliCurtain(argv):
     dictAll.update(Pattern.getPatternDic())
     dictAll.update(Function.getFunctionDict())
     dictAll.update(Function.getMetaFunctionDict())
+    dictAll.update(StatePatterns.getStatePatternDic())
+
     importFunctionsFromDict(dictAll)
 
     readline.parse_and_bind("tab: complete")
@@ -138,6 +147,8 @@ def runCliCurtain(argv):
     readline.parse_and_bind('set blink-matching-paren on')
     completer=Completer(dictAll)
     completer.setPatternDict(Pattern.getPatternDic())
+    completer.setStatePatternDict(StatePatterns.getStatePatternDic())
+
     try:
         readline.read_history_file('./.history')
     except:

@@ -60,7 +60,7 @@ def imagePattern(PatternInput):
 ###################################
 #Slightly modified BiggleZX code, found on
 #https://gist.github.com/BigglesZX/4016539
-@F.simpleCached(5)
+@F.simpleCached(20)
 def getGifFrames(imagePath, height, width):
     '''
     Iterate the GIF, extracting each frame.
@@ -103,7 +103,7 @@ def getGifFrames(imagePath, height, width):
         return frames
         pass
 
-@F.simpleCached(5)
+@F.simpleCached(20)
 def analyseImage(path):
     '''
     Pre-process pass over the image to determine the mode (full or additive).

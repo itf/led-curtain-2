@@ -2,6 +2,7 @@
 import Patterns.Pattern as Pattern
 import Patterns.Function as Function
 import Patterns.StaticPatterns.basicPatterns
+import Patterns.ExtraPatterns.StatePatterns as StatePatterns
 import Patterns.ExtraPatterns.SimpleText
 import Patterns.ExtraPatterns.Image
 import SavedPatterns
@@ -15,6 +16,7 @@ def importFunctionsFromDict(dictionary):
 importFunctionsFromDict(Pattern.getPatternDic())
 importFunctionsFromDict(Function.getFunctionDict())
 importFunctionsFromDict(Function.getMetaFunctionDict())
+importFunctionsFromDict(StatePatterns.getStatePatternDic())
 
 @Function.function('__hueShift4Beat')
 def __hueShift4Beat(pattern):  return arg('hue=totalBeats%4/4.')(hueShift(pattern))
