@@ -14,21 +14,16 @@ except:
     pass
 P = Config.Protocol
 colorConverter= Config.convertColor
-if Config.useAudio:
-    import Audio.AudioClientLib as Audio
 
-import Transportation.Sockets.ClientSocketUDP as Client
 import Patterns.Pattern as Pattern
 import Patterns.Function as Function
-import SavedPatterns
-import SavedFunctions
 
 
 import Patterns.StaticPatterns.basicPatterns as basicPattern
 import Patterns.ExtraPatterns.SimpleText
 import Patterns.ExtraPatterns.Image
 import Patterns.ExtraPatterns.StatePatterns as StatePatterns
-
+import UI.UIUtils as UIUtils
 
 
 Canvas = Config.Canvas
@@ -94,33 +89,9 @@ class Completer(rlcompleter.Completer):
     def setParameterDictContainer(self,pDictContainer):
         self.parameterDictContainer=pDictContainer
 
-def savePattern(name, code):
-    realCode ='\n' + name.replace(" ", "") + ' = Pattern.pattern(\''+name.replace(" ", "")+'\')('+ code+')'
-    with open("SavedPatterns.py", "a") as savedFunctions:
-        savedFunctions.write(realCode)
-        savedFunctions.close()
-    return realCode
-def safeSavePattern(name, code):
-    realCode=savePattern(name, 'isolateCanvas('+code+')')
-    return realCode
-
-def saveFunction(name,code, patternInput):
-    realFunctionCode = \
-                     '@Function.function(\'' + name.replace(" ", "") + '\')\n'\
-                     'def '+ name.replace(" ", "") + '(pattern):'\
-                     '  return '+ code\
-                     +'\n'
-    exec realFunctionCode in globals(), globals()
-    try:
-        testPatternInput = copy.deepcopy(patternInput)
-        globals()[name](trivial)(testPatternInput)
-        with open("SavedFunctions.py", "a") as savedFunctions:
-            savedFunctions.write(realFunctionCode)
-            savedFunctions.close()
-    except:
-        traceback.print_exc(file=sys.stdout)
-    return realFunctionCode
-
+def importFunctionsFromDict(dictionary):
+    for functionName in dictionary:
+        globals()[functionName] = dictionary[functionName]
 
 def runCliCurtain(argv):
     print 
@@ -130,12 +101,7 @@ def runCliCurtain(argv):
     print 'Write pattern code, parameter(r), recurrentParameter(rr), List (l), Save (s) or Safe Save (ss)'
     print 
     
-    dictAll={}
-    dictAll.update(Pattern.getPatternDic())
-    dictAll.update(Function.getFunctionDict())
-    dictAll.update(Function.getMetaFunctionDict())
-    dictAll.update(StatePatterns.getStatePatternDic())
-
+    dictAll=UIUtils.getDictOfFunctions()
     importFunctionsFromDict(dictAll)
 
     readline.parse_and_bind("tab: complete")
@@ -160,16 +126,30 @@ def runCliCurtain(argv):
     height = int(height)
     width = int(width)
     port = int(port)
-    patternContainer=[basicPattern.randomPattern, None,None]
-    patternString="random"
-    patternInput = Pattern.PatternInput(height=height, width = width)
-    patternInputContainer=[patternInput, None, None]
-    threadSender= threading.Thread(target=dataSender,
-                                   args= (patternContainer,
-                                          patternInputContainer,
-                                          host,
-                                          port))
-    threadSender.start()
+
+    patternString = "random"
+
+    patternContainer = [basicPattern.randomPattern]
+    rContainer = [None]
+    rrContainer = [None]
+    resetFrameContainer = [False]
+    patternInput = UIUtils.createInitialPatternInput(height, width)
+    patternInputContainer=[patternInput]
+    threadSender = UIUtils.startSendData(host = host,
+                  port = port,
+                  sendRate = SEND_RATE,
+                  patternContainer = patternContainer, #modified by the UI
+                  rContainer = rContainer, #modified by the UI and sender
+                  rrContainer = rrContainer, #modified by the UI and sender
+                  patternInputContainer = patternInputContainer, #Should never be modified by the UI
+                  resetFrameContainer= resetFrameContainer, #Should be set to 'true' every time 
+                                        #a pattern is set even if it is the
+                                        #same pattern
+                  isClosed = lambda : False, #Modified by the UI
+                  colorConverter = colorConverter, #Converts colors between colorspaces
+                  canvasToData = P.canvasToData #Convers canvas to data
+                  )
+
     completer.setParameterDictContainer(patternInputContainer)
     while(patternContainer[0]):
         try:
@@ -189,10 +169,10 @@ def runCliCurtain(argv):
 
                     if len(instruction)>1 and instruction[0]=="r" and instruction[1]==' ':
                         command = instruction[2:]
-                        patternInputContainer[1]=command
+                        rContainer[0]=command
                     elif len(instruction)>2 and instruction[0]=="r" and instruction[1]=='r' and instruction[2]==' ':
                         command = instruction[3:]
-                        patternInputContainer[2]=command
+                        rrContainer[0]=command
                     elif instruction =="l":
                         print "PATTERNS:"
                         patternDict=Pattern.getPatternDic()
@@ -213,22 +193,22 @@ def runCliCurtain(argv):
                         name = raw_input('Name for previous pattern:\n')
                         if name:
                             if instruction=="s":
-                                exec savePattern(name,patternString)
+                                exec UIUtils.savePattern(name,patternString) in globals(),locals()
                                 globals()[name] = patternContainer[0]
                                 dictAll[name]=globals()[name]
                                 
                             elif instruction=="ss":
-                                exec safeSavePattern(name,patternString)
+                                exec UIUtils.safeSavePattern(name,patternString) in globals(),locals()
                                 globals()[name] = isolateCanvas(patternContainer[0])
                                 dictAll[name]=globals()[name]
                                 
                             elif instruction=="srr":
                                 newPatternString = "arg('''"+\
-                                                   patternInputContainer[2] +\
+                                                   rrContainer[2] +\
                                                    " ''')("+\
                                                    patternString+\
                                                    ")"
-                                exec savePattern(name,newPatternString)
+                                exec UIUtils.savePattern(name,newPatternString) in globals(),locals()
                                 globals()[name] = eval(newPatternString)
                                 dictAll[name]=globals()[name]
                     elif instruction =="sf":
@@ -241,9 +221,8 @@ def runCliCurtain(argv):
                     else:
                             function = eval(instruction)
                             patternString=instruction
-                            patternContainer[1]=patternContainer[0]
                             patternContainer[0]=function
-                            patternContainer[2]="resetFrame"
+                            resetFrameContainer[0]=True
 
             except:
                 traceback.print_exc(file=sys.stdout)
@@ -251,99 +230,10 @@ def runCliCurtain(argv):
 
                 
         except:
-            patternContainer[0]=None
+            patternContainer[0] = None
             threadSender.join()
             print "threads successfully closed"
 
-def dataSender(patternContainer, patternInputContainer, host, port):
-    patternInput = patternInputContainer[0]
-    height = patternInput["height"]
-    width = patternInput["width"]
-    canvas = Canvas(height,width) 
-    patternInput["canvas"]=canvas
-    frame=0
-    previousPattern=patternContainer[0]
-
-    if Config.useAudio:
-        audio = Audio.AudioInfo()
-        patternInput["beat"] = audio.getBeat
-        patternInput["totalBeats"] = audio.getTotalBeats
-        patternInput["bpm"] = audio.getBPM
-
-    clientSocket = Client.ClientSocketUDP(host,port)
-    timeSleep = 1.0/SEND_RATE
-    previousTime = time.time()
-    while patternContainer[0]:
-            try:
-                if (patternInputContainer[1]):
-                    try:
-                        command = patternInputContainer[1]
-                        Function.execInPattern(command, patternInput)
-                        patternInputContainer[1]=None
-                    except:
-                        patternInputContainer[1]=None
-                        traceback.print_exc(file=sys.stdout)
-                if (patternInputContainer[2]):
-                    try:
-                        command = patternInputContainer[2]
-                        Function.execInPattern(command, patternInput)
-                    except:
-                        patternInputContainer[2]=None
-                        traceback.print_exc(file=sys.stdout)
-
-                pattern=patternContainer[0]
-                if(pattern!=previousPattern):
-                    patternInput['previousPattern'] = previousPattern
-                    patternInput['previousFrame']=frame
-                    frame=0
-                    previousPattern=pattern
-                    patternContainer[2]=None
-                elif patternContainer[2]== "resetFrame":
-                    patternInput['previousPattern'] = previousPattern
-                    patternInput['previousFrame']=frame
-                    frame=0
-                    patternContainer[2]=None
-                else:
-                    frame = frame+1
-                patternInput["frame"]=frame
-                newPatternInput=pattern(patternInput)
-                canvas=copy.deepcopy(newPatternInput["canvas"])
-                globalBrightness = newPatternInput['globalBrightness']
-                if colorConverter:
-                    canvas.mapFunction(lambda rgb,y,x: colorConverter(rgb,globalBrightness))
-                data=P.canvasToData(canvas)
-                clientSocket.sendData(data)
-                patternInput=newPatternInput
-                patternInputContainer[0]=patternInput
-                while previousTime+timeSleep > time.time():
-                    time.sleep(timeSleep/20.) #sleeps for a bit
-                previousTime=time.time()
-            except:
-                traceback.print_exc(file=sys.stdout)
-                if patternContainer[1]:
-                    patternContainer[0]=patternContainer[1]
-                    patternContainer[1]=None
-                else:
-                    if patternContainer[0]==black:
-                        patternContainer[0]=None
-                    height = patternInput["height"]
-                    width = patternInput["width"]
-                    patternInput = Pattern.PatternInput(height=height, width = width)
-                    canvas = Canvas(height,width)
-                    patternInput["canvas"]=canvas
-                    patternInputContainer[0]=patternInput
-                    patternInputContainer[1]=None
-                    patternInputContainer[2]=None
-                    patternContainer[0]=black
-                    time.sleep(0.1)
-        
-    if Config.useAudio:
-        audio.running=False
-
-
-def importFunctionsFromDict(dictionary):
-    for functionName in dictionary:
-        globals()[functionName] = dictionary[functionName]
 
 def main(argv):
 
