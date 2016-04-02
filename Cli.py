@@ -204,7 +204,7 @@ def runCliCurtain(argv):
                                 
                             elif instruction=="srr":
                                 newPatternString = "arg('''"+\
-                                                   rrContainer[2] +\
+                                                   rrContainer[0] +\
                                                    " ''')("+\
                                                    patternString+\
                                                    ")"

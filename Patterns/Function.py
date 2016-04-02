@@ -559,6 +559,51 @@ def timechange(patternnArray, timeArray):
     return timeChangedPattern
 
 
+@function('timeChangerArray2')
+def timechanger(patterns, timeArray):
+    '''
+    Takes as input an arbitrary number of patterns.
+    Changes between those patterns every timeChangerTime seconds
+    '''
+    startTime=getCurrentTime()
+    lenPat = len(patterns)
+    frameContainer=[0]
+    previousIndexContainer=[0]
+    numberOfCyclesContainer=[0]
+    totalTime = sum(timeArray)
+    def timeChangedPattern(patternInput):
+        timeElapsed=(getCurrentTime()-startTime)
+        
+        numberOfCycles = int(timeElapsed/totalTime)
+        if not numberOfCyclesContainer[0] == numberOfCycles:
+            #If just completed a full cycle, reset frame
+            #Useful if there is only one pattern in the timeChaner
+            #And this pattern uses the frame count
+            
+            numberOfCyclesContainer[0]=numberOfCycles
+            previousIndexContainer[0]=-1
+            
+        timeElapsed%=totalTime
+        
+        for i in xrange(len(timeArray)):
+            time=timeArray[i]
+            if timeElapsed>time:
+                timeElapsed = timeElapsed-time
+            else:
+                index=i
+                break
+        if not previousIndexContainer[0] == index:
+            patternInput["previousPattern"] = patterns[previousIndexContainer[0]]
+            patternInput["previousFrame"] = frameContainer[0]
+            previousIndexContainer[0]=index
+            frameContainer[0]=0
+        thisPatternInput = copy.copy(patternInput)
+        thisPatternInput['frame']=frameContainer[0]
+        frameContainer[0]+=1
+        return patterns[index](thisPatternInput)
+        
+    return timeChangedPattern
+
 @function('timeChanger')
 @defaultArguments(timeChangerTime =6)
 def timechanger(*patterns):

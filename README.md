@@ -372,3 +372,5 @@ function -> http://stackoverflow.com/questions/13923091/how-do-you-do-a-python-e
 [] Easy way to create patterns that contain an internal state [probably following the example of transition functions]
 
 [] Improve the Readme, explaining everything that the project does, and explaining the design choices.
+
+[]Make arguments dependent on x and y

@@ -67,7 +67,7 @@ class LocalDisplayConfig:
 class AudioServerConfig:
     port = 5001
     host = 'localhost'
-    delay = -0.03
+    delay = -0.13
     alpha = 0.95
     maxBPS = 6
 
