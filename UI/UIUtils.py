@@ -121,6 +121,18 @@ def startSendData(host,
     threadSender.start()
     return threadSender
 
+class dateAndTime:
+    def hour(self):
+        return time.strftime("%H")
+    def minute(self):
+        return time.strftime("%M")
+    def second(self):
+        return time.strftime("%S")
+    def date(self):
+        return time.strftime("%c")
+    def time(self):
+        return time.strftime("%H:%M")
+
 def _sendDataThread(host,
                     port,
                     sendRate,
@@ -143,6 +155,8 @@ def _sendDataThread(host,
         patternInput["beat"] = audio.getBeat
         patternInput["totalBeats"] = audio.getTotalBeats
         patternInput["bpm"] = audio.getBPM
+    patternInput["time"] = dateAndTime().time
+    patternInput["date"]= dateAndTime().date
 
     clientSocket = Client.ClientSocketUDP(host,port)
     timeSleep = 1.0/sendRate

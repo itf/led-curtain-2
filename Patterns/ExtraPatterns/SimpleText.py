@@ -1,6 +1,7 @@
 import Patterns.Pattern as P
 import Patterns.Function as F
 import letters
+import copy
 
 
 textRealHeight=5
@@ -55,7 +56,6 @@ def getLetters(text):
     myletters = [letters.letters[c] for c in text]
     return myletters
 
-@simpleCached(4)
 def createScaledText(canvas, text, textPos, conversionFactor):
     myletters = getLetters(text)
     textWidth = sum(let.width + 1 for let in myletters)

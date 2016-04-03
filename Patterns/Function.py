@@ -1210,4 +1210,26 @@ def splitRecursive(isHorizontal, *patterns):
     return(addPatterns(*modifiedPatterns))   
 
 ###################
+# Experimental functions
+#
+# Experimental functions are functions that happen to work because of details in the implementation
+# If the implementation of other classes change, they may also stop working.
+# Nevertheless, they can be pretty cool.
 
+@function('conditionRun')
+@defaultArguments(condition="True", conditionUpdateCode="")
+@rFunctionize
+def conditionRun(patternInput):
+    '''
+    Loops untill condition is met
+    '''
+    sleepTime=1/200.
+    conditionUpdateCode=patternInput["conditionUpdateCode"]
+    execInPattern(conditionUpdateCode, patternInput)
+    condition=patternInput["condition"]
+    while not condition:
+        conditionUpdateCode=patternInput["conditionUpdateCode"]
+        execInPattern(conditionUpdateCode, patternInput)
+        condition=patternInput["condition"]
+        time.sleep(sleepTime)
+    return patternInput
