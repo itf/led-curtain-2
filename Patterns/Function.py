@@ -214,6 +214,36 @@ def arg(strInstructionToEval):
     return updaterArg
 
 
+def bypassArg(strInstructionToEval):
+    '''
+    Does not return the patternInput to its original state
+    Used when running inside isolate, useful to keep state
+    '''
+    def updaterArg(pattern):
+        def updateArg(patternInput):
+            oldPatternInput = copy.copy(patternInput)
+            oldPatternInput.pop('canvas')
+            try:
+                execInPattern(strInstructionToEval, patternInput)
+                newPatternInput=pattern(patternInput)
+            except:
+                newPatternInput=pattern(patternInput)
+                execInPattern(strInstructionToEval, newPatternInput)
+                newPatternInput=pattern(newPatternInput)
+            return newPatternInput
+        return updateArg
+    return updaterArg
+
+@function('argIsolate')
+def argIsolate(strInstructionToEval):
+    '''
+    Run arg with the arguments isolated. Nothing outside can modify what is inside the arg.
+    '''
+    def updaterArg(pattern):
+        return isolate(bypassArg(strInstructionToEval)(pattern))
+    return updaterArg 
+
+
 def applyArguments(**kwargs):
     '''
     similar to arg, but to be used inside the code
