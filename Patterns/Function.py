@@ -294,7 +294,9 @@ def constant(pattern):
     def cached_f(patternInput):
         if cache[0]==None:
             cache[0] = copy.deepcopy(pattern(patternInput)['canvas'])
+        oldCanvas=patternInput['canvas']
         patternInput['canvas']=copy.deepcopy(cache[0])
+        patternInput['canvas'].updateArgs(oldCanvas)
         return patternInput
     return cached_f
 
