@@ -9,7 +9,11 @@ Copyright 2009-2015 James Bowman. http://excamera.com/sphinx/article-srgb.html
 Used with permission of the author
 '''
 import math
-
+import Config
+try:
+    import LocalConfig as Config
+except:
+    pass
 class Chebyshev:
     """
     Chebyshev(a, b, n, func)
@@ -55,12 +59,12 @@ def pow(a, b):
     return exp2(b * log2(a))
 
 
-def s2lin(x):
+def s2lin(x,gamma):
     a = 0.055
     if x <= 0.04045:
         return x * (1.0 / 12.92)
     else:
-        return pow((x + a) * (1.0 / (1 + a)), 2.4)
+        return pow((x + a) * (1.0 / (1 + a)), gamma)
 
 
 def lin2s(x):
@@ -73,8 +77,18 @@ def lin2s(x):
 ####End of code by James Bowman.
 
 
+rGamma = Config.ColorManagerConfig.redBaseGamma
+gGamma = Config.ColorManagerConfig.greenBaseGamma
+bGamma = Config.ColorManagerConfig.blueBaseGamma
+
+rBGamma = Config.ColorManagerConfig.redBrightnessFactor
+gBGamma = Config.ColorManagerConfig.greenBrightnessFactor
+bBGamma = Config.ColorManagerConfig.blueBrightnessFactor
 def convertColorToLin(color, brightness):
-    r,g,b = map(s2lin,color)
+    r,g,b = color
+    r = s2lin(r,rGamma+ brightness*rBGamma)
+    g = s2lin(g,gGamma+ brightness*gBGamma)
+    b= s2lin(b,bGamma+ brightness*bBGamma)
     r*=brightness
     g*=brightness
     b*=brightness

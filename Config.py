@@ -12,6 +12,17 @@ if curtain=="old":
     port=6038
     import Transportation.Protocol.OldProtocol as P
     Protocol = P
+    class ColorManagerConfig:
+        ####
+        #Sets gamma to BaseGamma + brightness * factor
+        #This happens to improve the image quality, but it is not supported
+        #by theory.
+        redBaseGamma = 1.65
+        greenBaseGamma = 1.55
+        blueBaseGamma = 1.65
+        redBrightnessFactor = 1.1
+        greenBrightnessFactor = 1.2
+        blueBrightnessFactor = 1.1
     import ColorManager as C
     convertColor = C.convertColorToLin #Converts the color profile to linear
 
@@ -22,6 +33,17 @@ elif curtain=='local': #Assume local
     port=5000
     import Transportation.Protocol.SimpleProtocol as P
     Protocol = P
+    class ColorManagerConfig:
+        ####
+        #Sets gamma to BaseGamma + brightness * factor
+        #This happens to improve the image quality, but it is not supported
+        #by theory.
+        redBaseGamma = 2.4
+        greenBaseGamma = 2.4
+        blueBaseGamma = 2.4
+        redBrightnessFactor = 0
+        greenBrightnessFactor = 0
+        blueBrightnessFactor = 0
     import ColorManager as C
     convertColor = C.convertColorToLin  #Converts the color profile to linear
 
@@ -33,29 +55,20 @@ elif curtain=='new': #New LED panel
     import Transportation.Protocol.SimpleProtocol as P
     Protocol = P
     P.canvasToData = P.canvasToRawData
+    class ColorManagerConfig:
+        ####
+        #Sets gamma to BaseGamma + brightness * factor
+        #This happens to improve the image quality, but it is not supported
+        #by theory.
+        redBaseGamma = 1.65
+        greenBaseGamma = 1.55
+        blueBaseGamma = 1.65
+        redBrightnessFactor = 1.1
+        greenBrightnessFactor = 1.2
+        blueBrightnessFactor = 1.1
     import ColorManager as C
     convertColor = C.convertColorToLin
 
-elif curtain=='other': #???
-    width = 60
-    height = 30
-    host=''#write host here
-    port=5000
-    import Transportation.Protocol.SimpleProtocol as P
-    Protocol = P
-    import ColorManager as C
-    convertColor = C.convertColorToLin
-
-elif curtain=='otherPi': #???
-    width = 60
-    height = 30
-    host=''#write host here
-    port=5000
-    import Transportation.Protocol.SimpleProtocol as P
-    Protocol = P
-    P.canvasToData = P.canvasToRawData
-    import ColorManager as C
-    convertColor = C.convertColorToLin
 
 class LocalDisplayConfig:
     width = 60
@@ -78,3 +91,18 @@ class PiDisplayConfig:
     port = 5000
     host = ''
 
+class ColorManagerConfig:
+    ####
+    #Sets gamma to BaseGamma + brightness * factor
+    #This happens to improve the image quality, but it is not supported
+    #by theory.
+    #
+    # For SRGB, set gamma to 2.4 and factors to 0.
+    #
+    
+    redBaseGamma = 1.65
+    greenBaseGamma = 1.55
+    blueBaseGamma = 1.65
+    redBrightnessFactor = 1.1
+    greenBrightnessFactor = 1.2
+    blueBrightnessFactor = 1.1
