@@ -5,6 +5,7 @@ import Patterns.StaticPatterns.basicPatterns
 import Patterns.ExtraPatterns.StatePatterns as StatePatterns
 import Patterns.ExtraPatterns.SimpleText
 import Patterns.ExtraPatterns.Image
+import Patterns.ExtraPatterns.HuslColor
 import SavedPatterns
 
 

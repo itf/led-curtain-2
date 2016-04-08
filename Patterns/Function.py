@@ -234,7 +234,7 @@ def bypassArg(strInstructionToEval):
         return updateArg
     return updaterArg
 
-@function('argIsolate')
+@function('isolateArg')
 def argIsolate(strInstructionToEval):
     '''
     Run arg with the arguments isolated. Nothing outside can modify what is inside the arg.
@@ -260,8 +260,9 @@ def applyArguments(**kwargs):
         return updateArg
     return updaterArg
 
-def execInPattern(strInstructionToEval, patternInput):
+def execInPattern(strInstructionToEval, patternInput, extra={}):
     defaultDict =getEvalDefaultDict()
+    defaultDict.update(extra)
     exec strInstructionToEval in defaultDict, patternInput
 
 def getEvalDefaultDict():
@@ -1252,6 +1253,7 @@ def splitRecursive(isHorizontal, *patterns):
 def conditionRun(patternInput):
     '''
     Loops untill condition is met
+    Use with argIsolate.
     '''
     sleepTime=1/200.
     conditionUpdateCode=patternInput["conditionUpdateCode"]

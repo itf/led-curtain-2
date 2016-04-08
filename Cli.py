@@ -23,6 +23,8 @@ import Patterns.StaticPatterns.basicPatterns as basicPattern
 import Patterns.ExtraPatterns.SimpleText
 import Patterns.ExtraPatterns.Image
 import Patterns.ExtraPatterns.StatePatterns as StatePatterns
+import Patterns.ExtraPatterns.HuslColor
+
 import UI.UIUtils as UIUtils
 
 

@@ -1,6 +1,7 @@
 curtain = ""
 useImages = False
 useAudio = True
+useHusl = False
 import ScreenCanvasArray 
 Canvas = ScreenCanvasArray.Canvas
 
