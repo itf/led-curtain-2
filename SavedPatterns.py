@@ -93,4 +93,4 @@ _clock = Pattern.pattern('_clock')(isolateArg('''conditionUpdateCode= "condition
 
 _dateClock = Pattern.pattern('_dateClock')(addP(arg('textHeight=0.23;textPos=0.3; text=date; yTranslate=-0.63')(translate(text)),_clock))
 
-_cubeHelix = Pattern.pattern('_cubeHelix')(defaultArgsP(rgbAngle=0)(arg('rgbEquation="rgbR=_rgbf+_rgbAmp*(-0.14861 * cos(_rgbAngle) + 1.78277 * sin(_rgbAngle));rgbG=_rgbf+_rgbAmp*(-0.29227 * cos(_rgbAngle) - 0.90649 * sin(_rgbAngle));rg
+_cubeHelix = Pattern.pattern('_cubeHelix')(defaultArgsP(rgbAngle=0)(arg('rgbEquation="rgbR=_rgbf+_rgbAmp*(-0.14861 * cos(_rgbAngle) + 1.78277 * sin(_rgbAngle));rgbG=_rgbf+_rgbAmp*(-0.29227 * cos(_rgbAngle) - 0.90649 * sin(_rgbAngle));rgbB=_rgbf+_rgbAmp * (1.97294 * cos(_rgbAngle)) ; _rgbAmp=_rgbS * _rgbf * (1. - _rgbf) / 2.;_rgbS=1.5+_rgbf*2.2;_rgbf= (-abs(0.5-(_rgbAngle/3.1416/2.+0.01)%1)**1)*1.05+0.77;_rgbAngle="+str(rgbAngle)+"*3.1416*2;"')(rgb)))
