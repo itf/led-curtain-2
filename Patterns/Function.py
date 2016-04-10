@@ -262,7 +262,7 @@ def applyArguments(**kwargs):
 
 def execInPattern(strInstructionToEval, patternInput, extra={}):
     defaultDict =getEvalDefaultDict()
-    defaultDict.update(extra)
+    patternInput.update(extra)
     exec strInstructionToEval in defaultDict, patternInput
 
 def getEvalDefaultDict():
