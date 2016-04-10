@@ -54,6 +54,10 @@ Everything is run from the command line
 
 And then change Images to True in config.py
 
+### Screen Capture
+
+On Windows and OSX, simply install pillow. For Linux, install pyscreenshot. pypy -m pip install pyscreenshot.
+
 ###Using Audio:
 
 Making the audio work is non-trivial. If you still want to do so, follow the following instructions!

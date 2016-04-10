@@ -17,10 +17,33 @@ if Config.useImages:
     from os import listdir
     imagePath = "Patterns/ExtraPatterns/images/"
     import glob
+    try:
+        import ImageGrab #For windows and OSS
+    except:
+        try:
+            import pyscreenshot as ImageGrab #for linux
+        except:
+            pass
 
 
-
-
+@P.pattern("screen")
+def screenPattern(patternInput):
+    try:
+        img=ImageGrab.grab(bbox=(0,0,60,30))
+    except:
+        return patternInput
+    height = patternInput['height']
+    width = patternInput['width']
+    img = img.resize((width,height),Image.NEAREST)
+    def imager(rgb,y,x):
+        try:
+            r,g,b=img.getpixel((x,y))[0:3]
+            return (r/255.,g/255.,b/255.)
+        except:
+            return (0,0,0)
+    canvas=patternInput["canvas"]
+    canvas.mapFunction(imager)
+    return patternInput
 
 @P.pattern("image")
 @F.defaultArgsP(imageName = "pacman.gif",
