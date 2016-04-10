@@ -101,6 +101,27 @@ def fractal(PatternInput):
     return PatternInput
 
 
+@P.pattern('rgb')
+@F.defaultArgsP(rgbR=1,
+                rgbB = 0,
+                rgbG=0,
+                rgbEquation="",
+                )
+def rgbPattern(patternInput):
+    equation= patternInput["rgbEquation"]
+    height = float(patternInput["height"])
+    width = float(patternInput["width"])
+    def mapper(rgb,y,x):
+        if equation:
+            xyDict={'x':x/width,'y':y/height}
+            F.execInPattern(equation,patternInput,xyDict)
+        r = patternInput["rgbR"]
+        b = patternInput["rgbB"]
+        g = patternInput["rgbG"]
+        return (r,g,b)
+    canvas=patternInput["canvas"]
+    canvas.mapFunction(mapper)
+    return patternInput
 
 
 patternDefaultDict = F.getEvalDefaultDict()
