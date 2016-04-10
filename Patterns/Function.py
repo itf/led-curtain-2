@@ -10,6 +10,7 @@ import colorsys
 import functools
 from functools import wraps
 import copy
+import random
 
 _dict_of_functions={}
 _dict_of_meta_functions={}
@@ -260,10 +261,6 @@ def applyArguments(**kwargs):
         return updateArg
     return updaterArg
 
-def execInPattern(strInstructionToEval, patternInput, extra={}):
-    defaultDict =getEvalDefaultDict()
-    patternInput.update(extra)
-    exec strInstructionToEval in defaultDict, patternInput
 
 def getEvalDefaultDict():
     defaultDict =collections.defaultdict(int)
@@ -277,6 +274,17 @@ def getEvalDefaultDict():
     defaultDict['random']=random.random
     defaultDict.update(math.__dict__)
     return defaultDict
+
+defaultDict =getEvalDefaultDict()
+def execInPattern(strInstructionToExec, patternInput, extra={}):
+    patternInput.update(extra)
+    exec strInstructionToExec in defaultDict, patternInput
+
+def evalInPattern(strInstructionToEval, patternInput, extra={}):
+    patternInput.update(extra)
+    return eval(strInstructionToEval, defaultDict, patternInput)
+
+
 
 
 
@@ -397,9 +405,11 @@ def hueShift(patternInput):
     '''
     Shifts the hue by the specified amount
     '''
-    hue=patternInput["hue"]
+    hue = patternInput["hue"]
+    getVal=patternInput.getValFunction()
     def shifter(rgb,y,x):
-        amount=hue
+        deltahue=getVal(hue,x,y)
+        amount=deltahue
         return hsvShifter(rgb,amount)
     canvas=patternInput["canvas"]
     canvas.mapFunction(shifter)
@@ -468,8 +478,11 @@ def brightness(patternInput):
     Changes the brightness. Allows values >1
     '''
     brightness=patternInput["brightness"]
+    getVal=patternInput.getValFunction()
+
     def brighter(rgb,y,x):
-        rgb = [min(color * brightness,1) for color in rgb]
+        bright=getVal(brightness,x,y)
+        rgb = [min(color * bright,1) for color in rgb]
         return rgb
     canvas=patternInput["canvas"]
     canvas.mapFunction(brighter)
@@ -572,27 +585,7 @@ def weightedMasker(color0, color1, color2):
 ##################################
 #Change patterns over time
 
-@function('timeChangerArrays')
-def timechange(patternnArray, timeArray):
-    totalTime = sum(timeArray)
-    startTime=getCurrentTime()
-
-    def timeChangedPattern(patternInput):
-        timeElapsed=(getCurrentTime()-startTime)
-    
-        timeElapsed%=totalTime
-
-        for i in xrange(len(timeArray)):
-            time=timeArray[i]
-            if timeElapsed>time:
-                timeElapsed = timeElapsed-time
-            else:
-                return patternnArray[i](patternInput)
-        return lambda x: x #Should never happen
-    return timeChangedPattern
-
-
-@function('timeChangerArray2')
+@function('timeChangerArray')
 def timechanger(patterns, timeArray):
     '''
     Takes as input an arbitrary number of patterns.
@@ -695,14 +688,15 @@ def translate(patternInput):
     '''
     height=patternInput["height"]
     width=patternInput["width"]
-    xTranslate=patternInput["xTranslate"]
-    yTranslate=patternInput["yTranslate"]
-
-    xTranslate = round(xTranslate*width)
-    yTranslate = round(yTranslate*height)
+    xTranslateInput=patternInput["xTranslate"]
+    yTranslateInput=patternInput["yTranslate"]
     oldcanvas = copy.deepcopy(patternInput["canvas"])
-
+    getVal=patternInput.getValFunction()
     def translator(rgb,y,x):
+        xTranslate=getVal(xTranslateInput,x,y)
+        yTranslate=getVal(yTranslateInput,x,y)
+        xTranslate = round(xTranslate*width)
+        yTranslate = round(yTranslate*height)
         positionY=int((y+yTranslate)%height)
         positionX=int((x+xTranslate)%width)
         color = oldcanvas[positionY, positionX]
