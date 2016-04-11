@@ -278,13 +278,21 @@ def getEvalDefaultDict():
 defaultDict =getEvalDefaultDict()
 def execInPattern(strInstructionToExec, patternInput, extra={}):
     patternInput.update(extra)
-    exec strInstructionToExec in defaultDict, patternInput
+    bytecode=getExecCode(strInstructionToExec)
+    exec bytecode in defaultDict, patternInput
 
 def evalInPattern(strInstructionToEval, patternInput, extra={}):
     patternInput.update(extra)
-    return eval(strInstructionToEval, defaultDict, patternInput)
+    bytecode=gerEvalCode(strInstructionToEval)
+    return eval(bytecode, defaultDict, patternInput)
 
+@simpleCached(100)
+def getExecCode(strInstructionToExec):
+    return compile(strInstructionToExec, "<string>", 'exec')  
 
+@simpleCached(100)
+def gerEvalCode(strInstructionToEval):
+    return compile(strInstructionToEval, "<string>", 'eval')  
 
 
 
