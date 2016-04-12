@@ -111,13 +111,14 @@ def rgbPattern(patternInput):
     equation= patternInput["rgbEquation"]
     height = float(patternInput["height"])
     width = float(patternInput["width"])
+    getVal=patternInput.getValFunction()
     def mapper(rgb,y,x):
         if equation:
             xyDict={'x':x/width,'y':y/height}
             F.execInPattern(equation,patternInput,xyDict)
-        r = patternInput["rgbR"]
-        b = patternInput["rgbB"]
-        g = patternInput["rgbG"]
+        r = getVal(patternInput["rgbR"],x,y)
+        b = getVal(patternInput["rgbB"],x,y)
+        g = getVal(patternInput["rgbG"],x,y)
         return (r,g,b)
     canvas=patternInput["canvas"]
     canvas.mapFunction(mapper)

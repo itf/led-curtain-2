@@ -157,6 +157,8 @@ def _sendDataThread(host,
         patternInput["bpm"] = audio.getBPM
     patternInput["time"] = dateAndTime().time
     patternInput["date"]= dateAndTime().date
+    
+    safePatternInput = copy.deepcopy(patternInput)
 
     clientSocket = Client.ClientSocketUDP(host,port)
     timeSleep = 1.0/sendRate
@@ -211,11 +213,16 @@ def _sendDataThread(host,
                 traceback.print_exc(file = sys.stdout)
                 if previousPreviousPattern:
                     patternContainer[0] = previousPreviousPattern
+                    previousPattern = patternContainer[0]
                     previousPreviousPattern = None
+                    height = patternInput["height"]
+                    width = patternInput["width"]
+                    canvas = Canvas(height,width)
+                    patternInput["canvas"] = canvas
                     
                 else:
-                    if patternContainer[0] == basicPattern.black:
-                        patternContainer[0]=None
+                    if patternContainer[0] == basicPattern.blackPattern:
+                        patternInput= copy.deepcopy(safePatternInput)
                     height = patternInput["height"]
                     width = patternInput["width"]
                     patternInput = Pattern.PatternInput(height = height, width = width)
@@ -224,7 +231,7 @@ def _sendDataThread(host,
                     patternInputContainer[0] = patternInput
                     rrContainer[0] = None
                     rrContainer[0] = None
-                    patternContainer[0] = basicPattern.black
+                    patternContainer[0] = basicPattern.blackPattern
                     time.sleep(0.2)
 
     #if not running, close audio
