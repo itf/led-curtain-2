@@ -89,7 +89,7 @@ class AudioInfo:
         self.lock.acquire()
         self.curTime = time.time()
         totalBeats= self._getCurrentBeat(self.curTime)+self.totalBeats
-        if totalBeats > self._previousTotalBeats:
+        if totalBeats >= self._previousTotalBeats:
             self._previousTotalBeats = totalBeats
         else:
             #this means that beat detection is working and therefore self._getCurrentBeat<1

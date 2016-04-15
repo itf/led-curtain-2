@@ -215,16 +215,25 @@ def runCliCurtain(argv):
                                 dictAll[name]=globals()[name]
                     elif instruction =="sf":
                         func = raw_input('Write Function. Use "pattern" as the input:\n')
+                        leftP = func.count('(')
+                        rightP = func.count(')')
+                        if(leftP > rightP):
+                            print "Attempting to fix mismatched left parenthesis"
+                            func=func+ ')'*(leftP-rightP)
+                        elif (rightP>leftP):
+                            print "Attempting to fix mismatched right parenthesis"
+                            func='('*(rightP-leftP) +func
                         name = raw_input('Name for function:\n')
                         if name:
-                            if saveFunction(name,func, patternInputContainer[0]):
-                                dictAll[name]=globals()[name]
+                            savedFunction = UIUtils.saveFunction(name,func, patternInputContainer[0])
+                            if savedFunction:
+                                dictAll[name]=globals()[name]=savedFunction
                                                         
                     else:
-                            function = eval(instruction)
-                            patternString=instruction
-                            patternContainer[0]=function
-                            resetFrameContainer[0]=True
+                        function = eval(instruction)
+                        patternString=instruction
+                        patternContainer[0]=function
+                        resetFrameContainer[0]=True
 
             except:
                 traceback.print_exc(file=sys.stdout)

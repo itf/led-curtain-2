@@ -60,13 +60,14 @@ def saveFunction(name,code, patternInput):
     exec realFunctionCode in globals(), globals()
     try:
         testPatternInput = copy.deepcopy(patternInput)
-        globals()[name](trivial)(testPatternInput)
+        globals()[name](basicPattern.trivialPattern)(testPatternInput)
         with open("SavedFunctions.py", "a") as savedFunctions:
             savedFunctions.write(realFunctionCode)
             savedFunctions.close()
     except:
+        globals()[name] = False
         traceback.print_exc(file=sys.stdout)
-    return realFunctionCode
+    return globals()[name]
 
 
 def createInitialPatternInput(height, width):
@@ -239,4 +240,5 @@ def _sendDataThread(host,
         audio.running=False
 
 
-
+dictAll=getDictOfFunctions()
+importFunctionsFromDict(dictAll)
