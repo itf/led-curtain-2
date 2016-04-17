@@ -58,6 +58,12 @@ And then change Images to True in config.py
 
 On Windows and OSX, simply install pillow. For Linux, install pyscreenshot. pypy -m pip install pyscreenshot.
 
+
+### Using Weather
+
+Install requests (sudo pypy -m install requests)
+Create an account on openweather, and configure your city ID and your API Key in local config
+
 ###Using Audio:
 
 Making the audio work is non-trivial. If you still want to do so, follow the following instructions!

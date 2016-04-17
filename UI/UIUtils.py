@@ -15,6 +15,9 @@ except:
 if Config.useAudio:
     import Audio.AudioClientLib as Audio
 
+if Config.useOpenWeather:
+    import UI.Weather as Weather
+
 import Transportation.Sockets.ClientSocketUDP as Client
 import Patterns.Pattern as Pattern
 import Patterns.Function as Function
@@ -130,7 +133,7 @@ class dateAndTime:
     def second(self):
         return time.strftime("%S")
     def date(self):
-        return time.strftime("%c")
+        return time.strftime("%a %b %d")
     def time(self):
         return time.strftime("%H:%M")
 
@@ -156,8 +159,18 @@ def _sendDataThread(host,
         patternInput["beat"] = audio.getBeat
         patternInput["totalBeats"] = audio.getTotalBeats
         patternInput["bpm"] = audio.getBPM
+        
     patternInput["time"] = dateAndTime().time
     patternInput["date"]= dateAndTime().date
+
+    if Config.useOpenWeather:
+        patternInput["temp"] = Weather.getTempNow
+        patternInput["tempMax"] = Weather.getTempMax
+        patternInput["tempMin"] = Weather.getTempMin
+        patternInput["weather"] = Weather.getWeather
+        
+
+
     
     safePatternInput = copy.deepcopy(patternInput)
 

@@ -89,7 +89,7 @@ _partyClouds = Pattern.pattern('_partyClouds')(weightedMask(cloudsRainbow,clouds
 _partyRocketHypno = Pattern.pattern('_partyRocketHypno')(arg('imageName="rocket"; imageHeight=imageWidth=0.8+sin(totalBeats/2.)*0.2')(weightedMask(translate(image),black,_hypnoCalm)))
 _partyPatterns = Pattern.pattern('_partyPatterns')(addP(timeChangerArray([_beatSnakes,  transitionFade(__beatInt4Hue(arg('xTranslate=-totalBeats/4. ;brightness=0.8')(translate(brightness(_nyanCat))))),_beatSinWaveTrailBeat, transitionRandom(_beatBlueGradient3), transitionFade(__beatInt4Hue(_partySpaceshipV2)),  _beatWorm, _beat3rgbCircle,  _partyAliensV2, transitionFade(_partyClouds), _gameOfLife, _partyRocketHypno],[29,17, 19,21, 17,  16, 22,28,19, 16,24]),arg('brightness=0.5;textHeight=0.3;transitionFadeStep=0.02')( timeChangerArray([brightness(vladTheImpaler), transitionFade(black)],[18,13]))))
 _springBreak = Pattern.pattern('_springBreak')(mask(addP(arg('text="spring";textHeight=0.35 ')(text),arg('text="break!";textHeight=0.4;yTranslate=0.5 ')(translate(text))), coolRandom,black))
-_clock = Pattern.pattern('_clock')(isolateArg('''conditionUpdateCode= "condition=(time != previousTime); previousTime=time;text=time";textHeight=0.48 ; textPos=0.5''')(conditionRun(text)))
+_clock = Pattern.pattern('_clock')(arg('''conditionUpdateCode= "condition=(time != previousTime);text=time";previousTime=time; textHeight=0.48 ; textPos=0.5''')(conditionRun(text)))
 
 _dateClock = Pattern.pattern('_dateClock')(addP(arg('textHeight=0.23;textPos=0.3; text=date; yTranslate=-0.63')(translate(text)),_clock))
 
@@ -97,3 +97,7 @@ _cubeHelix = Pattern.pattern('_cubeHelix')(defaultArgsP(rgbAngle=0)(arg('rgbEqua
 
 _lavaLamp = Pattern.pattern('_lavaLamp')(arg('''yTranslate="x/2.+sin(x*4*(1+sin(frame/300.))+frame/10.)*0.2";xTranslate="-y/2 - frame/60.-4*sin(x/3.*(1+sin(frame/120.)))";rotateAngle=frame/11. ''')(translate(__rotate(_3rgbCircle))))
 _beatDiamonds = Pattern.pattern('_beatDiamonds')(defaultArgsP(beatDiamondsNumber=3)(arg('hue="(int( max(abs(x+y-1),abs(x-y))-(totalBeats)  )/float(beatDiamondsNumber))" ')(hueShift(red))))
+_weatherClock = Pattern.pattern('_weatherClock')(arg('xTranslate=yTranslate=0 ')(addP(arg('text=time; textHeight=0.3333; yTranslate=0.0; xTranslate=-0.04')(translate(text)),arg('text=date;textHeight=0.166; yTranslate=-0.3533 ')(translate(text)),arg('text=str(temp)+" "+ str(tempMin)+" " + str(tempMax)+"C";textHeight=0.166; yTranslate=-0.60 ')(translate(text)), arg('text=weather;textHeight=0.166; yTranslate=-0.823')(translate(text)))))
+
+_weatherClockPretty = Pattern.pattern('_weatherClockPretty')(defaultArgsP(weatherClockNoise=0)(arg('weightedMeanWeight=0.7+weatherClockNoise ')(mask(_weatherClock,weightedMean2P(_cubeHelix,random),black))))
+_weatherClockPrettySlowUpdate = Pattern.pattern('_weatherClockPrettySlowUpdate')(defaultArgsP(weatherClockColorAdjust=0)(arg('''conditionUpdateCode= "condition=(time != previousTime)"; previousTime=time; rgbAngle=frame/1440.+weatherClockColorAdjust''')(conditionRun(_weatherClockPretty))))

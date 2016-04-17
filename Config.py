@@ -2,6 +2,12 @@ curtain = ""
 useImages = False
 useAudio = True
 useHusl = False
+useOpenWeather = False
+
+class openWeather:
+    api=""
+    cityID="4931972"
+
 import ScreenCanvasArray 
 Canvas = ScreenCanvasArray.Canvas
 
