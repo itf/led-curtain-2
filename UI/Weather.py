@@ -35,7 +35,12 @@ def getOpenWeatherRequest():
 def getTempNow():
     r=getOpenWeatherRequest()
     tKelvin=r['main']['temp']
-    return tKelvin-273.15
+    return round(tKelvin-273.15,2)
+
+def getTempNowF():
+    r=getOpenWeatherRequest()
+    tKelvin=r['main']['temp']
+    return round((tKelvin-273.15)*9/5.+32,2)
     
 def getTempMax():
     r=getOpenWeatherRequest()

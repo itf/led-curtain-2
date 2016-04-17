@@ -165,6 +165,7 @@ def _sendDataThread(host,
 
     if Config.useOpenWeather:
         patternInput["temp"] = Weather.getTempNow
+        patternInput["tempF"] = Weather.getTempNowF
         patternInput["tempMax"] = Weather.getTempMax
         patternInput["tempMin"] = Weather.getTempMin
         patternInput["weather"] = Weather.getWeather
