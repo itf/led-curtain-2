@@ -15,6 +15,9 @@ except:
 if Config.useAudio:
     import Audio.AudioClientLib as Audio
 
+if Config.useInput:
+    import Input.InputServerLib as Input
+    
 if Config.useOpenWeather:
     import UI.Weather as Weather
 
@@ -29,6 +32,8 @@ import Patterns.StaticPatterns.basicPatterns as basicPattern
 import Patterns.ExtraPatterns.SimpleText
 import Patterns.ExtraPatterns.Image
 import Patterns.ExtraPatterns.StatePatterns as StatePatterns
+
+import Patterns.ExtraPatterns.InputPatterns as InputPatterns
 
 
 
@@ -159,6 +164,11 @@ def _sendDataThread(host,
         patternInput["beat"] = audio.getBeat
         patternInput["totalBeats"] = audio.getTotalBeats
         patternInput["bpm"] = audio.getBPM
+
+    if Config.useInput:
+        userInput = Input.InputInfo()
+        patternInput["input"] = userInput.getInputs
+
         
     patternInput["time"] = dateAndTime().time
     patternInput["date"]= dateAndTime().date
@@ -252,6 +262,8 @@ def _sendDataThread(host,
     #if not running, close audio
     if Config.useAudio:
         audio.running=False
+    if Config.useInput:
+        userInput.running=False
 
 
 dictAll=getDictOfFunctions()

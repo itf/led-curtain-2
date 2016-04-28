@@ -1,6 +1,7 @@
 curtain = ""
 useImages = False
 useAudio = True
+useInput = False
 useHusl = False
 useOpenWeather = False
 
@@ -91,24 +92,15 @@ class AudioServerConfig:
     alpha = 0.95
     maxBPS = 6
 
+class InputServerConfig:
+    port = 5002
+    host = 'localhost'
+    playerNumber = '1'
+
 class PiDisplayConfig:
     width = 60
     height = 30
     port = 5000
     host = ''
 
-class ColorManagerConfig:
-    ####
-    #Sets gamma to BaseGamma + brightness * factor
-    #This happens to improve the image quality, but it is not supported
-    #by theory.
-    #
-    # For SRGB, set gamma to 2.4 and factors to 0.
-    #
-    
-    redBaseGamma = 1.65
-    greenBaseGamma = 1.55
-    blueBaseGamma = 1.65
-    redBrightnessFactor = 1.1
-    greenBrightnessFactor = 1.2
-    blueBrightnessFactor = 1.1
+
