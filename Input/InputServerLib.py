@@ -16,7 +16,7 @@ class InputInfo:
     def __init__(self, host=None, port=None):
         self.running=True
         if host == None:
-            self.host = Config.host
+            self.host = Config.server
         if port == None: 
             self.port = Config.port
         self.socket = Server.ServerSocketUDP(self.host,self.port)

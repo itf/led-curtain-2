@@ -95,6 +95,7 @@ class AudioServerConfig:
 class InputServerConfig:
     port = 5002
     host = 'localhost'
+    server = ''
     playerNumber = '1'
 
 class PiDisplayConfig:

@@ -1,6 +1,11 @@
 #!/usr/bin/python
 import sys
-from Config import InputServerConfig as Config
+
+try:
+    from LocalConfig import InputServerConfig as Config
+except:
+    from Config import InputServerConfig as Config
+    
 from Input import InputClientLib as InputLib
 
 
