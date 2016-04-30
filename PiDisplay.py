@@ -4,6 +4,7 @@ from Transportation.Sockets.ServerSocketUDP import ServerSocketUDP
 import Transportation.Protocol.SimpleProtocol as P
 from Display.PiWS2812b.Curtain import Curtain as Curtain
 from Config import PiDisplayConfig as Config
+import socket
 import time
 
 try:
@@ -23,6 +24,7 @@ def runDisplay(host, port, height, width):
             data =dataRaw[0]
             if data =="": #Necessary for games
                 try:
+                    print "empty Data"
                     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
                     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
                     newClientIP= dataRaw[1][0]
@@ -33,7 +35,6 @@ def runDisplay(host, port, height, width):
                 
             else:
                 lastServer=dataRaw[1]   
-                data = server.getData()
                 curtain.sendColorCanvas(data)
                 time.sleep(minSleepTime)
         except:
