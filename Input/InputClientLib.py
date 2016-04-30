@@ -19,13 +19,16 @@ def inputProcess(port, host='localhost', player=1):
                 try:
                     serverSocket = Server.ServerSocketUDP('',port)
                     clientSocket2 = Client.ClientSocketUDP(Config.host,Config.port)
-                    clientSocket2.sendData("")
-                    serverSocket.sock.settimeout(1)
+                    print Config.host
+                    for i in xrange(100):
+                        clientSocket2.sendData("")
+                    serverSocket.sock.settimeout(2)
                     newIP= serverSocket.getData()
                     clientSocket[0] = Client.ClientSocketUDP(newIP,port)
                     print "New IP is " + newIP
                     serverSocket.close()
                 except:
+                    serverSocket.close()
                     print "Could not get new ip"
 
                     
