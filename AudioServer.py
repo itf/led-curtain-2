@@ -2,7 +2,13 @@
 import sys
 
 import Transportation.Sockets.ClientSocketUDP as Client
-from Config import AudioServerConfig as Config
+try:
+    from LocalConfig import AudioServerConfig as Config
+except:
+    from Config import AudioServerConfig as Config
+
+    
+
 from Audio import AudioServerLib as AudioLib
 
 

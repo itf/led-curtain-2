@@ -74,6 +74,9 @@ def _getBlackColor(value, y, x):
 
 @P.pattern('rainbow')
 def rainbow(PatternInput):
+    '''
+    rainbow
+    '''
     width=PatternInput["width"]
     xHueShift =1./width
     def shifter(rgb,y,x):
@@ -98,6 +101,135 @@ def fractal(PatternInput):
     return PatternInput
 
 
+@P.pattern('rgb')
+@F.defaultArgsP(rgbR=1,
+                rgbB = 0,
+                rgbG=0,
+                rgbEquation="",
+                )
+def rgbPattern(patternInput):
+    equation= patternInput["rgbEquation"]
+    height = float(patternInput["height"])
+    width = float(patternInput["width"])
+    getVal=patternInput.getValFunction()
+    def mapper(rgb,y,x):
+        if equation:
+            xyDict={'x':x/width,'y':y/height}
+            F.execInPattern(equation,patternInput,xyDict)
+        r = getVal(patternInput["rgbR"],x,y)
+        b = getVal(patternInput["rgbB"],x,y)
+        g = getVal(patternInput["rgbG"],x,y)
+        return (r,g,b)
+    canvas=patternInput["canvas"]
+    canvas.mapFunction(mapper)
+    return patternInput
+
+
+patternDefaultDict = F.getEvalDefaultDict()
+equationPlane = []
+rotatedPlane=[]
+@P.pattern('equationxyPlotter')
+@F.defaultArgsP(equationXY="sin(10*(x**2+y**2))/3.",
+                equationXmin = -1,
+                equationXmax = 1,
+                equationYmin = -1,
+                equationYmax = 1,
+                equationAngle0 = 0
+                )
+def equation(PatternInput):
+    '''
+    Not well tested. Creates a 3d equation plot that can be rotated
+    '''
+    width = PatternInput["width"]
+    height = PatternInput["height"]
+    mWidth=width/2
+    mHeight=height/2
+    iterations =1
+
+    if equationPlane==[]:
+        for i in xrange(height*iterations):
+            equationPlane.append([0]*width*iterations)
+    equation=PatternInput["equationXY"]
+    equationXmin = PatternInput["equationXmin"]
+    equationXmax = PatternInput["equationXmax"]
+    equationYmin = PatternInput["equationYmin"]
+    equationYmax = PatternInput["equationYmax"]
+    equationAngle0 = PatternInput["equationAngle0"]
+    angle=equationAngle0
+
+    dx = float(equationXmax-equationXmin)/width
+    dy = float(equationYmax-equationYmin)/height
+
+    minZ= [+999999999]
+    maxZ= [-999999999]
+    @F.simpleCached(2)
+    def calculateEquationPlane(equation):
+        for y0 in xrange(height*iterations):
+            y=y0-mHeight*iterations
+            y = y*dy/iterations
+            for x0 in xrange(width*iterations):
+                x= x0-mWidth*iterations
+                x = x*dx/iterations
+                z =eval(equation, patternDefaultDict, locals())
+
+                equationPlane[y0][x0]=z
+                if minZ[0]>z:
+                    minZ[0]=z
+                if maxZ[0]<z:
+                    maxZ[0]=z
+        return equationPlane
+    
+    calculateEquationPlane(equation)
+
+    maxZ=maxZ[0]
+    minZ=minZ[0]
+    dz = maxZ-minZ
+
+    if rotatedPlane ==[]:
+        for i in xrange(height):
+            rotatedPlane.append([None]*width)
+    else:
+        for i in xrange(height):
+            for j in xrange(width):
+                rotatedPlane[i][j]=None
+
+
+    def rotateEquation(angle,equationPlane):
+        antiAngle= abs(1 - angle**2)**0.5
+        for y in xrange(height*iterations):
+            for x in xrange(width*iterations):
+                z = equationPlane[y][x]
+                y2 = int(round(y*(antiAngle)/iterations + (z/dy+mHeight) * angle))
+                z2 = z*(antiAngle) - (y- mHeight)*dy * angle/iterations
+                if y2<height and y2>=0:
+                    if rotatedPlane[y2][x/iterations]==None:
+                        rotatedPlane[y2][x/iterations] = z
+                    elif rotatedPlane[y2][x/iterations]< z2:
+                        rotatedPlane[y2][x/iterations]=z
+
+
+    if angle!=0:
+        rotateEquation(angle,equationPlane)
+        plotPlane=rotatedPlane
+    else:
+        plotPlane=equationPlane
+    def calculateEquation(eq,x,y):
+        return eval(eq, patternDefaultDict, locals())
+    def mapper(rgb,y,x):
+        h=plotPlane[height-y-1][width-x-1]
+        if h==None:
+            h=0
+            s=0
+            v=0
+        else:
+            h=(h-minZ)/dz
+            s=1
+            v=h*0.5+0.5
+        color =colorsys.hsv_to_rgb(h,s,v)
+        return color
+    canvas=PatternInput["canvas"]
+    canvas.mapFunction(mapper) 
+    return PatternInput
 
 @P.pattern('circle')
 @F.defaultArgsP(cRadius=0.666)
@@ -118,12 +250,21 @@ def circle(PatternInput):
     canvas.mapFunction(mapper)
     return PatternInput
 
+
+
 @P.pattern('radialHueGradient')
 @F.defaultArgsP(radialGradientRadius=0.666,
                 radialGradientColor0 = 0x6495ed,
                 radialGradientColor1=0x0ffff,
                 radialGradientPos=0)
 def radialHueGradient(PatternInput):
+    '''
+    Radial Hue gradient.
+    Depends on radialGradientRadius,
+                radialGradientColor0,
+                radialGradientColor1,
+                radialGradientPos
+    '''
     width = PatternInput["width"]
     height = PatternInput["height"]
     mWidth=width/2
@@ -170,6 +311,15 @@ def radialHueGradient(PatternInput):
                 linearGradientPos=0.5,
                 linearGradientAngle=0)
 def linearHueGradient(PatternInput):
+    '''
+    Linear Gradient.
+    Depends on:
+        linearGradientLength,
+        linearGradientColor0,
+        linearGradientColor1,
+        linearGradientPos,
+        linearGradientAngle
+    '''
     width = PatternInput["width"]
     height = PatternInput["height"]
     mWidth=width/2
@@ -217,4 +367,44 @@ def linearHueGradient(PatternInput):
         
     canvas=PatternInput["canvas"]
     canvas.mapFunction(mapper)
+    return PatternInput
+
+
+
+patternDefaultDict = F.getEvalDefaultDict()
+@P.pattern('equationxPlotter')
+@F.defaultArgsP(equationX="sin(x*3)/3",
+                equationXxmin = -3,
+                equationXxmax = 3,
+                )
+def equationX(PatternInput):
+    '''
+    2 dimensional equation plotter
+    '''
+    width = PatternInput["width"]
+    height = PatternInput["height"]
+    equation=PatternInput["equationX"]
+    equationXmin = PatternInput["equationXxmin"]
+    equationXmax = PatternInput["equationXxmax"]
+
+    dx=float(equationXmax-equationXmin)/width
+    
+    mWidth=width/2
+    mHeight=height/2
+
+    blackPattern(PatternInput)
+    
+    canvas=PatternInput["canvas"]
+    
+    for xi in xrange(width):
+        x=(xi-1/2.)*dx+equationXmin
+        y0 =eval(equation, patternDefaultDict, locals())
+        x=x+dx
+        y1 =eval(equation, patternDefaultDict, locals())
+
+        if y0<y1:
+            y0,y1=y1,y0
+        y0,y1 = int(round(mHeight*(1-y0))), int(round(mHeight*(1-y1)))
+        for yi in xrange(y0,y1+1):
+            canvas[yi,xi]=(1,0,0)
     return PatternInput

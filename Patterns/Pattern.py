@@ -127,6 +127,36 @@ class PatternInput(dict):
         else:
             return item
         
+    def getVal(self,val, patternInput, x,y):
+        ###
+        #Use if you want your arg to depend in x and y, or other parameters
+        if isinstance(val, basestring):
+            height = float(patternInput["height"])
+            width = float(patternInput["width"])
+            xyDict={'x':x/width,'y':y/height}
+            try:
+                val=F.evalInPattern(val,patternInput,xyDict)
+            except:
+                val = 0
+        return val
+
+    def getValFunction(self):
+        ###
+        #More efficient
+        #Use if you want your arg to depend in x and y, or other parameters
+        height = float(self["height"])
+        width = float(self["width"])
+        f= F.evalInPattern
+        def valFunction(val, x,y):
+            if isinstance(val, basestring):
+                xyDict={'x':x/width,'y':y/height}
+                try:
+                    val=f(val,self,xyDict)
+                except:
+                    val = 0
+            return val
+        return valFunction
+    
     def __deepcopy__(self,memo):
         #needed in order to copy the functions properly 
         newone = copy.copy(self)
