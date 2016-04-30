@@ -83,6 +83,17 @@ class LocalDisplayConfig:
     port = 5000
     normalize = True
     linearColorProfileCorretion = True
+    class ColorManagerConfig:
+        ####
+        #Sets gamma to BaseGamma + brightness * factor
+        #This happens to improve the image quality, but it is not supported
+        #by theory.
+        redBaseGamma = 2.4
+        greenBaseGamma = 2.4
+        blueBaseGamma = 2.4
+        redBrightnessFactor = 0
+        greenBrightnessFactor = 0
+        blueBrightnessFactor = 0
 
 
 class AudioServerConfig:
