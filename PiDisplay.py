@@ -4,14 +4,18 @@ from Transportation.Sockets.ServerSocketUDP import ServerSocketUDP
 import Transportation.Protocol.SimpleProtocol as P
 from Display.PiWS2812b.Curtain import Curtain as Curtain
 from Config import PiDisplayConfig as Config
+import time
+
 
 def runDisplay(host, port, height, width):
+    minSleepTime=0.0000090*height*width
     server=ServerSocketUDP(host,port)
     curtain = Curtain(width,height)
     while(1):
         try:
             data = server.getData()
-            curtain.sendColorCanvas(data)
+	    curtain.sendColorCanvas(data)
+            time.sleep(minSleepTime)
         except:
             pass
 
