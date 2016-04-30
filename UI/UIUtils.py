@@ -167,7 +167,9 @@ def _sendDataThread(host,
 
     if Config.useInput:
         userInput = Input.InputInfo()
-        patternInput["input"] = userInput.getInputs
+        patternInput["lastInput"] = userInput.getLastInputs
+        patternInput["inputList"] = userInput.getInputList
+
 
         
     patternInput["time"] = dateAndTime().time

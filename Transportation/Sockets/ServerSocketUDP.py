@@ -9,6 +9,10 @@ class ServerSocketUDP(ServerInterface):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.bind(self._serverAddress)
 
-        
+    def getDataHost(self):
+        return self.sock.recvfrom(16384)
+    
     def getData(self):
         return self.sock.recvfrom(16384)[0]
+    def close(self):
+        self.sock.close()
