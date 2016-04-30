@@ -10,8 +10,8 @@ except:
 DEBUG = 0
 
 def inputProcess(port, host='localhost', player=1):
-    clientSocket = [Client.ClientSocketUDP(host,port)]
-    try:
+        clientSocket = [Client.ClientSocketUDP(host,port)]
+    #try:
         import curses
         def sendKey(stdscr):
             while True:
@@ -20,15 +20,19 @@ def inputProcess(port, host='localhost', player=1):
                     try:
                         serverSocket = Server.ServerSocketUDP('',port)
                         clientSocket2 = Client.ClientSocketUDP(Config.host,Config.port)
-                        clientSocket2.sendData("")
-                        serverSocket.sock.settimeout(1)
+                        for i in xrange(100):
+                            clientSocket2.sendData("")
+                        serverSocket.sock.settimeout(2)
                         newIP= serverSocket.getData()
                         clientSocket[0] = Client.ClientSocketUDP(newIP,port)
                         print "New IP is " + newIP
                         serverSocket.close()
                     except:
                         print "Could not get new ip"
-
+                        try:
+                            serverSocket.close()
+                        except:
+                            pass
                         
                 try:
                     clientSocket[0].sendData(str(player)+'#'+c)
@@ -38,20 +42,22 @@ def inputProcess(port, host='localhost', player=1):
                     print c
         curses.wrapper(sendKey)
 
-    except: #Using windows derp
+
+    #except: #Using windows derp
         from msvcrt import getch
         def sendKey():
             while True:
                 c = msvcrt.getch()
                 C= ord(c)
-                if C == 224: #function key
+                if C == 224 or C ==0: #function key
                     c = msvcrt.getch()
                     if c == '?':
                         try:
                             serverSocket = Server.ServerSocketUDP('',port)
                             clientSocket2 = Client.ClientSocketUDP(Config.host,Config.port)
-                            clientSocket2.sendData("")
-                            serverSocket.sock.settimeout(1)
+                            for i in xrange(100):
+                                clientSocket2.sendData("")
+                            serverSocket.sock.settimeout(2)
                             newIP= serverSocket.getData()
                             clientSocket[0] = Client.ClientSocketUDP(newIP,port)
                             print "New IP is " + newIP
