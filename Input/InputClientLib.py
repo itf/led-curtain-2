@@ -10,8 +10,8 @@ except:
 DEBUG = 0
 
 def inputProcess(port, host='localhost', player=1):
-        clientSocket = [Client.ClientSocketUDP(host,port)]
-    #try:
+    clientSocket = [Client.ClientSocketUDP(host,port)]
+    try:
         import curses
         def sendKey(stdscr):
             while True:
@@ -43,7 +43,7 @@ def inputProcess(port, host='localhost', player=1):
         curses.wrapper(sendKey)
 
 
-    #except: #Using windows derp
+    except: #Using windows derp
         from msvcrt import getch
         def sendKey():
             while True:

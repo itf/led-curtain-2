@@ -7,4 +7,5 @@ venv/
 *\#
 .history
 dependencyTests
+.idea
 LocalConfig.py

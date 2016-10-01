@@ -150,7 +150,12 @@ def agarioInit(statePatternDict, patternInput):
 
     
     statePatternDict['blobBodies']={}
+    statePatternDict['blobSpeeds']={}
+    statePatternDict['blobMovements']={}
     statePatternDict['blobColors']={}
+
+    statePatternDict['maxSpeed'] = 1
+    statePatternDict['speedStep'] = 0.1
     
     
 
@@ -163,7 +168,11 @@ def agarioPatternFunction(patternInput,statePatternDict):
     inputs = patternInput['inputList']
     blobBodies = statePatternDict['blobBodies']
     blobColors = statePatternDict['blobColors']
-
+    blobSpeeds = statePatternDict['blobSpeeds']
+    blobMovements = statePatternDict['blobMovements']
+    maxSpeed = statePatternDict['maxSpeed'] = 1
+    speedStep = statePatternDict['speedStep'] = 0.1
+    
     poisons=statePatternDict['poison']
     poisonColor=statePatternDict['poisonColor']
 
@@ -178,6 +187,8 @@ def agarioPatternFunction(patternInput,statePatternDict):
     for i in deadBlobs:
         blobBodies.pop(i)
         blobColors.pop(i)
+        blobSpeeds.pop(i)
+        blobMovements.pop(i)
 
     ##Add new players or dead players back
     for sB in inputs:
@@ -186,7 +197,8 @@ def agarioPatternFunction(patternInput,statePatternDict):
             y = random.randint(1,height)
             blobBodies[sB] = [[y,x],[y, x-1],[y-1, x],[y, x+1],[y+1, x]]
             blobColors[sB]= [random.random(),random.random(),random.random()]
-
+            blobSpeeds[sB] = [0,0]
+            blobMovements[sB] = [0,0]
 
     ##Move Poison:
     for poison in poisons:
@@ -210,22 +222,34 @@ def agarioPatternFunction(patternInput,statePatternDict):
         blobBodySize = len(blobBody) 
         directionList = inputs[bb]
 
-        ##Move blobs
+        ##Change speed
         if directionList:
             direction=directionList.pop(0)
+            y,x = blobSpeeds[bb]
+            if direction in UP:
+                blobSpeeds[bb]= [y-speedStep,x]
+            elif direction in DOWN:
+                blobSpeeds[bb] = [y+speedStep,x]
+            elif direction in RIGHT:
+                blobSpeeds[bb]= [y,x+speedStep]
+            elif direction in LEFT:
+                blobSpeeds[bb]= [y,x-speedStep]
+                
+            blobSpeeds[bb][0]= min(max(-maxSpeed,blobSpeeds[bb][0]),maxSpeed)
+            blobSpeeds[bb][1]=min(max(-maxSpeed,blobSpeeds[bb][1]),maxSpeed)
 
-            for i in xrange(blobBodySize):
-                y,x = blobBody[i]
-                if direction in UP:
-                    blobBody[i]= [y-1,x]
-                elif direction in DOWN:
-                   blobBody[i] = [y+1,x]
-                elif direction in RIGHT:
-                    blobBody[i]= [y,x+1]
-                elif direction in LEFT:
-                    blobBody[i]= [y,x-1]
-                blobBody[i][0]=blobBody[i][0]%height
-                blobBody[i][1]=blobBody[i][1]%width
+        blobMovements[bb][0]+=blobSpeeds[bb][0]
+        blobMovements[bb][1]+=blobSpeeds[bb][1]
+
+        #Move blob 
+        dx = int(blobMovements[bb][1])
+        dy = int (blobMovements[bb][0])
+        blobMovements[bb][0]-=dy
+        blobMovements[bb][1]-=dx
+        
+        for i in xrange(blobBodySize):
+            blobBody[i][0]=(blobBody[i][0]+dy)%height
+            blobBody[i][1]=(blobBody[i][1]+dx)%width
 
         ##Eat poison
         for i in xrange(blobBodySize):

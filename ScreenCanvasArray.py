@@ -3,6 +3,8 @@ from array import array as array
 class Canvas:
     '''
     Array Implementation of canvas
+    All the mod operations that look convoluted are here because
+    they were considerably faster than loops
     '''
     def __init__(self,height, width, previousArray=None):
         if (previousArray==None):

@@ -228,7 +228,6 @@ def runCliCurtain(argv):
                             savedFunction = UIUtils.saveFunction(name,func, patternInputContainer[0])
                             if savedFunction:
                                 dictAll[name]=globals()[name]=savedFunction
-                                                        
                     else:
                         function = eval(instruction)
                         patternString=instruction

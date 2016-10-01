@@ -11,8 +11,8 @@ from Config import InputServerConfig as Config
 
 DEBUG = 0
 
-#Inputs get deleted every 18 seconds.
-LOGOUT_TIME=18
+#Inputs get deleted every 90 seconds.
+LOGOUT_TIME=90
 #Input list only keeps track of the last 10 inputs
 MAX_INPUT_LIST=10
 #Keeping input list and last inputs is redundant, but it makes it easier to use.
