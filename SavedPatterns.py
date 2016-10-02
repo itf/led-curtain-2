@@ -107,3 +107,4 @@ _partyPatternsDemo = Pattern.pattern('_partyPatterns')(addP(timeChangerArray([_b
 
 _burningManOnFire = Pattern.pattern('_burningManOnFire')(addP(arg('imageName="burning"; xTranslate = "-frame/70." ')(translate(image)),arg('brightness=0.45; imageName="fire" ')(brightness(image))))
 _EC = Pattern.pattern('_EC')((arg('text="EC"; textPos=0.45; textHeight=1; brightness=1.2')(brightness(mask(text,addP(arg('brightness=0.8 ')(brightness(meanP(red,random))),arg('imageName="fire" ')(image)),black)))))
+_snowmanFromHell = Pattern.pattern('_snowmanFromHell')(arg('text="xmas!";textHeight=0.3; huslS=0.6; huslH=-0.02; huslL=-0.5; imageName="snowman" ')(mask(text, hueShift(text), weightedMask(blur(cloudsRainbow),blur(husl(image)),image))))

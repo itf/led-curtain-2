@@ -9,7 +9,7 @@ textRealHeight=5
 @P.pattern("text")
 @F.defaultArgsP(text='SPAACE', textHeight=1, textPos=0.5)
 def textPattern(PatternInput):
-    text = PatternInput['text']
+    text = str(PatternInput['text'])
     text=text.upper()
     textHeight = PatternInput['textHeight']
     textPos = PatternInput['textPos']
