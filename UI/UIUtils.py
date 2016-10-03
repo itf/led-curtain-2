@@ -165,6 +165,9 @@ def _sendDataThread(host,
         patternInput["totalBeats"] = audio.getTotalBeats
         patternInput["bpm"] = audio.getBPM
 
+        patternInput["audioIntensity"] = audio.getIntensity
+
+
     if Config.useInput:
         userInput = Input.InputInfo()
         patternInput["lastInput"] = userInput.getLastInputs

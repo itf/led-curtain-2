@@ -13,7 +13,7 @@ except:
     from Config import InputServerConfig as InputConfig
 
 def runDisplay(host, port, height, width):
-    minSleepTime=0.0000090*height*width
+    minSleepTime=0.0000092*height*width
     server=ServerSocketUDP(host,port)
     curtain = Curtain(width,height)
     lastServer=["",""]
@@ -37,6 +37,8 @@ def runDisplay(host, port, height, width):
                 lastServer=dataRaw[1]   
                 curtain.sendColorCanvas(data)
                 time.sleep(minSleepTime)
+        except KeyboardInterrupt:
+            exit()
         except:
             pass
 

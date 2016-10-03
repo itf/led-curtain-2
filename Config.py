@@ -12,6 +12,8 @@ class openWeather:
 import ScreenCanvasArray 
 Canvas = ScreenCanvasArray.Canvas
 
+SendRate=24
+
 if curtain=="old":
     width = 15
     height = 5

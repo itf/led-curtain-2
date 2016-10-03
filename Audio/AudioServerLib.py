@@ -42,6 +42,8 @@ def audioProcess(port, host='localhost'):
         while 1:
             try:
                 jack.process(output, capture[:,0:0+N])
+                intensity = numpy.square(capture).mean()
+                clientSocket.sendData("I#"+str(intensity))
                 #audioMono = 
                 for i in xrange(1,int(N/hop_s)+1):
                     if o(capture[0,0:i*hop_s]):

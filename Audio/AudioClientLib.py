@@ -32,6 +32,8 @@ class AudioInfo:
         self.totalBeats = 0
         self.beatsPerSecond = 140./60
 
+        self.intensity = 0
+
 
         self.lock = threading.RLock()
         threadListener= threading.Thread(target=self._listenerFunction,
@@ -45,12 +47,22 @@ class AudioInfo:
                 data = self.socket.getData()
                 if data=="beat":
                     self._tap()
+                else:
+                    type, value = data.split('#',1)
+                    if type=="I":
+                        self._setIntensity(value)
+
             except:
                 pass
         self.socket.sock.close()
 
 
-    
+    def _setIntensity(self, value):
+        self.intensity = float(value)
+
+    def getIntensity(self):
+        return self.intensity
+
     
     def _tap(self):
         self.lock.acquire()

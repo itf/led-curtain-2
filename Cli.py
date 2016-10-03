@@ -37,7 +37,7 @@ This file is a prototype with lots of poor choices(in my opinion)
 It is just something that was hacked together. The rest of the code doesn't reflect this file
 """
 
-SEND_RATE=24
+SEND_RATE = Config.SendRate
 
 class Completer(rlcompleter.Completer):
     '''
