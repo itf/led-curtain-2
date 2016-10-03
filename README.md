@@ -95,6 +95,8 @@ I use the python bindings for rpi_ws281x; however, I had to modify the code to i
 https://github.com/itf/rpi_ws281x.
 You will need to install, swig and python-dev to compile it.
 
+Instructions: install scons, install swig, install python-dev. Go to the top directory, run sudo scons. Cd into the python directory and run sudo python setup.py install
+
 Also, remember to run piUdpBuffer.sh, to remove lag caused by the UDP buffer
 
 #Cli pattern programming language - Quick start
