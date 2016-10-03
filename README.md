@@ -59,6 +59,9 @@ And then change Images to True in config.py
 
 On Windows and OSX, simply install pillow. For Linux, install pyscreenshot. pypy -m pip install pyscreenshot.
 
+### Husl
+
+A different color space. Can make some nice colors for patterns. Install husl: sudo pypy -m pip install husl
 
 ### Using Weather
 
