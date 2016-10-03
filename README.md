@@ -41,6 +41,7 @@ Everything is run from the command line
 ###Using images:
 
 * install pillow on pypy (or cPython):
+(dependencies: sudo apt-get install pypy-dev python-dev)
 * First way:
 	* Download https://github.com/python-pillow/Pillow
 	* Run: pypy setup.py install from that directory
