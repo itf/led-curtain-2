@@ -33,7 +33,7 @@ class AudioInfo:
         self.beatsPerSecond = 140./60
 
         self.intensity = 0
-
+        self.lowIntensity = 0
 
         self.lock = threading.RLock()
         threadListener= threading.Thread(target=self._listenerFunction,
@@ -51,6 +51,8 @@ class AudioInfo:
                     type, value = data.split('#',1)
                     if type=="I":
                         self._setIntensity(value)
+                    if type=="L":
+                        self._setLowIntensity(value)
 
             except:
                 pass
@@ -62,6 +64,12 @@ class AudioInfo:
 
     def getIntensity(self):
         return self.intensity
+
+    def _setLowIntensity(self, value):
+        self.lowIntensity = float(value)
+
+    def getLowIntensity(self):
+        return self.lowIntensity
 
     
     def _tap(self):

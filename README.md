@@ -69,7 +69,7 @@ Create an account on openweather, and configure your city ID and your API Key in
 Making the audio work is non-trivial. If you still want to do so, follow the following instructions!
 * Install jack
 	* Instaling jack is hard. That is a fact. So try this step before the others.
-	* To install on windows, read here http://jackaudio.org/faq/jack_on_windows.html	
+	* To install on windows, read here http://jackaudio.org/faq/jack_on_windows.html
 	* To install on ubuntu, install jack2 and then pulseaudio-module-jack and reset.
 	* TO install on Mac, good luck.
 * install pyjack on cpython (sudo python -m pip install pyjack /  pip install pyjack / download pyjack and run setup.py)
@@ -111,7 +111,7 @@ The syntax of this short programming language is the same as python. Every funct
 
 In order to modfy the parameters that a function or pattern depend on, you should use the function arg('arguments=something')(function(pattern)). So to set the radius of a circle to be the same as the height of your led panel, do:
 
-arg('cRadius=1')(circle)
+arg('circleRadius=1')(circle)
 
 
 To modify the parameters without using arg, write r to set the values of the parameters once, or rr to modify the values continuosly
@@ -138,12 +138,12 @@ The easiest way to learn how to use the CLI is by examples. Example of patterns 
 
 * mask(circle, blue, green) -> masks a blue circle on top  of green
 
-* arg('cRadius=abs(frame%20-10)/30.')(circle)  -> pulsatingCircle
+* arg('circleRadius=abs(frame%20-10)/30.')(circle)  -> pulsatingCircle
 * arg('nRainbows=2')(rainbownize(red))  -> doubleRainbow
 
-* arg('xTranslate= cos(frame/37.); yTranslate = sin(frame/60.)*2')(mask(translate(circle),meanP(softRainbow,trivial),blur(trivial))) 
+* arg('translateX= cos(frame/37.); translateY = sin(frame/60.)*2')(mask(translate(circle),meanP(softRainbow,trivial),blur(trivial))) 
 					-> moving masked circle with blurring background
-* hueShift(arg('xTranslate= cos(frame/37.); yTranslate = sin(frame/60.)*2; weightedMeanWeight=0.03; hue=0.021')(mask(translate(circle),prettyDiagonalRainbow, weightedMean2P(black,blur(trivial)))))) 
+* hueShift(arg('translateX= cos(frame/37.); translateY = sin(frame/60.)*2; weightedMeanWeight=0.03; hue=0.021')(mask(translate(circle),prettyDiagonalRainbow, weightedMean2P(black,blur(trivial)))))) 
 					-> movingCircle with fading to black background (_mesmerezingMeteor)
 
 
@@ -166,7 +166,7 @@ The easiest way to learn how to use the CLI is by examples. Example of patterns 
 ####Audio example:
 
 * hueShift(circle
-* rr cRadius=beat; hue = int(totalBeats%4)/4.
+* rr circleRadius=beat; hue = int(totalBeats%4)/4.
 * srr
 * name of this pattern
 
@@ -245,7 +245,7 @@ The patternInput is the input given to the patterns. It is a dictionary that con
 
 Instead of returning a function when accessing a function inside the patternInput, it returs the evaluation of the function, which allow patterns to use the audioFunctions (Beat, totalbeats) as if they were numbers.
 
-Initially, the patternInput is almost empty, but after running patterns it gets populated with their arguments. Example: after running "circle" patternInput is populated with cRadius, which can be modified to change the radius of the circle.
+Initially, the patternInput is almost empty, but after running patterns it gets populated with their arguments. Example: after running "circle" patternInput is populated with circleRadius, which can be modified to change the radius of the circle.
 
 If something is not present on the patternInput, it is evaluated to 0, which provides some extra protection against patterns that could potentially depend on a pattern having run before them.
 
@@ -384,3 +384,5 @@ function -> http://stackoverflow.com/questions/13923091/how-do-you-do-a-python-e
 [] Improve the Readme, explaining everything that the project does, and explaining the design choices.
 
 []Make arguments dependent on x and y
+
+[]Keep arguments that are modified inside args stay modified inside args. Create a function in pattern input called getDifference, which returns a dict. 

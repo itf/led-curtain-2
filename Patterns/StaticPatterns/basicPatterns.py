@@ -232,15 +232,15 @@ def equation(PatternInput):
     return PatternInput
 
 @P.pattern('circle')
-@F.defaultArgsP(cRadius=0.666)
+@F.defaultArgsP(circleRadius=0.666)
 def circle(PatternInput):
     width = PatternInput["width"]
     height = PatternInput["height"]
     mWidth=width/2
     mHeight=height/2
-    cRadius=PatternInput['cRadius']
-    cRadius = round(cRadius * min(mWidth, mHeight))
-    sCRadius=cRadius**2
+    circleRadius=PatternInput['circleRadius']
+    circleRadius = (circleRadius * min(mWidth, mHeight))
+    sCRadius=circleRadius**2
     def mapper(rgb,y,x):
         if (mWidth-x)**2 +(mHeight-y)**2 > sCRadius:
             return (0,0,0)
@@ -269,11 +269,11 @@ def radialHueGradient(PatternInput):
     height = PatternInput["height"]
     mWidth=width/2
     mHeight=height/2
-    cRadius=PatternInput['radialGradientRadius']
-    cRadius = round(cRadius * min(mWidth, mHeight))
+    circleRadius=PatternInput['radialGradientRadius']
+    circleRadius = (circleRadius * min(mWidth, mHeight))
     epsilon=0.001
-    cRadius=max(cRadius,epsilon)
-    sCRadius=cRadius**2
+    circleRadius=max(circleRadius,epsilon)
+    sCRadius=circleRadius**2
 
     gradientColor0 = PatternInput["radialGradientColor0"]
     gradientColor1 = PatternInput["radialGradientColor1"]
@@ -295,7 +295,7 @@ def radialHueGradient(PatternInput):
     
     def mapper(rgb,y,x):
         radius = ((mWidth-x)**2 +(mHeight-y)**2)**0.5
-        normalizedRadius = (float(radius)/cRadius +gradientPos) %1
+        normalizedRadius = (float(radius)/circleRadius +gradientPos) %1
         h,s,v = h0+dh*normalizedRadius , s0+ds*normalizedRadius, v0+dv*normalizedRadius
         return colorsys.hsv_to_rgb(h,s,v)
         

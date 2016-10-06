@@ -19,26 +19,26 @@ importFunctionsFromDict(Function.getFunctionDict())
 importFunctionsFromDict(Function.getMetaFunctionDict())
 importFunctionsFromDict(StatePatterns.getStatePatternDic())
 
-rotatingRainbow=Pattern.pattern('rotatingRainbow')(isolateCanvas(step(rainbow,vRainbownize(trivial))))
+_rotatingRainbow=Pattern.pattern('_rotatingRainbow')(isolateCanvas(step(rainbow,vRainbownize(trivial))))
 
-coolRandom=Pattern.pattern('coolRandom')(movingHue(constant(random)))
+_coolRandom=Pattern.pattern('_coolRandom')(movingHue(constant(random)))
 
-movingColors=Pattern.pattern('movingColors')(movingHue(red))
-prettyDiagonalRainbow=Pattern.pattern('prettyDiagonalRainbow')(defaultArgs(hueFrameRate=0.02, nVRainbows=3, nRainbows=2)(compose(movingHue,vRainbownize,rainbownize))(red))
+_movingColors=Pattern.pattern('_movingColors')(movingHue(red))
+_prettyDiagonalRainbow=Pattern.pattern('_prettyDiagonalRainbow')(defaultArgs(hueFrameRate=0.02, vRainbowizeN=3, nRainbows=2)(compose(movingHue,vRainbownize,rainbownize))(red))
 
-softRainbow=Pattern.pattern('softRainbow')(movingHue(meanP(movingColors,rainbow)))
+_softRainbow=Pattern.pattern('_softRainbow')(movingHue(meanP(_movingColors,rainbow)))
 
-rainbowAurora = Pattern.pattern('rainbowAurora')(isolateCanvas(movingHue(meanP(step(softRainbow,vRainbownize(trivial)),softRainbow))))
+_rainbowAurora = Pattern.pattern('_rainbowAurora')(isolateCanvas(movingHue(meanP(step(_softRainbow,vRainbownize(trivial)),_softRainbow))))
 
-_pulsatingCircle = Pattern.pattern('_pulsatingCircle')(arg('cRadius=abs(frame%20-10)/10.')(circle))
+_pulsatingCircle = Pattern.pattern('_pulsatingCircle')(arg('circleRadius=abs(frame%20-10)/10.')(circle))
 
-_explosionRed = Pattern.pattern('_explosionRed')(arg('cRadius = sin(frame/30.)*4./3.; hue=0.05')(mask(circle,hueShift(trivial),meanP(red,trivial))))
-meteorRainbow = Pattern.pattern('meteorRainbow')(arg('xTranslate= cos(frame/37.); yTranslate = sin(frame/60.)*2 ')(mask(translate(circle),meanP(softRainbow,trivial),blur(trivial))))
-_mesmerezingMeteor = Pattern.pattern('_mesmerezingMeteor')(isolateCanvas(hueShift((arg('xTranslate= cos(frame/37.); yTranslate = sin(frame/60.)*2; weightedMeanWeight=0.05; hue=0.021')(mask(translate(circle),prettyDiagonalRainbow, weightedMean2P(black,blur(trivial))))))))
+_explosionRed = Pattern.pattern('_explosionRed')(arg('circleRadius = sin(frame/30.)*4./3.; hue=0.05')(mask(circle,hueShift(trivial),meanP(red,trivial))))
+_meteorRainbow = Pattern.pattern('_meteorRainbow')(arg('translateX= cos(frame/37.); translateY = sin(frame/60.)*2 ')(mask(translate(circle),meanP(_softRainbow,trivial),blur(trivial))))
+_mesmerezingMeteor = Pattern.pattern('_mesmerezingMeteor')(isolateCanvas(hueShift((arg('translateX= cos(frame/37.); translateY = sin(frame/60.)*2; weightedMeanWeight=0.05; hue=0.021')(mask(translate(circle),_prettyDiagonalRainbow, weightedMean2P(black,blur(trivial))))))))
 
 cloudsRainbow = Pattern.pattern('cloudsRainbow')(arg('generationBornRange=[3,4]; generationSurviveRange=[1,2,3]; generationStates=48; generationNeighborDistance=1 ')(isolate(step(circle,gameOfGeneration(trivial)))))
 
-spaaceMoving = Pattern.pattern('spaaceMoving')(arg('textHeight=0.2; textPos=0.5; xTranslate= frame%17/17.; yTranslate=frame%33/33.; weightedMeanWeight=0 if frame%10==0 else 1')(step(black,mask(isolateCanvas(step(black,weightedMean2P(trivial,translate(text)))),softRainbow,arg('weightedMeanWeight=0.1 ')(weightedMean2P(black,blur(trivial)))))))
+spaaceMoving = Pattern.pattern('spaaceMoving')(arg('textHeight=0.2; textPos=0.5; translateX= frame%17/17.; translateY=frame%33/33.; weightedMeanWeight=0 if frame%10==0 else 1')(step(black,mask(isolateCanvas(step(black,weightedMean2P(trivial,translate(text)))),_softRainbow,arg('weightedMeanWeight=0.1 ')(weightedMean2P(black,blur(trivial)))))))
 
 scrollingText = Pattern.pattern('scrollingText')(arg('textPos=frame%float(len(text)*8)/(len(text)*8) ')(text))
 
@@ -46,9 +46,9 @@ vladTheImpaler = Pattern.pattern('vladTheImpaler')(isolate(arg("""text ='''  Vla
 
 _nyanCat = Pattern.pattern('_nyanCat')(arg('imageName="nyanCatLarge" ')(image))
 
-_crazyNyanPacman = Pattern.pattern('_crazyNyanPacman')(arg('imageHeight=imageWidth=0.5; xTranslate=-frame/30.; yTranslate=sin(frame/30.) ')(translate(addP(_nyanCat, arg('xTranslate=0.5')(translate(_nyanCat)), arg('yTranslate=0.5')(translate(_nyanCat)), arg('xTranslate=-yTranslate ')(translate(image)), arg('yTranslate=-xTranslate ')(translate(image))))))
+_crazyNyanPacman = Pattern.pattern('_crazyNyanPacman')(arg('imageHeight=imageWidth=0.5; translateX=-frame/30.; translateY=sin(frame/30.) ')(translate(addP(_nyanCat, arg('translateX=0.5')(translate(_nyanCat)), arg('translateY=0.5')(translate(_nyanCat)), arg('translateX=-translateY ')(translate(image)), arg('translateY=-translateX ')(translate(image))))))
 
-_beatCircleRainbow = Pattern.pattern('_beatCircleRainbow')(arg('cRadius=(1-beat)*2;hue=totalBeats%4/4.;weightedMeanWeight=0.25')(hueShift(mask(circle, blue,weightedMean2P(rainbow,black)))))
+_beatCircleRainbow = Pattern.pattern('_beatCircleRainbow')(arg('circleRadius=(1-beat)*2;hue=totalBeats%4/4.;weightedMeanWeight=0.25')(hueShift(mask(circle, blue,weightedMean2P(rainbow,black)))))
 _beat4Rainbow = Pattern.pattern('_beat4Rainbow')(arg('''hue=totalBeats%4/4. ''')(hueShift(constant(rainbow))))
 _blueExplosion = Pattern.pattern('_blueExplosion')(arg('''gradientPos=-frame/30. ''')(radialHueGradient))
 _beatBlueGradient = Pattern.pattern('_beatBlueGradient')(arg('''radialGradientPos=-beat; radialGradientColor0=0x0a000F; radialGradientColor1=0x0ffff ''')(radialHueGradient))
@@ -59,12 +59,12 @@ _hypnoCalm = Pattern.pattern('_hypnoCalm')(arg('''radialGradientRadius=(sin(fram
 _mazeGame = Pattern.pattern('_mazeGame')(arg('lifeSurviveRange=[2,3,4]; lifeBornRange=[3]')(_gameOfLife))
 _beatCircleColor = Pattern.pattern('_beatCircleColor')(__hueShift4Beat(_beatBlueGradient))
 
-_demo = Pattern.pattern('_demo')(arg('textHeight=0.3;timeChangerTime=30; transitionRandomPixels=10 ')(mask(vladTheImpaler,green,timeChanger(cloudsRainbow, transitionRandom(_mesmerezingMeteor), transitionRandom(rainbowAurora), _gameOfLife, transitionFade(_hypnoCalm), transitionRandom(arg('xTranslate = -frame/60. ')(translate(_nyanCat))), transitionFade(coolRandom),transitionRandom(_beatBlueGradient)))))
+_demo = Pattern.pattern('_demo')(arg('textHeight=0.3;timeChangerTime=30; transitionRandomPixels=10 ')(mask(vladTheImpaler,green,timeChanger(cloudsRainbow, transitionRandom(_mesmerezingMeteor), transitionRandom(_rainbowAurora), _gameOfLife, transitionFade(_hypnoCalm), transitionRandom(arg('translateX = -frame/60. ')(translate(_nyanCat))), transitionFade(_coolRandom),transitionRandom(_beatBlueGradient)))))
 
-_nyanOnFire = Pattern.pattern('_nyanOnFire')(arg('weightedMeanWeight=0.65')(weightedMean2P(arg('imageName="fire"')(image),arg('imageName="nyanC";xTranslate=-frame/90. ')(translate(image)))))
-_nyanFadeFire = Pattern.pattern('_nyanFadeFire')(arg('transitionRandomPixels=3; timeChangerTime=35; weightedMeanWeight=0.65')(weightedMean2P(arg('imageName="fire"')(timeChanger(image,image,transitionRandom(black))) ,arg('imageName="nyanC";xTranslate=-frame/90. ')(timeChanger(translate(image),translate(transitionRandom(black)), black)))))
-_3rgbCircle = Pattern.pattern('_3rgbCircle')(defaultArgsP(trans0=0,trans1=0.333, trans2= -0.333, c0=0.666, c1=0.666, c2 =0.666)((addP(arg('xTranslate=trans0; cRadius=c0; yTranslate=0')(translate(circle)), arg('xTranslate=trans1; yTranslate=0; hue=0.333;cRadius=c1')(hueShift(translate(circle))),arg('xTranslate=trans2; yTranslate=0; hue=0.667;cRadius=c2')(hueShift(translate(circle)))))))
-_beat3rgbCircle = Pattern.pattern('_beat3rgbCircle')(arg('''c1=(beat-.5)*2.;c0=beat*2.; c2=(beat-0.5)*2 ''')(defaultArgsP(trans0=0,trans1=0.333, trans2= -0.333, c0=0.666, c1=0.666, c2 =0.666)((addP(arg('xTranslate=trans0; cRadius=c0')(translate(circle)), arg('xTranslate=trans1; hue=0.333;cRadius=c1')(hueShift(translate(circle))),arg('xTranslate=trans2;hue=0.667;cRadius=c2')(hueShift(translate(circle))))))))
+_nyanOnFire = Pattern.pattern('_nyanOnFire')(arg('weightedMeanWeight=0.65')(weightedMean2P(arg('imageName="fire"')(image),arg('imageName="nyanC";translateX=-frame/90. ')(translate(image)))))
+_nyanFadeFire = Pattern.pattern('_nyanFadeFire')(arg('transitionRandomPixels=3; timeChangerTime=35; weightedMeanWeight=0.65')(weightedMean2P(arg('imageName="fire"')(timeChanger(image,image,transitionRandom(black))) ,arg('imageName="nyanC";translateX=-frame/90. ')(timeChanger(translate(image),translate(transitionRandom(black)), black)))))
+_3rgbCircle = Pattern.pattern('_3rgbCircle')(defaultArgsP(trans0=0,trans1=0.333, trans2= -0.333, c0=0.666, c1=0.666, c2 =0.666)((addP(arg('translateX=trans0; circleRadius=c0; translateY=0')(translate(circle)), arg('translateX=trans1; translateY=0; hue=0.333;circleRadius=c1')(hueShift(translate(circle))),arg('translateX=trans2; translateY=0; hue=0.667;circleRadius=c2')(hueShift(translate(circle)))))))
+_beat3rgbCircle = Pattern.pattern('_beat3rgbCircle')(arg('''c1=(beat-.5)*2.;c0=beat*2.; c2=(beat-0.5)*2 ''')(defaultArgsP(trans0=0,trans1=0.333, trans2= -0.333, c0=0.666, c1=0.666, c2 =0.666)((addP(arg('translateX=trans0; circleRadius=c0')(translate(circle)), arg('translateX=trans1; hue=0.333;circleRadius=c1')(hueShift(translate(circle))),arg('translateX=trans2;hue=0.667;circleRadius=c2')(hueShift(translate(circle))))))))
 _beatBlueGradient3 = Pattern.pattern('_beatBlueGradient3')(defaultArgsP(radialGradientRadius=2)(mask(_beat3rgbCircle,_beatBlueGradient,black)))
 _exampleEquationPlotter = Pattern.pattern('_exampleEquationPlotter')(arg('''equationAngle0=abs(sin(frame/90.)) ''')(equationxyPlotter))
 _beatLinearHue3Circle = Pattern.pattern('_beatLinearHue3Circle')(arg('''linearGradientAngle=totalBeats/2.; linearGradientPos=beat ''')(mask(_beat3rgbCircle,linearHueGradient,black)))
@@ -82,29 +82,31 @@ _recursiveImage = Pattern.pattern('_recursiveImage')(splitRecursiveH(image,image
 _beatSnakes2 = Pattern.pattern('_beatSnakes2')(isolateCanvas((addP(arg('hue=0.5 ')(hueShift(simpleSnake())),simpleSnake(), arg('weightedMeanWeight=0.6+0.45*beat ')(weightedMean2P(blur(trivial),black))))))
 _partyAliens = Pattern.pattern('_partyAliens')(isolateCanvas(arg('imageName="alien"; scaleX=0.5+0.5*beat; scaleTranslateY=0; scaleTranslateX=-0.25-0.25*beat; brightness=0.6; scaleY=1 ')(addP(brightness(blur(trivial)),rainbownize(scaleAndTranslateCanvas(splitHorizontal(image,image,image,image)))))))
 _partyAliensV2 = Pattern.pattern('_partyAliensV2')(isolateCanvas(arg('imageName="alien"; scaleX=scaleY=0.75+0.5*(abs(1-totalBeats%2)-0.5);  scaleTranslateY=0; scaleTranslateX=-scaleX/2.; brightness=0.6 ')(addP(brightness(blur(trivial)),rainbownize(scaleAndTranslateCanvas(splitHorizontal(image,image,image,image)))))))
-_partySpaceshipFlash = Pattern.pattern('_partySpaceshipFlash')(arg('''xTranslate=0; yTranslate=totalBeats/4.;weightedMeanWeight=beat; brightness=0.5+beat; imageName='spaceship' ''')(translate(brightness(weightedMean2P(image, blur(image))))))
+_partySpaceshipFlash = Pattern.pattern('_partySpaceshipFlash')(arg('''translateX=0; translateY=totalBeats/4.;weightedMeanWeight=beat; brightness=0.5+beat; imageName='spaceship' ''')(translate(brightness(weightedMean2P(image, blur(image))))))
 _partySpaceshipV2 = Pattern.pattern('_partySpaceshipV2')(splitRecursiveV(_partySpaceshipFlash,_partySpaceshipFlash,_partySpaceshipFlash))
 
 _partyClouds = Pattern.pattern('_partyClouds')(weightedMask(cloudsRainbow,cloudsRainbow,black))
 _partyRocketHypno = Pattern.pattern('_partyRocketHypno')(arg('imageName="rocket"; imageHeight=imageWidth=0.8+sin(totalBeats/2.)*0.2')(weightedMask(translate(image),black,_hypnoCalm)))
-_partyPatterns = Pattern.pattern('_partyPatterns')(addP(timeChangerArray([_beatSnakes,  transitionFade(__beatInt4Hue(arg('xTranslate=-totalBeats/4. ;brightness=0.8')(translate(brightness(_nyanCat))))),_beatSinWaveTrailBeat, transitionRandom(_beatBlueGradient3), transitionFade(__beatInt4Hue(_partySpaceshipV2)),  _beatWorm, _beat3rgbCircle,  _partyAliensV2, transitionFade(_partyClouds), _gameOfLife, _partyRocketHypno],[29,17, 19,21, 17,  16, 22,28,19, 16,24]),arg('brightness=0.5;textHeight=0.3;transitionFadeStep=0.02')( timeChangerArray([brightness(vladTheImpaler), transitionFade(black)],[18,13]))))
-_partyPatterns2 = Pattern.pattern('_partyPatterns2')(addP(timeChangerArray([_beatSnakes,  transitionFade(__beatInt4Hue(arg('xTranslate=-totalBeats/4. ;brightness=0.8')(translate(brightness(_nyanCat))))),_beatSinWaveTrailBeat, transitionFade(__beatInt4Hue(_partySpaceshipV2)),  _beatWorm,  _partyAliensV2, transitionFade(_partyClouds), _gameOfLife, _partyRocketHypno],[29,17, 19,21, 22,28,19, 16,24]),arg('brightness=0.5;textHeight=0.3;transitionFadeStep=0.02')( timeChangerArray([brightness(vladTheImpaler), transitionFade(black)],[18,13]))))
+_partyPatterns = Pattern.pattern('_partyPatterns')(addP(timeChangerArray([_beatSnakes,  transitionFade(__beatInt4Hue(arg('translateX=-totalBeats/4. ;brightness=0.8')(translate(brightness(_nyanCat))))),_beatSinWaveTrailBeat, transitionRandom(_beatBlueGradient3), transitionFade(__beatInt4Hue(_partySpaceshipV2)),  _beatWorm, _beat3rgbCircle,  _partyAliensV2, transitionFade(_partyClouds), _gameOfLife, _partyRocketHypno],[29,17, 19,21, 17,  16, 22,28,19, 16,24]),arg('brightness=0.5;textHeight=0.3;transitionFadeStep=0.02')( timeChangerArray([brightness(vladTheImpaler), transitionFade(black)],[18,13]))))
+_partyPatterns2 = Pattern.pattern('_partyPatterns2')(addP(timeChangerArray([_beatSnakes,  transitionFade(__beatInt4Hue(arg('translateX=-totalBeats/4. ;brightness=0.8')(translate(brightness(_nyanCat))))),_beatSinWaveTrailBeat, transitionFade(__beatInt4Hue(_partySpaceshipV2)),  _beatWorm,  _partyAliensV2, transitionFade(_partyClouds), _gameOfLife, _partyRocketHypno],[29,17, 19,21, 22,28,19, 16,24]),arg('brightness=0.5;textHeight=0.3;transitionFadeStep=0.02')( timeChangerArray([brightness(vladTheImpaler), transitionFade(black)],[18,13]))))
 
-_springBreak = Pattern.pattern('_springBreak')(mask(addP(arg('text="spring";textHeight=0.35 ')(text),arg('text="break!";textHeight=0.4;yTranslate=0.5 ')(translate(text))), coolRandom,black))
+_springBreak = Pattern.pattern('_springBreak')(mask(addP(arg('text="spring";textHeight=0.35 ')(text),arg('text="break!";textHeight=0.4;translateY=0.5 ')(translate(text))), _coolRandom,black))
 _clock = Pattern.pattern('_clock')(arg('''conditionUpdateCode= "condition=(time != previousTime);text=time";previousTime=time; textHeight=0.48 ; textPos=0.5''')(conditionRun(text)))
 
-_dateClock = Pattern.pattern('_dateClock')(addP(arg('textHeight=0.23;textPos=0.3; text=date; yTranslate=-0.63')(translate(text)),_clock))
+_dateClock = Pattern.pattern('_dateClock')(addP(arg('textHeight=0.23;textPos=0.3; text=date; translateY=-0.63')(translate(text)),_clock))
 
 _cubeHelix = Pattern.pattern('_cubeHelix')(defaultArgsP(rgbAngle=0)(arg('rgbEquation="rgbR=_rgbf+_rgbAmp*(-0.14861 * cos(_rgbAngle) + 1.78277 * sin(_rgbAngle));rgbG=_rgbf+_rgbAmp*(-0.29227 * cos(_rgbAngle) - 0.90649 * sin(_rgbAngle));rgbB=_rgbf+_rgbAmp * (1.97294 * cos(_rgbAngle)) ; _rgbAmp=_rgbS * _rgbf * (1. - _rgbf) / 2.;_rgbS=1.5+_rgbf*2.2;_rgbf= (-abs(0.5-(_rgbAngle/3.1416/2.+0.01)%1)**1)*1.05+0.77;_rgbAngle="+str(rgbAngle)+"*3.1416*2;"')(rgb)))
 
-_lavaLamp = Pattern.pattern('_lavaLamp')(arg('''yTranslate="x/2.+sin(x*4*(1+sin(frame/300.))+frame/10.)*0.2";xTranslate="-y/2 - frame/60.-4*sin(x/3.*(1+sin(frame/120.)))";rotateAngle=frame/11. ''')(translate(__rotate(_3rgbCircle))))
+_lavaLamp = Pattern.pattern('_lavaLamp')(arg('''translateY="x/2.+sin(x*4*(1+sin(frame/300.))+frame/10.)*0.2";translateX="-y/2 - frame/60.-4*sin(x/3.*(1+sin(frame/120.)))";rotateAngle=frame/11. ''')(translate(__rotate(_3rgbCircle))))
 _beatDiamonds = Pattern.pattern('_beatDiamonds')(defaultArgsP(beatDiamondsNumber=3)(arg('hue="(int( max(abs(x+y-1),abs(x-y))-(totalBeats)  )/float(beatDiamondsNumber))" ')(hueShift(red))))
-_weatherClock = Pattern.pattern('_weatherClock')(arg('xTranslate=yTranslate=0 ')(addP(arg('text=time; textHeight=0.3333; yTranslate=0.0; xTranslate=-0.04')(translate(text)),arg('text=date;textHeight=0.166; yTranslate=-0.3533 ')(translate(text)),arg('text=str(temp)+"C  "+ str(tempF)+"F";textHeight=0.166; yTranslate=-0.60 ')(translate(text)), arg('text=weather;textHeight=0.166; yTranslate=-0.823')(translate(text)))))
+_weatherClock = Pattern.pattern('_weatherClock')(arg('translateX=translateY=0 ')(addP(arg('text=time; textHeight=0.3333; translateY=0.0; translateX=-0.04')(translate(text)),arg('text=date;textHeight=0.166; translateY=-0.3533 ')(translate(text)),arg('text=str(temp)+"C  "+ str(tempF)+"F";textHeight=0.166; translateY=-0.60 ')(translate(text)), arg('text=weather;textHeight=0.166; translateY=-0.823')(translate(text)))))
 
 _weatherClockPretty = Pattern.pattern('_weatherClockPretty')(defaultArgsP(weatherClockNoise=0)(arg('weightedMeanWeight=0.7+weatherClockNoise ')(mask(_weatherClock,weightedMean2P(_cubeHelix,random),black))))
 _weatherClockPrettySlowUpdate = Pattern.pattern('_weatherClockPrettySlowUpdate')(defaultArgsP(weatherClockColorAdjust=0)(arg('''conditionUpdateCode= "condition=(time != previousTime)"; previousTime=time; rgbAngle=frame/1440.+weatherClockColorAdjust''')(conditionRun(_weatherClockPretty))))
-_partyPatternsDemo = Pattern.pattern('_partyPatterns')(addP(timeChangerArray([_beatSnakes,  transitionFade(__beatInt4Hue(arg('xTranslate=-totalBeats/4. ;brightness=0.8')(translate(brightness(_nyanCat))))),_beatSinWaveTrailBeat, transitionRandom(_beatBlueGradient3), transitionFade(__beatInt4Hue(_partySpaceshipV2)),  _beatWorm, _beat3rgbCircle,  _partyAliensV2, transitionFade(_partyClouds), _gameOfLife, _partyRocketHypno],[15,8, 9,11, 9,  10, 12,14,11, 9,13]),arg('brightness=0.5;textHeight=0.3;transitionFadeStep=0.02')( timeChangerArray([brightness(vladTheImpaler), transitionFade(black)],[9,6]))))
+_partyPatternsDemo = Pattern.pattern('_partyPatterns')(addP(timeChangerArray([_beatSnakes,  transitionFade(__beatInt4Hue(arg('translateX=-totalBeats/4. ;brightness=0.8')(translate(brightness(_nyanCat))))),_beatSinWaveTrailBeat, transitionRandom(_beatBlueGradient3), transitionFade(__beatInt4Hue(_partySpaceshipV2)),  _beatWorm, _beat3rgbCircle,  _partyAliensV2, transitionFade(_partyClouds), _gameOfLife, _partyRocketHypno],[15,8, 9,11, 9,  10, 12,14,11, 9,13]),arg('brightness=0.5;textHeight=0.3;transitionFadeStep=0.02')( timeChangerArray([brightness(vladTheImpaler), transitionFade(black)],[9,6]))))
 
-_burningManOnFire = Pattern.pattern('_burningManOnFire')(addP(arg('imageName="burning"; xTranslate = "-frame/70." ')(translate(image)),arg('brightness=0.45; imageName="fire" ')(brightness(image))))
+_burningManOnFire = Pattern.pattern('_burningManOnFire')(addP(arg('imageName="burning"; translateX = "-frame/70." ')(translate(image)),arg('brightness=0.45; imageName="fire" ')(brightness(image))))
 _EC = Pattern.pattern('_EC')((arg('text="EC"; textPos=0.45; textHeight=1; brightness=1.2')(brightness(mask(text,addP(arg('brightness=0.8 ')(brightness(meanP(red,random))),arg('imageName="fire" ')(image)),black)))))
 _snowmanFromHell = Pattern.pattern('_snowmanFromHell')(arg('text="xmas!";textHeight=0.3; huslS=0.6; huslH=-0.02; huslL=-0.5; imageName="snowman" ')(mask(text, hueShift(text), weightedMask(blur(cloudsRainbow),blur(husl(image)),image))))
+
+_audioCircleRadial = Pattern.pattern('_audioCircleRadial')(arg('''epsilon=1; ty=10000; audioLowIntensity2= audioLowIntensity+audioLowIntensity2*0.6; audioIntensity2 = audioIntensity + audioIntensity2*0.6; averageAudioIntensityAux = 0.998*averageAudioIntensityAux+log(audioIntensity2*ty + epsilon)*0.8; averageAudioIntensity = averageAudioIntensityAux/500.-0.82; radialGradientColor1=0x02040F; radialGradientColor0=6591981; hue="abs(x-0.5)**2+abs(y-0.5)**2";  ''')(defaultArgsP(_audioCircleDeltaRadius=-0.3)(blur(hueShift( arg('circleRadius=log((audioIntensity2)*ty+epsilon)*0.8 - averageAudioIntensity;radialGradientRadius=circleRadius+_audioCircleDeltaRadius')(mask(circle, radialHueGradient, black)))))))

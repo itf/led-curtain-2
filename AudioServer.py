@@ -27,7 +27,7 @@ def main(argv):
         argv=[port,host]   
         AudioLib.audioProcess(*argv)
     else:
-        print "Usage AudioServer <port> <host> "
+        print ("Usage AudioServer <port> <host> ")
 
 if __name__ == "__main__":
    main(sys.argv[1:])

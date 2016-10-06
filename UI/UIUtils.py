@@ -166,6 +166,8 @@ def _sendDataThread(host,
         patternInput["bpm"] = audio.getBPM
 
         patternInput["audioIntensity"] = audio.getIntensity
+        patternInput["audioLowIntensity"] = audio.getLowIntensity
+
 
 
     if Config.useInput:

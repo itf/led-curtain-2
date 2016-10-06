@@ -11,6 +11,7 @@ import functools
 from functools import wraps
 import copy
 import random
+from collections import OrderedDict
 
 _dict_of_functions={}
 _dict_of_meta_functions={}
@@ -49,13 +50,30 @@ def getMetaFunctionDict():
 ########################3333
 #Helper functions - Helps constructing functions
 
+def pseudoRandomInitializer(function):
+    '''
+    Decorator for the pseudoRandom function
+    '''
+    pseudoRandomSize = 30000
+    randomArray = [random.random() for _ in xrange(pseudoRandomSize)]
+    index = [0]
+    def pseudoRandomFunction():
+        element = randomArray[index[0]]
+        index[0] = (index[0]+1)%pseudoRandomSize
+        return element
+    return pseudoRandomFunction
+
+@pseudoRandomInitializer
+def pseudoRandom():
+    return
+
 def simpleCached(cacheSize):
     '''
     A simple cache. Use like:
     @simpleCache(cachesize)
     def function:
     '''
-    cache={}
+    cache=OrderedDict()
     def cacheFunction(function):
         def cachedFunction(*args):
             tArgs=tuple(args)
@@ -64,8 +82,8 @@ def simpleCached(cacheSize):
             else:
                 answer=function(*args)
                 if len(cache)>cacheSize:
-                    cache.popitem()
-                    cache.popitem()
+                    cache.popitem(last = False)
+                    cache.popitem(last = False)
                 cache[tArgs]=answer
                 return answer
         return cachedFunction
@@ -410,13 +428,13 @@ def rainbownize(patternInput):
     return patternInput
 
 @function('vRainbownize')
-@defaultArguments(nVRainbows=1)
+@defaultArguments(vRainbowizeN=1)
 @functionize
 def vRainbownize(patternInput):
     '''
     Vertical rainbownize
     '''
-    numberOfRainbows=patternInput["nVRainbows"]
+    numberOfRainbows=patternInput["vRainbowizeN"]
     height=patternInput["height"]
     yHueShift =1./height
     def shifter(rgb,y,x):
@@ -656,26 +674,26 @@ def getCurrentTime():
 #############################
 #Movement and position functions
 @function('translate')
-@defaultArguments(xTranslate=0, yTranslate=0)
+@defaultArguments(translateX=0, translateY=0)
 @functionize
 def translate(patternInput):
     '''
     Translates the pattern by the the specified percentage
-    percentage translator. args('xTranslate=0; yTranslate=0')
+    percentage translator. args('translateX=0; translateY=0')
     '''
     height=patternInput["height"]
     width=patternInput["width"]
-    xTranslateInput=patternInput["xTranslate"]
-    yTranslateInput=patternInput["yTranslate"]
+    translateXInput=patternInput["translateX"]
+    translateYInput=patternInput["translateY"]
     oldcanvas = copy.deepcopy(patternInput["canvas"])
     getVal=patternInput.getValFunction()
     def translator(rgb,y,x):
-        xTranslate=getVal(xTranslateInput,x,y)
-        yTranslate=getVal(yTranslateInput,x,y)
-        xTranslate = round(xTranslate*width)
-        yTranslate = round(yTranslate*height)
-        positionY=int((y+yTranslate)%height)
-        positionX=int((x+xTranslate)%width)
+        translateX=getVal(translateXInput,x,y)
+        translateY=getVal(translateYInput,x,y)
+        translateX = round(translateX*width)
+        translateY = round(translateY*height)
+        positionY=int((y+translateY)%height)
+        positionX=int((x+translateX)%width)
         color = oldcanvas[positionY, positionX]
         return color
     canvas=patternInput["canvas"]
@@ -1114,26 +1132,26 @@ def scale(pattern):
         width=patternInput["width"]
         scaleX=patternInput["scaleX"]
         scaleY=patternInput["scaleY"]
-        xTranslate=patternInput["scaleTranslateX"]
-        yTranslate=patternInput["scaleTranslateY"]
-        xTranslate = xTranslate*width
-        yTranslate = yTranslate*height
+        translateX=patternInput["scaleTranslateX"]
+        translateY=patternInput["scaleTranslateY"]
+        translateX = translateX*width
+        translateY = translateY*height
 
         newWidth = scaleX*width
         newHeight = scaleY*height
 
         #To take into account that translate may change the width by +-1 because of division errors
         # Also, make everythinG INTO ints
-        newWidth = int(round(newWidth+xTranslate))-int(round(xTranslate))
-        newHeight= int(round(newHeight+yTranslate))-int(round(yTranslate))
+        newWidth = int(round(newWidth+translateX))-int(round(translateX))
+        newHeight= int(round(newHeight+translateY))-int(round(translateY))
 
-        xTranslate = int(round(xTranslate))
-        yTranslate = int(round(yTranslate))
+        translateX = int(round(translateX))
+        translateY = int(round(translateY))
         
         patternInput["height"] = max(1,newHeight)
         patternInput["width"] = max(1,newWidth)
         canvas = patternInput["canvas"]
-        canvas.translateAndScale(x=xTranslate, y=yTranslate,
+        canvas.translateAndScale(x=translateX, y=translateY,
                                  width=newWidth, height=newHeight)
         newPatternInput = pattern(patternInput)
         newCanvas = newPatternInput["canvas"]
