@@ -41,6 +41,7 @@ Everything is run from the command line
 ###Using images:
 
 * install pillow on pypy (or cPython):
+(dependencies: sudo apt-get install pypy-dev python-dev)
 * First way:
 	* Download https://github.com/python-pillow/Pillow
 	* Run: pypy setup.py install from that directory
@@ -58,6 +59,9 @@ And then change Images to True in config.py
 
 On Windows and OSX, simply install pillow. For Linux, install pyscreenshot. pypy -m pip install pyscreenshot.
 
+### Husl
+
+A different color space. Can make some nice colors for patterns. Install husl: sudo pypy -m pip install husl
 
 ### Using Weather
 
@@ -94,6 +98,8 @@ Making the audio work is non-trivial. If you still want to do so, follow the fol
 I use the python bindings for rpi_ws281x; however, I had to modify the code to improve its performance. Check it out on
 https://github.com/itf/rpi_ws281x.
 You will need to install, swig and python-dev to compile it.
+
+Instructions: install scons, install swig, install python-dev. Go to the top directory, run sudo scons. Cd into the python directory and run sudo python setup.py install
 
 Also, remember to run piUdpBuffer.sh, to remove lag caused by the UDP buffer
 
@@ -388,3 +394,4 @@ function -> http://stackoverflow.com/questions/13923091/how-do-you-do-a-python-e
 [x]Keep arguments that are modified inside args stay modified inside args. Create a function in pattern input called getDifference, which returns a dict. 
 
 []Allow string arguments (arguments that use "getVal") to depend on themselves, such as : rgbB = "rgbB + cos(frame)". Assumes string arguments that are supposed to be strings, such as "text" don't use "getVal", but, rather, maybe other function. For this, create a copy of the pattern input dict with no string arguments. Modify "set" as well, to only set values if they are not strings.
+
