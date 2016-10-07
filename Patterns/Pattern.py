@@ -156,6 +156,15 @@ class PatternInput(dict):
                     val = 0
             return val
         return valFunction
+
+    def getDifferent(self, otherPatternInput):
+        #Returns the differences in the parameters
+        result = {}
+        for i in self:
+            #uses get so that we avoid the extra logic from __getitem__
+            if i != 'canvas' and i!='previousPattern' and self.get(i)!=otherPatternInput.get(i):
+                result[i] = self.get(i)
+        return result
     
     def __deepcopy__(self,memo):
         #needed in order to copy the functions properly 

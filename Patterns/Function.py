@@ -215,17 +215,24 @@ def arg(strInstructionToEval):
     '''
     Evaluates the instruction on every frame update, modifying
     the arguments to the functions and patterns
+
+    If a parameter is modified by the arg function, it keeps the modified value
+    So it is possible to do things such as x=0.9*x from inside and arg function.
     '''
     def updaterArg(pattern):
+        modifiedParameters = {}
         def updateArg(patternInput):
             oldPatternInput = copy.copy(patternInput)
             oldPatternInput.pop('canvas')
             try:
+                patternInput.update(modifiedParameters)
                 execInPattern(strInstructionToEval, patternInput)
+                modifiedParameters.update(patternInput.getDifferent(oldPatternInput))
                 newPatternInput=pattern(patternInput)
             except:
                 newPatternInput=pattern(patternInput)
                 execInPattern(strInstructionToEval, newPatternInput)
+                modifiedParameters.update(patternInput.getDifferent(oldPatternInput))
                 newPatternInput=pattern(newPatternInput)
             newPatternInput.update(oldPatternInput)
             return newPatternInput
