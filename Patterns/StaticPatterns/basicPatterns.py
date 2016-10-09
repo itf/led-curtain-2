@@ -130,6 +130,45 @@ def rgbPattern(patternInput):
     return patternInput
 
 
+@P.pattern('cubeHelix')
+@F.defaultArgsP(cubeHelixAngle = 0,
+                cubeHelixLight = 0.77,
+                cubeHelixGamma = 1
+                )
+def cubeHelixPattern(patternInput):
+    cubeHelixAngle = patternInput["cubeHelixAngle"]
+    cubeHelixLight = patternInput["cubeHelixLight"]
+    cubeHelixGamma = patternInput["cubeHelixGamma"]
+
+    getVal=patternInput.getValFunction()
+    def mapper(rgb,y,x):
+        angle = float(getVal(cubeHelixAngle,x,y, 'cubeHelixAngle'))
+        light = float(getVal(cubeHelixLight,x,y, 'cubeHelixLight'))
+        gamma = float(getVal(cubeHelixGamma,x,y, 'cubeHelixGamma'))
+        r, g, b =  _cubeHelix(angle, light, gamma)
+        return (r,g,b)
+    canvas=patternInput["canvas"]
+    canvas.mapFunction(mapper)
+    return patternInput
+
+@F.simpleCached(1800)
+def _cubeHelix(normalizedAngle, lightParameter = 0.77, gamma = 1):
+    #####
+    # Based on Dave Green's `cubehelix' colour scheme,
+    # and jradavenport cubehelix python implementation
+    # and ideas from A Less-Angry Rainbow by mike bostock
+    #
+    _rgbAngle= normalizedAngle*3.1416*2
+    _rgbf= (-abs(0.5-(_rgbAngle/3.1416/2.+0.01)%1)**gamma)*1.05+lightParameter
+    _rgbS=1.5+_rgbf*2.2
+    _rgbAmp=_rgbS * _rgbf * (1. - _rgbf) / 2.
+    rgbR=_rgbf+_rgbAmp*(-0.14861 * math.cos(_rgbAngle) + 1.78277 * math.sin(_rgbAngle))
+    rgbG=_rgbf+_rgbAmp*(-0.29227 * math.cos(_rgbAngle) - 0.90649 * math.sin(_rgbAngle))
+    rgbB=_rgbf+_rgbAmp * (1.97294 * math.cos(_rgbAngle))
+    return (rgbR, rgbG, rgbB)
+
+
+
 patternDefaultDict = F.getEvalDefaultDict()
 equationPlane = []
 rotatedPlane=[]
