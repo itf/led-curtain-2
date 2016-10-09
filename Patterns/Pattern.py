@@ -117,6 +117,7 @@ class PatternInput(dict):
         self['previousPattern']=previousPattern
         self['previousFrame']=previousFrame
         self['globalBrightness']=globalBrightness
+        self.numericValue = {}
         
     def __getitem__(self, key):
         item = dict.__getitem__(self,key)
@@ -126,19 +127,6 @@ class PatternInput(dict):
             return item()
         else:
             return item
-        
-    def getVal(self,val, patternInput, x,y):
-        ###
-        #Use if you want your arg to depend in x and y, or other parameters
-        if isinstance(val, basestring):
-            height = float(patternInput["height"])
-            width = float(patternInput["width"])
-            xyDict={'x':x/width,'y':y/height}
-            try:
-                val=F.evalInPattern(val,patternInput,xyDict)
-            except:
-                val = 0
-        return val
 
     def getValFunction(self):
         ###
@@ -147,17 +135,21 @@ class PatternInput(dict):
         height = float(self["height"])
         width = float(self["width"])
         f= F.evalInPattern
-        def valFunction(val, x,y):
+        def valFunction(val, x,y, name=None):
             if isinstance(val, basestring):
-                xyDict={'x':x/width,'y':y/height}
+                extraDict={'x':x/width,'y':y/height}
+                extraDict.update(self.numericValue)
                 try:
-                    val=f(val,self,xyDict)
+                    val=f(val,self,extraDict)
                 except:
                     val = 0
+            if(name):
+                self.numericValue[name] = val
             return val
         return valFunction
 
     def getDifferent(self, otherPatternInput):
+        ###
         #Returns the differences in the parameters
         result = {}
         for i in self:
@@ -165,9 +157,12 @@ class PatternInput(dict):
             if i != 'canvas' and i!='previousPattern' and self.get(i)!=otherPatternInput.get(i):
                 result[i] = self.get(i)
         return result
-    
+
+
     def __deepcopy__(self,memo):
-        #needed in order to copy the functions properly 
+        #needed in order to copy the functions properly
+        #calling deep copy would copy the value that the functions are evaluated to, since __geitem is
+        #overloaded
         newone = copy.copy(self)
         newone['canvas'] = copy.deepcopy(self['canvas'])
         return newone

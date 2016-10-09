@@ -276,9 +276,11 @@ def execInPattern(strInstructionToExec, patternInput, extra={}):
     exec bytecode in defaultDict, patternInput
 
 def evalInPattern(strInstructionToEval, patternInput, extra={}):
-    patternInput.update(extra)
+    evalDict = {}
+    evalDict.update(patternInput)
+    evalDict.update(extra)
     bytecode=gerEvalCode(strInstructionToEval)
-    return eval(bytecode, defaultDict, patternInput)
+    return eval(bytecode, defaultDict, evalDict)
 
 @simpleCached(100)
 def getExecCode(strInstructionToExec):
@@ -410,7 +412,7 @@ def hueShift(patternInput):
     hue = patternInput["hue"]
     getVal=patternInput.getValFunction()
     def shifter(rgb,y,x):
-        deltahue=getVal(hue,x,y)
+        deltahue=getVal(hue,x,y,"hue")
         amount=deltahue
         return hsvShifter(rgb,amount)
     canvas=patternInput["canvas"]
@@ -483,7 +485,7 @@ def brightness(patternInput):
     getVal=patternInput.getValFunction()
 
     def brighter(rgb,y,x):
-        bright=getVal(brightness,x,y)
+        bright=getVal(brightness,x,y, "brightness")
         rgb = [min(color * bright,1) for color in rgb]
         return rgb
     canvas=patternInput["canvas"]
@@ -695,8 +697,8 @@ def translate(patternInput):
     oldcanvas = copy.deepcopy(patternInput["canvas"])
     getVal=patternInput.getValFunction()
     def translator(rgb,y,x):
-        translateX=getVal(translateXInput,x,y)
-        translateY=getVal(translateYInput,x,y)
+        translateX=getVal(translateXInput,x,y, "translateX")
+        translateY=getVal(translateYInput,x,y, "translateY")
         translateX = round(translateX*width)
         translateY = round(translateY*height)
         positionY=int((y+translateY)%height)

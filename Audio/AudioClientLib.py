@@ -38,6 +38,7 @@ class AudioInfo:
         self.lock = threading.RLock()
         threadListener= threading.Thread(target=self._listenerFunction,
                                    args= ())
+        threadListener.setDaemon(True)
         threadListener.start()
 
     def _listenerFunction(self):

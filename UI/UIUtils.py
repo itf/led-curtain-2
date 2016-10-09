@@ -127,6 +127,7 @@ def startSendData(host,
                                          isClosed,
                                          colorConverter,
                                          canvasToData))
+    threadSender.setDaemon(True)
     threadSender.start()
     return threadSender
 
@@ -176,7 +177,7 @@ def _sendDataThread(host,
         patternInput["inputList"] = userInput.getInputList
 
 
-        
+
     patternInput["time"] = dateAndTime().time
     patternInput["date"]= dateAndTime().date
 
@@ -186,7 +187,7 @@ def _sendDataThread(host,
         patternInput["tempMax"] = Weather.getTempMax
         patternInput["tempMin"] = Weather.getTempMin
         patternInput["weather"] = Weather.getWeather
-        
+
 
 
     

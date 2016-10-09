@@ -29,15 +29,18 @@ if Config.useHusl:
         huslEquation=patternInput["huslEquation"]
         height = float(patternInput["height"])
         width = float(patternInput["width"])
+        huslH = patternInput["huslH"]
+        huslS = patternInput["huslS"]
+        huslL = patternInput["huslL"]
         getVal=patternInput.getValFunction()
         def shifter(rgb,y,x):
             if huslEquation:
                 xyDict={'x':x/width,'y':y/height}
                 F.execInPattern(huslEquation,patternInput,xyDict)
-            huslH=getVal(patternInput["huslH"],x,y)
-            huslS=getVal(patternInput["huslS"],x,y)
-            huslL=getVal(patternInput["huslL"],x,y)
-            return huslShifter(rgb,huslH,huslS,huslL)
+            H=getVal(huslH,x,y)
+            S=getVal(huslS,x,y)
+            L=getVal(huslL,x,y)
+            return huslShifter(rgb,H,S,L)
         canvas=patternInput["canvas"]
         canvas.mapFunction(shifter)
         return patternInput

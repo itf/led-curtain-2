@@ -393,5 +393,5 @@ function -> http://stackoverflow.com/questions/13923091/how-do-you-do-a-python-e
 
 [x]Keep arguments that are modified inside args stay modified inside args. Create a function in pattern input called getDifference, which returns a dict. 
 
-[]Allow string arguments (arguments that use "getVal") to depend on themselves, such as : rgbB = "rgbB + cos(frame)". Assumes string arguments that are supposed to be strings, such as "text" don't use "getVal", but, rather, maybe other function. For this, create a copy of the pattern input dict with no string arguments. Modify "set" as well, to only set values if they are not strings.
+[x]Allow string arguments (arguments that use "getVal") to depend on themselves, such as : rgbB = "rgbB + cos(frame)". Assumes string arguments that are supposed to be strings, such as "text" don't use "getVal", but, rather, maybe other function. For this, create a copy of the pattern input dict with no string arguments. Modify "set" as well, to only set values if they are not strings.
 

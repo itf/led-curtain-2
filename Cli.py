@@ -3,9 +3,24 @@ import sys
 import threading
 import time
 import copy
-import rlcompleter
-import readline
+
+##Throws an exception when running under pypy on windows
+#Still runs the code, but with limited functionality
+try:
+    import rlcompleter
+    import readline
+except:
+    print "Running CLI without readline."
+    class readline_class():
+        def __getattr__(self, attr):
+            return lambda *args, **vargs: None
+
+        def __setattr__(self, key, value):
+            return True
+    readline = readline_class()
+
 import traceback
+import re
 
 import Config
 try:
@@ -37,7 +52,6 @@ This file is a prototype with lots of poor choices(in my opinion)
 It is just something that was hacked together. The rest of the code doesn't reflect this file
 """
 
-SEND_RATE = Config.SendRate
 
 class Completer(rlcompleter.Completer):
     '''
@@ -95,6 +109,12 @@ def importFunctionsFromDict(dictionary):
     for functionName in dictionary:
         globals()[functionName] = dictionary[functionName]
 
+def safe_raw_input(message):
+    #Removes leading whitespaces as well as any character that can't be printed with a standard american keyboard
+    instruction = raw_input(message)
+    cleanInstruction =  re.sub('[^a-zA-Z0-9-_* \\\/\'\"\!\@\#\$\%\^\&\*\_\-\+\=\.\,\?\[\]\{\}\|\~\`\;\:\(\).]', '', instruction.strip())
+    return cleanInstruction
+
 def runCliCurtain(argv):
     print 
     print "CLI to combine patterns"
@@ -137,9 +157,10 @@ def runCliCurtain(argv):
     resetFrameContainer = [False]
     patternInput = UIUtils.createInitialPatternInput(height, width)
     patternInputContainer=[patternInput]
+    sendRate = Config.SendRate
     threadSender = UIUtils.startSendData(host = host,
                   port = port,
-                  sendRate = SEND_RATE,
+                  sendRate = sendRate,
                   patternContainer = patternContainer, #modified by the UI
                   rContainer = rContainer, #modified by the UI and sender
                   rrContainer = rrContainer, #modified by the UI and sender
@@ -155,7 +176,7 @@ def runCliCurtain(argv):
     completer.setParameterDictContainer(patternInputContainer)
     while(patternContainer[0]):
         try:
-            instruction = raw_input('Pattern code, parameter(r), recurrentParameter(rr), List (l), \nSave (s), Safe Save (ss), Save W/ args (srr), saveFunction (sf)\n')
+            instruction = safe_raw_input('Pattern code, parameter(r), recurrentParameter(rr), List (l), \nSave (s), Safe Save (ss), Save W/ args (srr), saveFunction (sf)\n')
             readline.write_history_file('./.history')
 
             try:
@@ -192,7 +213,7 @@ def runCliCurtain(argv):
                             print str(function) +" " + str(metaFuncDict[function].func_doc)
                     elif instruction =="s" or instruction =="ss" \
                          or instruction == "srr":
-                        name = raw_input('Name for previous pattern:\n')
+                        name = safe_raw_input('Name for previous pattern:\n')
                         if name:
                             if instruction=="s":
                                 exec UIUtils.savePattern(name,patternString) in globals(),locals()
@@ -214,7 +235,7 @@ def runCliCurtain(argv):
                                 globals()[name] = eval(newPatternString)
                                 dictAll[name]=globals()[name]
                     elif instruction =="sf":
-                        func = raw_input('Write Function. Use "pattern" as the input:\n')
+                        func = safe_raw_input('Write Function. Use "pattern" as the input:\n')
                         leftP = func.count('(')
                         rightP = func.count(')')
                         if(leftP > rightP):
@@ -223,7 +244,7 @@ def runCliCurtain(argv):
                         elif (rightP>leftP):
                             print "Attempting to fix mismatched right parenthesis"
                             func='('*(rightP-leftP) +func
-                        name = raw_input('Name for function:\n')
+                        name = safe_raw_input('Name for function:\n')
                         if name:
                             savedFunction = UIUtils.saveFunction(name,func, patternInputContainer[0])
                             if savedFunction:
@@ -241,7 +262,6 @@ def runCliCurtain(argv):
                 
         except:
             patternContainer[0] = None
-            threadSender.join()
             print "threads successfully closed"
 
 

@@ -5,6 +5,7 @@ import Patterns.Pattern as P
 import Patterns.Function as F
 
 
+
 @P.pattern("random")
 def randomPattern(PatternInput):
     '''
@@ -112,13 +113,17 @@ def rgbPattern(patternInput):
     height = float(patternInput["height"])
     width = float(patternInput["width"])
     getVal=patternInput.getValFunction()
+    rgbR = patternInput["rgbR"]
+    rgbB = patternInput["rgbB"]
+    rgbG = patternInput["rgbG"]
+
     def mapper(rgb,y,x):
         if equation:
             xyDict={'x':x/width,'y':y/height}
             F.execInPattern(equation,patternInput,xyDict)
-        r = getVal(patternInput["rgbR"],x,y)
-        b = getVal(patternInput["rgbB"],x,y)
-        g = getVal(patternInput["rgbG"],x,y)
+        r = getVal(rgbR,x,y, 'rgbR')
+        b = getVal(rgbB,x,y, 'rgbB')
+        g = getVal(rgbG,x,y, 'rgbG')
         return (r,g,b)
     canvas=patternInput["canvas"]
     canvas.mapFunction(mapper)
