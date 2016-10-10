@@ -1,2 +1,2 @@
-echo Assuming pypy is in this directory
-AutoCompleter.py 3>&1 1>&2 2>&3 | pypy.exe Cli.py
+echo Assuming you've added the correct path to pypy
+AutoCompleter.py 

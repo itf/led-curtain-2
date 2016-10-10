@@ -14,6 +14,13 @@ Canvas = ScreenCanvasArray.Canvas
 
 SendRate=24
 
+####
+#If using windows you must modify the following lines
+
+pypyPath = "" #path to the pypy executable
+
+#end modify windows
+############
 if curtain=="old":
     width = 15
     height = 5

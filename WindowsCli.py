@@ -11,42 +11,16 @@
 #
 # From the command line, run:
 #
-# ./AutoCompleter.py 3>&1 1>&2 2>&3 | pypy ./Cli.py
-#
-# This pipes the error messages onto the standard output, the standard output onto the error messages
-# and pipes the resulting standard output onto pypy ./Cli.py
-#
-# Readline always sends data to stdout. In order to show tab completion onto the terminal while piping, you need to
-# redirect it to the error output. For the piping to still be useful, you need to redirect the previous error
-# to the standard output, and print messages onto the error output.
+# ./WindowsCli.py
 #
 # This file runs a mock version of the senders code, and runs the pattern and pattern input
 #
 #
 from __future__ import print_function
-import os
 import sys
-
-class RedirectStdStreams(object):
-    #As defined in http://stackoverflow.com/questions/6796492/temporarily-redirect-stdout-stderr
-    def __init__(self, stdout=None, stderr=None):
-        self._stdout = stdout or sys.stdout
-        self._stderr = stderr or sys.stderr
-
-    def __enter__(self):
-        self.old_stdout, self.old_stderr = sys.stdout, sys.stderr
-        self.old_stdout.flush(); self.old_stderr.flush()
-        sys.stdout, sys.stderr = self._stdout, self._stderr
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        self._stdout.flush(); self._stderr.flush()
-        sys.stdout = self.old_stdout
-        sys.stderr = self.old_stderr
-
 import copy
 import rlcompleter
 import readline
-
 
 try:
     import LocalConfig as Config
@@ -76,14 +50,8 @@ import SavedFunctions
 
 import sys
 
-
-previousPrint = print
-def eprint (*args, **kwargs):
-    previousPrint(*args, file=sys.stderr, **kwargs)
-
-##Necessary to stop duplicated messages when running "r print test" for debug
-def print(*args, **kargs):
-    pass
+import sys
+import subprocess
 
 class Completer(rlcompleter.Completer):
     '''
@@ -101,7 +69,7 @@ class Completer(rlcompleter.Completer):
         line = readline.get_line_buffer()
         nQuotes = line[0:pos].count("'")
         isR = len(line) > 1 and line[0] == 'r' and (
-        line[1] == ' ' or (len(line) > 2 and line[1] == 'r' and line[2] == ' '))
+            line[1] == ' ' or (len(line) > 2 and line[1] == 'r' and line[2] == ' '))
         matches = []
         n = len(text)
         if (nQuotes % 2 == 1 or isR):
@@ -145,7 +113,6 @@ def importFunctionsFromDict(dictionary):
         globals()[functionName] = dictionary[functionName]
 
 
-
 def initializePatternInputParameters(patternInput):
     if Config.useAudio:
         patternInput["beat"] = 1
@@ -160,17 +127,29 @@ def initializePatternInputParameters(patternInput):
         patternInput["inputList"] = 1
 
     patternInput["time"] = 1
-    patternInput["date"]= 1
+    patternInput["date"] = 1
 
     if Config.useOpenWeather:
-        patternInput["temp"] =1
+        patternInput["temp"] = 1
         patternInput["tempF"] = 1
         patternInput["tempMax"] = 1
         patternInput["tempMin"] = 1
         patternInput["weather"] = 1
     patternInput["frame"] = 1
 
+
 def runCliCurtain():
+    try:
+        cli = subprocess.Popen([Config.pypyPath, 'Cli.py'],
+                           stdin=subprocess.PIPE)
+    except:
+        print("the path to pypy is wrong.")
+        print("the path selected is" + Config.pypyPath)
+        exit()
+
+    def eprint(x):
+        cli.stdin.write(x + "\n")
+
     dictAll = UIUtils.getDictOfFunctions()
     importFunctionsFromDict(dictAll)
 
@@ -195,7 +174,7 @@ def runCliCurtain():
     height = 1
     width = 1
 
-    pattern= basicPattern.blackPattern
+    pattern = basicPattern.blackPattern
     patternInput = UIUtils.createInitialPatternInput(height, width)
     initializePatternInputParameters(patternInput)
     patternInputContainer = [patternInput]
@@ -216,7 +195,7 @@ def runCliCurtain():
                         instruction = '(' * (rightP - leftP) + instruction
 
                     if len(instruction) > 1 and instruction[0] == "r" and instruction[1] == ' ':
-                        eprint ( instruction)
+                        eprint(instruction)
                         command = instruction[2:]
                         try:
                             Function.execInPattern(command, patternInput)
@@ -224,32 +203,32 @@ def runCliCurtain():
                             pass
                     elif len(instruction) > 2 and instruction[0] == "r" and instruction[1] == 'r' and instruction[
                         2] == ' ':
-                        eprint ( instruction)
+                        eprint(instruction)
                         command = instruction[3:]
                         try:
                             Function.execInPattern(command, patternInput)
                         except:
                             pass
                     elif instruction == "l":
-                        eprint ( 'l' )
+                        eprint('l')
                     elif instruction == "s" or instruction == "ss" \
                             or instruction == "srr":
-                        eprint ( instruction)
+                        eprint(instruction)
                         name = raw_input('')
-                        eprint ( name )
+                        eprint(name)
                         if name:
-                                dictAll[name] = basicPattern.trivialPattern #assigns dummy pattern to save pattern
+                            dictAll[name] = basicPattern.trivialPattern  # assigns dummy pattern to save pattern
                     elif instruction == "sf":
                         func = raw_input('')
-                        eprint ( func)
+                        eprint(func)
                         name = raw_input('')
-                        eprint ( name)
+                        eprint(name)
                         if name:
                             savedFunction = UIUtils.saveFunction(name, func, patternInputContainer[0])
                             if savedFunction:
-                                dictAll[name] = lambda x:x
+                                dictAll[name] = lambda x: x
                     else:
-                        eprint ( instruction )
+                        eprint(instruction)
                         function = eval(instruction)
                         patternString = instruction
                         pattern = function
@@ -261,12 +240,13 @@ def runCliCurtain():
                 pass
 
         except:
+            cli.communicate()
             exit()
+
 
 def main(argv):
     runCliCurtain()
 
 
 if __name__ == "__main__":
-    with RedirectStdStreams(stdout=sys.stderr, stderr=sys.stdout):
-        main(sys.argv[1:])
+    main(sys.argv[1:])
