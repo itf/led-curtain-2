@@ -358,7 +358,7 @@ def agarioIsDone(statePatternDict):
 @SP.makeStatePattern(agarioPatternFunction,agarioInit,agarioIsDone)
 def agarPattern():
     '''
-    A simple snake that turns and grows with the beat controlled by the user
+    A simple agario copy game where a red dot kills you
     '''
     pass
 

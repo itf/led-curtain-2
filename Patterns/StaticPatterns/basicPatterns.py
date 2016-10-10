@@ -76,7 +76,7 @@ def _getBlackColor(value, y, x):
 @P.pattern('rainbow')
 def rainbow(PatternInput):
     '''
-    rainbow
+    (PatternInput) -> hue rainbow
     '''
     width=PatternInput["width"]
     xHueShift =1./width
@@ -109,6 +109,10 @@ def fractal(PatternInput):
                 rgbEquation="",
                 )
 def rgbPattern(patternInput):
+    '''
+    Defines values or equations for rgbR, rgbB, rgbG.
+    To set equations such as "cos(x)", use quotes for the value of rgb.
+    '''
     equation= patternInput["rgbEquation"]
     height = float(patternInput["height"])
     width = float(patternInput["width"])
@@ -136,6 +140,10 @@ def rgbPattern(patternInput):
                 cubeHelixGamma = 1
                 )
 def cubeHelixPattern(patternInput):
+    '''
+    A tentative colorhelix color space. The colors look really pretty
+    Use it to make a more friendly rainbow, to graph, etc.
+    '''
     cubeHelixAngle = patternInput["cubeHelixAngle"]
     cubeHelixLight = patternInput["cubeHelixLight"]
     cubeHelixGamma = patternInput["cubeHelixGamma"]
@@ -278,6 +286,11 @@ def equation(PatternInput):
 @P.pattern('circle')
 @F.defaultArgsP(circleRadius=0.666)
 def circle(PatternInput):
+    '''
+    Creates a circle centered at the canvas
+    With the radius normalized to the smalles dimension of the canvas
+    default: circleRadius = "0.666"
+    '''
     width = PatternInput["width"]
     height = PatternInput["height"]
     mWidth=width/2
@@ -424,6 +437,7 @@ patternDefaultDict = F.getEvalDefaultDict()
 def equationX(PatternInput):
     '''
     2 dimensional equation plotter
+    Example: equationX="sin(x*3)/3"
     '''
     width = PatternInput["width"]
     height = PatternInput["height"]

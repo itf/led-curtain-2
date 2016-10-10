@@ -47,26 +47,8 @@ def getMetaFunctionDict():
     '''
     return _dict_of_meta_functions
 
-########################3333
+########################
 #Helper functions - Helps constructing functions
-
-def pseudoRandomInitializer(function):
-    '''
-    Decorator for the pseudoRandom function
-    '''
-    pseudoRandomSize = 30000
-    randomArray = [random.random() for _ in xrange(pseudoRandomSize)]
-    index = [0]
-    def pseudoRandomFunction():
-        element = randomArray[index[0]]
-        index[0] = (index[0]+1)%pseudoRandomSize
-        return element
-    return pseudoRandomFunction
-
-@pseudoRandomInitializer
-def pseudoRandom():
-    return
-
 def simpleCached(cacheSize):
     '''
     A simple cache. Use like:
@@ -148,6 +130,27 @@ def rMetaFunctionize(myMetaFunction):
 
 #############################
 
+
+#######################
+# Other utils:
+def pseudoRandomInitializer(function):
+    '''
+    Decorator for the pseudoRandom function
+    '''
+    pseudoRandomSize = 30000
+    randomArray = [random.random() for _ in xrange(pseudoRandomSize)]
+    index = [0]
+    def pseudoRandomFunction():
+        element = randomArray[index[0]]
+        index[0] = (index[0]+1)%pseudoRandomSize
+        return element
+    return pseudoRandomFunction
+
+@pseudoRandomInitializer
+def pseudoRandom():
+    return
+
+
 #########################
 #Functions that modify the behavior of the arguments
 
@@ -218,6 +221,9 @@ def arg(strInstructionToEval):
 
     If a parameter is modified by the arg function, it keeps the modified value
     So it is possible to do things such as x=0.9*x from inside and arg function.
+
+    In short words, arg('x=1')(pattern) means:
+    exec x=1, and then run the pattern.
     '''
     def updaterArg(pattern):
         modifiedParameters = {}
@@ -360,6 +366,8 @@ def isolate(pattern):
 def isolateCanvas(pattern):
     '''
     Runs the pattern in its own canvas environment
+    Useful when using "blur(trivial)", since it will allow you to blur only
+    the part of the canvas affected by what is inside this function.
     '''
     previousCanvas = [None]
     @wraps(pattern) #preserves __name__ and __doc__

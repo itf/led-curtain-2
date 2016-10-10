@@ -24,7 +24,8 @@ if Config.useHusl:
     @F.functionize
     def huslShift(patternInput):
         '''
-        Shifts the hue by the specified amount
+        Shifts the hue, saturation and light by the specified amount
+        In the HUSL colors space (approximately even lightness)
         '''
         huslEquation=patternInput["huslEquation"]
         height = float(patternInput["height"])

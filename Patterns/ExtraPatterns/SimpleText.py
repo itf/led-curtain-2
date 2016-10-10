@@ -9,6 +9,13 @@ textRealHeight=5
 @P.pattern("text")
 @F.defaultArgsP(text='SPAACE', textHeight=1, textPos=0.5)
 def textPattern(PatternInput):
+    '''
+    A simple text pattern, that uses letters that are 5 pixes tall.
+    At textPos=0, the text is not on the screen; it is all the way tothe right.
+    At text pos=1, it also exits the screen, and is all the way to the left.
+    The height is normalized. Height=1 means that it uses the whole vertical span
+    of the screen.
+    '''
     text = str(PatternInput['text'])
     text=text.upper()
     textHeight = PatternInput['textHeight']

@@ -50,6 +50,11 @@ def screenPattern(patternInput):
                 imageHeight = 1,
                 imageWidth = 1)
 def imagePattern(PatternInput):
+    '''
+    Displays a GIF on the screen. Set the imageName,
+    normalized imageHeight and imageWidth.
+    Autoplays one frame of the gif per frame.
+    '''
     if Config.useImages:
         imageName = PatternInput['imageName']
         imageHeight = PatternInput['imageHeight']
