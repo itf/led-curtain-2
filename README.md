@@ -149,7 +149,7 @@ The easiest way to learn how to use the CLI is by examples. Example of patterns 
 
 * arg('translateX= cos(frame/37.); translateY = sin(frame/60.)*2')(mask(translate(circle),meanP(softRainbow,trivial),blur(trivial))) 
 					-> moving masked circle with blurring background
-* hueShift(arg('translateX= cos(frame/37.); translateY = sin(frame/60.)*2; weightedMeanWeight=0.03; hue=0.021')(mask(translate(circle),prettyDiagonalRainbow, weightedMean2P(black,blur(trivial)))))) 
+* hueShift(arg('translateX= cos(frame/37.); translateY = sin(frame/60.)*2; weightedMeanWeight=0.03; hue=0.021')(mask(translate(circle),_prettyDiagonalRainbow, weightedMean2P(black,blur(trivial))))))
 					-> movingCircle with fading to black background (_mesmerezingMeteor)
 
 
