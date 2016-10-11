@@ -560,11 +560,22 @@ def prod(factors):
 @combineCanvas
 def multiplyPatterns(*colors):
     '''
-    Adds patterns together
+    Multiply patterns together
     '''
     colorOutput= tuple([prod(color) for color in zip(*colors)])
     return colorOutput
 
+def sub(factors):
+    return functools.reduce(lambda x,y:x-y, factors)
+
+@function('subtractP')
+@combineCanvas
+def multiplyPatterns(*colors):
+    '''
+    Subtract patterns together
+    '''
+    colorOutput= tuple([sub(color) for color in zip(*colors)])
+    return colorOutput
 
 @function('weightedMean2P')
 @defaultArguments(weightedMeanWeight=0.5)

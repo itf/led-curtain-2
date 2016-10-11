@@ -141,7 +141,8 @@ def initializePatternInputParameters(patternInput):
 def runCliCurtain():
     try:
         cli = subprocess.Popen([Config.pypyPath, 'Cli.py'],
-                           stdin=subprocess.PIPE)
+                           stdin=subprocess.PIPE, universal_newlines=True,
+                               bufsize=1)
     except:
         print("the path to pypy is wrong.")
         print("the path selected is" + Config.pypyPath)
@@ -149,6 +150,8 @@ def runCliCurtain():
 
     def eprint(x):
         cli.stdin.write(x + "\n")
+        cli.stdin.flush()
+
 
     dictAll = UIUtils.getDictOfFunctions()
     importFunctionsFromDict(dictAll)
@@ -183,7 +186,6 @@ def runCliCurtain():
     while (pattern):
         try:
             instruction = raw_input('')
-            print(instruction)
             readline.write_history_file('./.history')
             try:
                 if instruction:
@@ -236,6 +238,9 @@ def runCliCurtain():
                             patternInput = pattern(patternInput)
                         except:
                             pass
+                        patternInputContainer[0] = patternInput
+                else:
+                    eprint(instruction)
             except:
                 pass
 
