@@ -112,7 +112,7 @@ def importFunctionsFromDict(dictionary):
 def safe_raw_input(message):
     #Removes leading whitespaces as well as any character that can't be printed with a standard american keyboard
     instruction = raw_input(message)
-    cleanInstruction =  re.sub('[^a-zA-Z0-9-_* \\\/\'\"\!\@\#\$\%\^\&\*\_\-\+\=\.\,\?\[\]\{\}\|\~\`\;\:\(\).]', '', instruction.strip())
+    cleanInstruction =  re.sub('[^a-zA-Z0-9-_*\ \\\/\'\"\!\@\#\$\%\^\&\*\_\-\+\=\.\,\?\[\]\{\}\|\~\`\;\:\(\).]', '', instruction.strip())
     return cleanInstruction
 
 def runCliCurtain(argv):

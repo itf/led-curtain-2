@@ -506,37 +506,50 @@ def brightness(patternInput):
 ##########################
 #Functions that combine patterns
 
-def combineCanvas(colorCombiner):
+def combineCanvas(**kwargs):
     '''
     Helper function to combines patterns together.
-    See meaner and addPattern
+    See meaner and addPattern. You can also setup weights, etc in the kwargs
     '''
-    @wraps(colorCombiner) #preserve docs and name
-    def combineFunction(*patterns):
-        def combinedPattern(patternInput):
-            patternOutputs=[]
-            for pattern in patterns:
-                patternOutputs.append(pattern(copy.deepcopy(patternInput)))
-            canvass=[]
-            for patternOutput in patternOutputs:
-                canvass.append(patternOutput['canvas'])
-            def combiner(rgb,y,x):
-                return colorCombiner(*[canvas[y,x] for canvas in canvass])
-            canvas=patternInput['canvas']
+    def combineCanvasWithKwargs(colorCombiner):
+        @wraps(colorCombiner) #preserve docs and name
+        @defaultArguments(**kwargs)
+        def combineFunction(*patterns):
+            def combinedPattern(patternInput):
+                patternOutputs=[]
+                for pattern in patterns:
+                    patternOutputs.append(pattern(copy.deepcopy(patternInput)))
+                canvass=[]
+                for patternOutput in patternOutputs:
+                    canvass.append(patternOutput['canvas'])
 
-            for patternOutput in patternOutputs:
-                patternInput.update(patternOutput)
-                
-            canvas.mapFunction(combiner)
-            patternInput['canvas']=canvas
-            return patternInput
-        return combinedPattern
-    return combineFunction
+                parameters = {}
+                for arg in kwargs:
+                    parameters[arg] = patternInput[arg]
+
+                getVal = patternInput.getValFunction()
+                argValues = {}
+
+                def combiner(rgb,y,x):
+                    for arg, value in parameters.iteritems():
+                        argValues[arg] = getVal(value, x, y, arg)
+                    return colorCombiner(*[canvas[y,x] for canvas in canvass], **argValues)
+                canvas=patternInput['canvas']
+
+                for patternOutput in patternOutputs:
+                    patternInput.update(patternOutput)
+
+                canvas.mapFunction(combiner)
+                patternInput['canvas']=canvas
+                return patternInput
+            return combinedPattern
+        return combineFunction
+    return combineCanvasWithKwargs
 
 
 @function('meanP')
-@combineCanvas
-def meaner(*colors):
+@combineCanvas()
+def meaner(*colors, **kwargs):
     '''
     Takes the mean of 2 patterns
     '''
@@ -544,8 +557,8 @@ def meaner(*colors):
     return colorOutput
 
 @function('addP')
-@combineCanvas
-def addPatterns(*colors):
+@combineCanvas()
+def addPatterns(*colors, **kwargs):
     '''
     Adds patterns together
     '''
@@ -556,9 +569,10 @@ def addPatterns(*colors):
 def prod(factors):
     return functools.reduce(lambda x,y:x*y, factors)
 
+
 @function('mulP')
-@combineCanvas
-def multiplyPatterns(*colors):
+@combineCanvas()
+def multiplyPatterns(*colors, **kwargs):
     '''
     Multiply patterns together
     '''
@@ -569,34 +583,43 @@ def sub(factors):
     return functools.reduce(lambda x,y:x-y, factors)
 
 @function('subtractP')
-@combineCanvas
-def multiplyPatterns(*colors):
+@combineCanvas()
+def multiplyPatterns(*colors, **kwargs):
     '''
     Subtract patterns together
     '''
     colorOutput= tuple([sub(color) for color in zip(*colors)])
     return colorOutput
 
-@function('weightedMean2P')
-@defaultArguments(weightedMeanWeight=0.5)
-def weightedMeanP(*patterns):
-    '''
-    Takes the weighted mean of 2 patterns
-    '''
-    def weighter(patternInput):
-        weight=patternInput['weightedMeanWeight']
-        @combineCanvas
-        def meaner(color0, color1):
-            colorOutput= tuple([min(color[0]*weight+color[1]*(1-weight),1) for color in zip(color0, color1)])
-            return colorOutput
-        return meaner(*patterns)(patternInput)
-    return weighter
 
+def screen(factors):
+    inverseFactors = [1-factor for factor in factors]
+    return 1 - prod(inverseFactors)
+
+
+@function('screenP')
+@combineCanvas(screenPWeight = 0)
+def screenPatterns(*colors, **kwargs):
+    '''
+    Screen pattern colors together
+    '''
+    weight = kwargs["screenPWeight"]
+    colorOutput= tuple([screen(color) for color in  zip(*colors)])
+    colorOutput = tuple([min(color[0]*weight+color[1]*(1-weight),1) for color in zip(colors[0], colorOutput)])
+    return colorOutput
+
+
+@function('weightedMean2P')
+@combineCanvas(weightedMean2P=0.5)
+def weightedMean2P(color0, color1, **kwargs):
+    weight = kwargs["weightedMean2P"]
+    colorOutput= tuple([min(color[0]*weight+color[1]*(1-weight),1) for color in zip(color0, color1)])
+    return colorOutput
 
 
 @function('mask')
-@combineCanvas
-def masker(color0, color1, color2):
+@combineCanvas()
+def masker(color0, color1, color2, **kwargs):
     '''
     Uses the first pattern as a mask for the other 2 patterns
     '''
@@ -607,8 +630,8 @@ def masker(color0, color1, color2):
     return colorOutput
 
 @function('weightedMask')
-@combineCanvas
-def weightedMasker(color0, color1, color2):
+@combineCanvas()
+def weightedMasker(color0, color1, color2, **kwargs):
     '''
     Uses the red channel of the first pattern as a weighted mask for the other 2 patterns
     '''
@@ -1065,7 +1088,7 @@ def transitionFadeFunction(previousPattern, pattern, patternInput, transitionDic
         except:
             pass
         patternInput['weightedMeanWeight']=weight
-        newPatternInput = weightedMeanP(pattern, previousPattern)(patternInput)
+        newPatternInput = weightedMean2P(pattern, previousPattern)(patternInput)
         if oldWeight!=None:
             newPatternInput['weightedMeanWeight']=oldWeight
         else:
