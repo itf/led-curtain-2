@@ -193,7 +193,7 @@ def runCliCurtain(argv):
                     if len(instruction)>1 and instruction[0]=="r" and instruction[1]==' ':
                         command = instruction[2:]
                         rContainer[0]=command
-                    elif len(instruction)>2 and instruction[0]=="r" and instruction[1]=='r' and instruction[2]==' ':
+                    elif len(instruction)>=2 and instruction[0]=="r" and instruction[1]=='r' and (len(instruction) == 2 or instruction[2]==' '):
                         command = instruction[3:]
                         rrContainer[0]=command
                     elif instruction =="l":

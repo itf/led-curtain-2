@@ -281,12 +281,15 @@ def execInPattern(strInstructionToExec, patternInput, extra={}):
     bytecode=getExecCode(strInstructionToExec)
     exec bytecode in defaultDict, patternInput
 
+patternInputContainer = [None]
 def evalInPattern(strInstructionToEval, patternInput, extra={}):
-    evalDict = {}
-    evalDict.update(patternInput)
-    evalDict.update(extra)
+    if not patternInputContainer[0]:
+        patternInputContainer[0] = copy.copy(patternInput)
+    patternInputDict = patternInputContainer[0]
+    patternInputDict.update(patternInput)
+    patternInputDict.update(extra)
     bytecode=gerEvalCode(strInstructionToEval)
-    return eval(bytecode, defaultDict, evalDict)
+    return eval(bytecode, defaultDict, patternInputDict)
 
 @simpleCached(100)
 def getExecCode(strInstructionToExec):
@@ -388,6 +391,7 @@ def isolateCanvas(pattern):
 #############################
 #Hue, Color Brightness Functions
 
+@simpleCached(1000)
 def hsvShifter(rgb,amount):
     h,s,v=colorsys.rgb_to_hsv(*rgb)
     h +=amount
@@ -529,11 +533,14 @@ def combineCanvas(**kwargs):
 
                 getVal = patternInput.getValFunction()
                 argValues = {}
-
-                def combiner(rgb,y,x):
-                    for arg, value in parameters.iteritems():
-                        argValues[arg] = getVal(value, x, y, arg)
-                    return colorCombiner(*[canvas[y,x] for canvas in canvass], **argValues)
+                if (len(canvass) >0):
+                    def combiner(rgb,y,x):
+                        for arg, value in parameters.iteritems():
+                            argValues[arg] = getVal(value, x, y, arg)
+                        return colorCombiner(*[canvas[y,x] for canvas in canvass], **argValues)
+                else:
+                    def combiner(rgb,y,x):
+                        return (0,0,0)
                 canvas=patternInput['canvas']
 
                 for patternOutput in patternOutputs:
@@ -605,7 +612,8 @@ def screenPatterns(*colors, **kwargs):
     '''
     weight = kwargs["screenPWeight"]
     colorOutput= tuple([screen(color) for color in  zip(*colors)])
-    colorOutput = tuple([min(color[0]*weight+color[1]*(1-weight),1) for color in zip(colors[0], colorOutput)])
+    if weight>0:
+        colorOutput = tuple([min(color[0]*weight+color[1]*(1-weight),1) for color in zip(colors[0], colorOutput)])
     return colorOutput
 
 
@@ -1084,15 +1092,15 @@ def transitionFadeFunction(previousPattern, pattern, patternInput, transitionDic
         transitionDict['weight'] = weight
         oldWeight=None
         try:
-            oldWeight = patternInput['weightedMeanWeight']
+            oldWeight = patternInput['weightedMean2P']
         except:
             pass
-        patternInput['weightedMeanWeight']=weight
+        patternInput['weightedMean2P']=weight
         newPatternInput = weightedMean2P(pattern, previousPattern)(patternInput)
         if oldWeight!=None:
-            newPatternInput['weightedMeanWeight']=oldWeight
+            newPatternInput['weightedMean2P']=oldWeight
         else:
-            newPatternInput.pop('weightedMeanWeight')
+            newPatternInput.pop('weightedMean2P')
         newPatternInput= newPatternInput
     else:
         done=True
@@ -1293,7 +1301,39 @@ def splitRecursive(isHorizontal, *patterns):
         translateX+=scaleX
     metaFunction = applyArguments(scaleX=scaleX, scaleY=scaleY, scaleTranslateX=translateX, scaleTranslateY=translateY)
     modifiedPatterns.append(metaFunction(scale(patterns[lenP-1])))
-    return(addPatterns(*modifiedPatterns))   
+    return(addPatterns(*modifiedPatterns))
+
+from collections import deque
+@function("randomSpawn")
+@defaultArguments(randomSpawnProb=0.1, randomSpawnWidth=0.3, randomSpawnHeight=0.3, randomSpawnFadeFrames=50, randomSpawnRandomPatternParam = 0)
+def randomSpawn(pattern):
+    spawnedPatterns = deque()
+    spawnedPatternsInitialFrame = deque()
+    def randomSpawnedPattern(patternInput):
+        thisframe = patternInput['frame']
+        randomSpawnProb = patternInput['randomSpawnProb']
+        randomSpawnWidth =  patternInput['randomSpawnWidth']
+        randomSpawnHeight =  patternInput['randomSpawnHeight']
+        randomSpawnFadeFrames = patternInput['randomSpawnFadeFrames']
+        spawn = random.random() < randomSpawnProb
+        if spawn:
+            translateX = random.random()
+            translateY = random.random()
+            scaleX = randomSpawnWidth
+            scaleY = randomSpawnHeight
+            randomSpawnRandom = random.random()
+            metaFunction = applyArguments(randomSpawnRandomPatternParam = randomSpawnRandom, scaleX=scaleX, scaleY=scaleY, scaleTranslateX=translateX, scaleTranslateY=translateY)
+            brightnessArg = arg('brightness = 1 - (frame -' + str(thisframe) + ')/float(' + str(randomSpawnFadeFrames) + ')')
+            newPattern = brightnessArg(metaFunction(brightness(scale(pattern))))
+            spawnedPatterns.append(newPattern)
+            spawnedPatternsInitialFrame.append(thisframe)
+        while(len(spawnedPatternsInitialFrame)>0 and  thisframe - spawnedPatternsInitialFrame[0] > randomSpawnFadeFrames) :
+            spawnedPatterns.popleft()
+            spawnedPatternsInitialFrame.popleft()
+        return (screenPatterns(*spawnedPatterns))(patternInput)
+    return randomSpawnedPattern
+
+
 
 ###################
 # Experimental functions

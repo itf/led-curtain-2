@@ -125,9 +125,9 @@ def rgbPattern(patternInput):
         if equation:
             xyDict={'x':x/width,'y':y/height}
             F.execInPattern(equation,patternInput,xyDict)
-        r = getVal(rgbR,x,y, 'rgbR')
-        b = getVal(rgbB,x,y, 'rgbB')
-        g = getVal(rgbG,x,y, 'rgbG')
+        r = getVal(rgbR,x,y, 'rgbR', rgb = rgb)
+        b = getVal(rgbB,x,y, 'rgbB', rgb = rgb)
+        g = getVal(rgbG,x,y, 'rgbG', rgb = rgb)
         return (r,g,b)
     canvas=patternInput["canvas"]
     canvas.mapFunction(mapper)
@@ -296,9 +296,12 @@ def circle(PatternInput):
     mWidth=width/2
     mHeight=height/2
     circleRadius=PatternInput['circleRadius']
-    circleRadius = (circleRadius * min(mWidth, mHeight))
-    sCRadius=circleRadius**2
+    getVal = PatternInput.getValFunction()
     def mapper(rgb,y,x):
+        circleR = getVal(circleRadius, x, y)
+        circleR = (circleR * min(mWidth, mHeight))
+        sCRadius = circleR ** 2
+
         if (mWidth-x)**2 +(mHeight-y)**2 > sCRadius:
             return (0,0,0)
         else:
@@ -307,6 +310,166 @@ def circle(PatternInput):
     canvas.mapFunction(mapper)
     return PatternInput
 
+
+
+DEBUG_POLYGON=False
+@P.pattern('polygon')
+@F.defaultArgsP(polygonRadius = 0.666,
+                polygonSizes = 4)
+def polygon(PatternInput):
+    '''
+    Creates a polygon centered at the canvas
+    With the radius normalized to the smallest dimension of the canvas
+    default: circleRadius = "0.666"
+    '''
+    width = PatternInput["width"]
+    height = PatternInput["height"]
+    mWidth = width/2
+    mHeight = height/2
+    polygonRadius = PatternInput['polygonRadius']
+    polygonRadius = (polygonRadius * min(mWidth, mHeight))
+    polygonSizes = PatternInput['polygonSizes']
+
+    @F.simpleCached(5000)
+    def isInside(x, y, polygonRadius, polygonSizes):
+        inside = 1
+        xCoef = 0
+        yCoef = 1
+        angle = math.pi *2 / polygonSizes
+        for i in range(int(math.ceil(polygonSizes))):
+            distanceFromPlane = (x-mWidth) * xCoef + (y-mHeight) * yCoef
+            if DEBUG_POLYGON:
+                if abs(distanceFromPlane-polygonRadius)<0.5:
+                    return 1.5
+                    pass
+            if distanceFromPlane > polygonRadius:
+                inside *= max(0, polygonRadius+1-distanceFromPlane) #makes the edges not sharp
+                if inside==0:
+                    break
+            xCoef, yCoef = xCoef*math.cos(angle) +  yCoef*math.sin(-angle), \
+                            xCoef*math.sin(angle) +  yCoef*math.cos(angle)
+        return inside
+
+    def mapper(rgb, y, x):
+        inside = isInside(x, y, polygonRadius, polygonSizes)
+        return (inside,0,0)
+    canvas=PatternInput["canvas"]
+    canvas.mapFunction(mapper)
+    return PatternInput
+
+@P.pattern('polygon2')
+@F.defaultArgsP(polygonRadius = 0.666,
+                polygonSizes = 4)
+def polygon2(PatternInput):
+    '''
+    Creates a polygon centered at the canvas
+    With the radius normalized to the smallest dimension of the canvas
+    default: circleRadius = "0.666"
+    '''
+    width = PatternInput["width"]
+    height = PatternInput["height"]
+    mWidth = width/2
+    mHeight = height/2
+    polygonRadius = PatternInput['polygonRadius']
+    polygonRadius = (polygonRadius * min(mWidth, mHeight))
+    polygonSizes = PatternInput['polygonSizes']
+
+    @F.simpleCached(5000)
+    def isInside(x, y, polygonRadius, polygonSizes):
+        inside = 1
+        xCoef = 0
+        yCoef = 1
+        angle = math.pi *2 / polygonSizes
+        vertexX = -math.sin(angle/2)*polygonRadius
+        vertexY = math.cos(angle/2)*polygonRadius
+        for i in range(int(math.ceil(polygonSizes))):
+            vertexDistance = xCoef*vertexX + yCoef* vertexY
+            distanceFromPlane = (x-mWidth) * xCoef + (y-mHeight) * yCoef
+            if DEBUG_POLYGON:
+                if x == int(mWidth+vertexX) and y == int(mHeight+vertexY):
+                    return 2
+                    pass
+                if abs(distanceFromPlane-vertexDistance)<0.5:
+                    return 1.5
+                    pass
+            if distanceFromPlane > vertexDistance:
+                inside *= max(0, vertexDistance+1-distanceFromPlane) #makes the edges not sharp
+                if inside==0:
+                    break
+            xCoef, yCoef = xCoef*math.cos(angle) +  yCoef*math.sin(-angle), \
+                            xCoef*math.sin(angle) +  yCoef*math.cos(angle)
+            vertexX, vertexY = vertexX * math.cos(angle) + vertexY * math.sin(-angle), \
+                               vertexX * math.sin(+angle) + vertexY * math.cos(angle)
+
+        return inside
+
+    def mapper(rgb, y, x):
+        inside = isInside(x, y, polygonRadius, polygonSizes)
+        return (inside,0,0)
+    canvas=PatternInput["canvas"]
+    canvas.mapFunction(mapper)
+    return PatternInput
+
+@P.pattern('polygon3')
+@F.defaultArgsP(polygonRadius = 0.666,
+                polygonSizes = 4,
+                polygonAlisasing = 1,
+                polygonSparePlanes = 0)
+def polygon3(patternInput):
+    '''
+    Creates a polygon centered at the canvas
+    With the radius normalized to the smallest dimension of the canvas
+    default: circleRadius = "0.666"
+    '''
+    width = patternInput["width"]
+    height = patternInput["height"]
+    mWidth = width/2
+    mHeight = height/2
+    polygonRadius = patternInput['polygonRadius']
+    polygonRadius = (polygonRadius * min(mWidth, mHeight))
+    polygonSizes = patternInput['polygonSizes']
+    polygonAlisasing = patternInput['polygonAlisasing']
+    polygonSparePlanes = patternInput['polygonSparePlanes']
+    def isInside(x, y, polygonRadius, polygonSizes):
+        inside = 1
+        outsidePlanes = polygonSparePlanes+1
+        angle = math.pi *2 / polygonSizes
+        nextVertexX = -math.sin(angle/2)*polygonRadius
+        nextVertexY = math.cos(angle/2)*polygonRadius
+        negativeAngle = (math.ceil(polygonSizes)*angle-angle/2)
+        vertexX = -math.sin(negativeAngle)*polygonRadius
+        vertexY = math.cos(negativeAngle)*polygonRadius
+        planes = 0
+        for i in range(int(math.ceil(polygonSizes))):
+            xCoef =  nextVertexY- vertexY
+            yCoef = vertexX- nextVertexX
+            epsilon=1e-10
+            xCoef,yCoef = xCoef/math.sqrt(xCoef**2+yCoef**2+epsilon), yCoef/math.sqrt(xCoef**2+yCoef**2+epsilon)
+            vertexDistance = xCoef*nextVertexX + yCoef* nextVertexY
+            distanceFromPlane = (x-mWidth) * xCoef + (y-mHeight) * yCoef
+            if DEBUG_POLYGON:
+                if x == int(mWidth+vertexX) and y == int(mHeight+vertexY):
+                    return 2
+                    pass
+                if abs(distanceFromPlane-vertexDistance)<0.5:
+                    return 1.5
+                    pass
+            if distanceFromPlane > vertexDistance:
+                inside *= min(1,max(0, vertexDistance+polygonAlisasing-distanceFromPlane)) #makes the edges not sharp
+                outsidePlanes -=1
+                inside = max(inside,min(1,outsidePlanes))
+            vertexX, vertexY = nextVertexX, nextVertexY
+            nextVertexX, nextVertexY = vertexX * math.cos(angle) + vertexY * math.sin(-angle), \
+                                       vertexX * math.sin(+angle) + vertexY * math.cos(angle)
+
+        return inside
+
+    def mapper(rgb, y, x):
+        inside = isInside(x, y, polygonRadius, polygonSizes)
+        return (inside,0,0)
+    canvas=patternInput["canvas"]
+    canvas.mapFunction(mapper)
+    return patternInput
 
 
 @P.pattern('radialHueGradient')

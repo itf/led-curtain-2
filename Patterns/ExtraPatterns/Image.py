@@ -66,7 +66,7 @@ def imagePattern(PatternInput):
         fullPath=imagePath+imageName
         imageYpixels = int(height*imageHeight)
         imageXpixels = int(width*imageWidth)
-        
+
         imageFrames=getGifFrames(fullPath, imageYpixels, imageXpixels)
         nFrames= len(imageFrames)
         imageFrameNumber = frame%nFrames
@@ -82,19 +82,19 @@ def imagePattern(PatternInput):
                 return (0,0,0)
         canvas=PatternInput["canvas"]
         canvas.mapFunction(imager)
-    
+
     return PatternInput
 
 ###################################
 #Slightly modified BiggleZX code, found on
 #https://gist.github.com/BigglesZX/4016539
-@F.simpleCached(20)
+@F.simpleCached(50)
 def getGifFrames(imagePath, height, width):
     '''
     Iterate the GIF, extracting each frame.
     '''
     mode = analyseImage(imagePath)['mode']
-    
+
     im = openImage(imagePath)
 
     i = 0
@@ -111,16 +111,16 @@ def getGifFrames(imagePath, height, width):
             '''
             if not im.getpalette():
                 im.putpalette(p)
-            
+
             new_frame = Image.new('RGBA', im.size)
-            
+
             '''
             Is this file a "partial"-mode GIF where frames update a region of a different size to the entire image?
             If so, we need to construct the new frame by pasting it on top of the preceding frames.
             '''
             if mode == 'partial':
                 new_frame.paste(last_frame)
-            
+
             new_frame.paste(im, (0,0), im.convert('RGBA'))
             frames.append(new_frame.resize((width, height), Image.NEAREST))
 
@@ -171,4 +171,4 @@ def openImage(imagePath):
             filename = glob.glob(imagePath + '*')[0]
             im = Image.open(filename)
     return im
-   
+

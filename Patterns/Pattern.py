@@ -135,9 +135,10 @@ class PatternInput(dict):
         height = float(self["height"])
         width = float(self["width"])
         f= F.evalInPattern
-        def valFunction(val, x,y, name=None):
+        def valFunction(val, x,y, name=None, **kwargs):
             if isinstance(val, basestring):
-                extraDict={'x':x/width,'y':y/height}
+                extraDict = kwargs
+                extraDict.update({'x':x/width,'y':y/height})
                 extraDict.update(self.numericValue)
                 try:
                     val=f(val,self,extraDict)
