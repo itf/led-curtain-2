@@ -39,10 +39,9 @@ def canvasToRawData(canvas):
     return data
 
 def canvasToString(canvas):
-    convert = lambda x: chr(max(min(255,int(round(255*x))),0))
-    height = canvas.height
-    width = canvas.width
-    return[convert(color) for y in xrange(height) for x in xrange(width)  for color in canvas[y,x]]
+    array = canvas.getArray()
+    convert = lambda x: chr(max(min(255,int((255*x+0.5))),0))
+    return[convert(color) for color in array]
 
 
 def dataToCanvas(data):

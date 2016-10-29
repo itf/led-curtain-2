@@ -57,6 +57,7 @@ def simpleCached(cacheSize):
     '''
     cache=OrderedDict()
     def cacheFunction(function):
+        @wraps(function)
         def cachedFunction(*args):
             tArgs=tuple(args)
             if tArgs in cache:
@@ -64,6 +65,9 @@ def simpleCached(cacheSize):
             else:
                 answer=function(*args)
                 if len(cache)>cacheSize:
+                    cache.popitem(last = False)
+                    cache.popitem(last = False)
+                    cache.popitem(last = False)
                     cache.popitem(last = False)
                     cache.popitem(last = False)
                 cache[tArgs]=answer
@@ -381,7 +385,7 @@ def isolateCanvas(pattern):
         isolatedPatternInput = copy.copy(patternInput)
         isolatedPatternInput['canvas']=previousCanvas[0]
         patternOutput = pattern(isolatedPatternInput)
-        previousCanvas[0]=copy.deepcopy(patternOutput['canvas'])
+        previousCanvas[0] = copy.deepcopy(patternOutput['canvas'])
         return patternOutput
     return isolated
 
@@ -393,7 +397,10 @@ def isolateCanvas(pattern):
 
 @simpleCached(1000)
 def hsvShifter(rgb,amount):
-    h,s,v=colorsys.rgb_to_hsv(*rgb)
+    try:
+        h,s,v=colorsys.rgb_to_hsv(*rgb)
+    except:
+        h,s,v = 0,0,0
     h +=amount
     return colorsys.hsv_to_rgb(h,s,v)
 
@@ -527,20 +534,26 @@ def combineCanvas(**kwargs):
                 for patternOutput in patternOutputs:
                     canvass.append(patternOutput['canvas'])
 
-                parameters = {}
-                for arg in kwargs:
-                    parameters[arg] = patternInput[arg]
+                if (len(canvass) == 0):
+                    def combiner(rgb,y,x):
+                        return (0,0,0)
 
-                getVal = patternInput.getValFunction()
-                argValues = {}
-                if (len(canvass) >0):
+                elif (len(kwargs) > 0):
+                    parameters = {}
+                    for arg in kwargs:
+                        parameters[arg] = patternInput[arg]
+
+                    getVal = patternInput.getValFunction()
+                    argValues = {}
+                    #optimizing for perfomance
                     def combiner(rgb,y,x):
                         for arg, value in parameters.iteritems():
                             argValues[arg] = getVal(value, x, y, arg)
                         return colorCombiner(*[canvas[y,x] for canvas in canvass], **argValues)
                 else:
                     def combiner(rgb,y,x):
-                        return (0,0,0)
+                        return colorCombiner(*[canvas[y,x] for canvas in canvass])
+
                 canvas=patternInput['canvas']
 
                 for patternOutput in patternOutputs:
@@ -571,6 +584,15 @@ def addPatterns(*colors, **kwargs):
     '''
     colorOutput= tuple([min(sum(color),1) for color in zip(*colors)])
     return colorOutput
+
+def runNext(*patterns):
+    def addPatternsApply(patternInput):
+        if len(patterns) >1 :
+            for pattern in patterns:
+                patternInput = pattern(patternInput)
+        return patternInput
+    return addPatternsApply
+
 
 
 def prod(factors):
@@ -1305,28 +1327,32 @@ def splitRecursive(isHorizontal, *patterns):
 
 from collections import deque
 @function("randomSpawn")
-@defaultArguments(randomSpawnProb=0.1, randomSpawnWidth=0.3, randomSpawnHeight=0.3, randomSpawnFadeFrames=50, randomSpawnRandomPatternParam = 0)
-def randomSpawn(pattern):
+@defaultArguments(randomSpawnProb=0.1, randomSpawnWidth=0.3, randomSpawnHeight=0.3, randomSpawnFadeFrames=50, randomSpawnRandomPatternParam = 0, randomSpawnNTries = 1)
+def randomSpawn(*patterns):
     spawnedPatterns = deque()
     spawnedPatternsInitialFrame = deque()
+    p = [0]
     def randomSpawnedPattern(patternInput):
         thisframe = patternInput['frame']
         randomSpawnProb = patternInput['randomSpawnProb']
         randomSpawnWidth =  patternInput['randomSpawnWidth']
         randomSpawnHeight =  patternInput['randomSpawnHeight']
         randomSpawnFadeFrames = patternInput['randomSpawnFadeFrames']
-        spawn = random.random() < randomSpawnProb
-        if spawn:
-            translateX = random.random()
-            translateY = random.random()
-            scaleX = randomSpawnWidth
-            scaleY = randomSpawnHeight
-            randomSpawnRandom = random.random()
-            metaFunction = applyArguments(randomSpawnRandomPatternParam = randomSpawnRandom, scaleX=scaleX, scaleY=scaleY, scaleTranslateX=translateX, scaleTranslateY=translateY)
-            brightnessArg = arg('brightness = 1 - (frame -' + str(thisframe) + ')/float(' + str(randomSpawnFadeFrames) + ')')
-            newPattern = brightnessArg(metaFunction(brightness(scale(pattern))))
-            spawnedPatterns.append(newPattern)
-            spawnedPatternsInitialFrame.append(thisframe)
+        randomSpawnNTries = patternInput['randomSpawnNTries']
+        for i in xrange(randomSpawnNTries):
+            spawn = random.random() < randomSpawnProb
+            if spawn:
+                translateX = random.random()
+                translateY = random.random()
+                scaleX = randomSpawnWidth
+                scaleY = randomSpawnHeight
+                randomSpawnRandom = random.random()
+                metaFunction = applyArguments(randomSpawnRandomPatternParam = randomSpawnRandom, scaleX=scaleX, scaleY=scaleY, scaleTranslateX=translateX, scaleTranslateY=translateY)
+                brightnessArg = arg('brightness = 1 - (frame -' + str(thisframe) + ')/float(' + str(randomSpawnFadeFrames) + ')')
+                newPattern = brightnessArg(metaFunction(brightness(scale(patterns[p[0]]))))
+                p[0]= (p[0]+1)%len(patterns)
+                spawnedPatterns.append(newPattern)
+                spawnedPatternsInitialFrame.append(thisframe)
         while(len(spawnedPatternsInitialFrame)>0 and  thisframe - spawnedPatternsInitialFrame[0] > randomSpawnFadeFrames) :
             spawnedPatterns.popleft()
             spawnedPatternsInitialFrame.popleft()

@@ -35,6 +35,7 @@ import Patterns.ExtraPatterns.StatePatterns as StatePatterns
 
 import Patterns.ExtraPatterns.InputPatterns as InputPatterns
 
+import cProfile
 
 
 Canvas = Config.Canvas
@@ -154,7 +155,6 @@ def _sendDataThread(host,
                     isClosed,
                     colorConverter,
                     canvasToData):
-    
     patternInput = patternInputContainer[0]
     frame=0
     previousPattern=patternContainer[0]
@@ -199,13 +199,30 @@ def _sendDataThread(host,
     while patternContainer[0] and not isClosed():
             try:
                 if (rContainer[0]):
-                    try:
-                        command = rContainer[0]
-                        Function.execInPattern(command, patternInput)
-                        rContainer[0]=None
-                    except:
-                        rContainer[0]=None
-                        traceback.print_exc(file=sys.stdout)
+                    if rContainer[0] == "start profiler":
+                        print("starting profiler. Write stats for stats")
+                        profiler = cProfile.Profile()
+                        profiler.enable()
+                        rContainer[0] = None
+                    elif rContainer[0] == "stats":
+                        import pstats
+                        profiler.dump_stats("prof-stats")
+                        p = pstats.Stats('prof-stats')
+                        print("cumulative time")
+                        print()
+                        p.sort_stats('tottime').print_stats(10)
+                        profiler.enable()
+
+                        rContainer[0] = None
+
+                    else:
+                        try:
+                            command = rContainer[0]
+                            Function.execInPattern(command, patternInput)
+                            rContainer[0]=None
+                        except:
+                            rContainer[0]=None
+                            traceback.print_exc(file=sys.stdout)
                 if (rrContainer[0]):
                     try:
                         command = rrContainer[0]
@@ -236,12 +253,13 @@ def _sendDataThread(host,
                 if colorConverter:
                     canvas.mapFunction(lambda rgb,y,x: colorConverter(rgb,globalBrightness))
                 data=canvasToData(canvas)
-                clientSocket.sendData(data)
-                patternInput=newPatternInput
-                patternInputContainer[0]=patternInput
                 while previousTime+timeSleep > time.time():
                     time.sleep(timeSleep/20.) #sleeps for a bit
                 previousTime=time.time()
+                clientSocket.sendData(data)
+                patternInput=newPatternInput
+                patternInputContainer[0]=patternInput
+
             except:
                 traceback.print_exc(file = sys.stdout)
                 if previousPreviousPattern:

@@ -64,7 +64,7 @@ def s2lin(x,gamma):
     if x <= 0.04045:
         return x * (1.0 / 12.92)
     else:
-        return pow((x + a) * (1.0 / (1 + a)), gamma)
+        return ((x + a) * (1.0 / (1 + a)))**gamma
 
 
 def lin2s(x):

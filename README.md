@@ -395,3 +395,10 @@ function -> http://stackoverflow.com/questions/13923091/how-do-you-do-a-python-e
 
 [x]Allow string arguments (arguments that use "getVal") to depend on themselves, such as : rgbB = "rgbB + cos(frame)". Assumes string arguments that are supposed to be strings, such as "text" don't use "getVal", but, rather, maybe other function. For this, create a copy of the pattern input dict with no string arguments. Modify "set" as well, to only set values if they are not strings.
 
+[]Make equation plotter 2d better
+
+[]Make combine patterns much much more efficient by allowing the canvas to have a getter canvas and a setter canvas, and allowing the combine patterns to simply modify how patterns modify the setter pattern
+
+For the above, do the following: patterns use the usual mapfunction. Functions, however, add themselves to the "pattern" they are modifying. Basically, a tree structure where the roots are
+functions, and the other nodes are functions (and the data that enters the root are the arrayget, i.e. the previous output.
+This happens on the pixel level, rather than canvas level, so it is not necessary to allocate more memory
