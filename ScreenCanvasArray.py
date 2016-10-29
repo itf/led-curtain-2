@@ -8,8 +8,7 @@ class Canvas:
     '''
     def __init__(self,height, width, previousArray=None):
         if (previousArray is None):
-            self._array = array('f',(0. for x in xrange(3*width * height)))
-
+            self._array = [0. for x in xrange(3*width * height)]
         else:
             self._array = previousArray
         self.height=height
