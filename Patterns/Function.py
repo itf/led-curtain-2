@@ -395,13 +395,12 @@ def isolateCanvas(pattern):
 #############################
 #Hue, Color Brightness Functions
 
-@simpleCached(1000)
 def hsvShifter(rgb,amount):
-    try:
+    if rgb == (0,0,0):
+        return (0,0,0)
+    else:
         h,s,v=colorsys.rgb_to_hsv(*rgb)
-    except:
-        h,s,v = 0,0,0
-    h +=amount
+        h +=amount
     return colorsys.hsv_to_rgb(h,s,v)
 
 
@@ -1327,7 +1326,7 @@ def splitRecursive(isHorizontal, *patterns):
 
 from collections import deque
 @function("randomSpawn")
-@defaultArguments(randomSpawnProb=0.1, randomSpawnWidth=0.3, randomSpawnHeight=0.3, randomSpawnFadeFrames=50, randomSpawnRandomPatternParam = 0, randomSpawnNTries = 1)
+@defaultArguments(randomSpawnProb=0.1, randomSpawnWidth=0.3, randomSpawnHeight=0.3, randomSpawnFadeFrames=50, randomSpawnRandomPatternParam = 0, randomSpawnPatternFadeParam =0, randomSpawnNTries = 1)
 def randomSpawn(*patterns):
     spawnedPatterns = deque()
     spawnedPatternsInitialFrame = deque()
@@ -1348,7 +1347,7 @@ def randomSpawn(*patterns):
                 scaleY = randomSpawnHeight
                 randomSpawnRandom = random.random()
                 metaFunction = applyArguments(randomSpawnRandomPatternParam = randomSpawnRandom, scaleX=scaleX, scaleY=scaleY, scaleTranslateX=translateX, scaleTranslateY=translateY)
-                brightnessArg = arg('brightness = 1 - (frame -' + str(thisframe) + ')/float(' + str(randomSpawnFadeFrames) + ')')
+                brightnessArg = arg('randomSpawnPatternFadeParam = (frame -' + str(thisframe) + ')/float(' + str(randomSpawnFadeFrames) + ') ;brightness = 1 - randomSpawnPatternFadeParam')
                 newPattern = brightnessArg(metaFunction(brightness(scale(patterns[p[0]]))))
                 p[0]= (p[0]+1)%len(patterns)
                 spawnedPatterns.append(newPattern)
