@@ -1359,6 +1359,66 @@ def randomSpawn(*patterns):
     return randomSpawnedPattern
 
 
+@function("randomFadeMask")
+@defaultArguments(randomFadeMaskProb=0.1, randomFadeMaskWidth=0.3, randomFadeMaskHeight=0.3, randomFadeMaskFadeFrames=50, randomFadeMaskNTries = 1)
+def randomFadeMask(pattern0, pattern1):
+    spawnedMask = deque()
+    p = [0]
+
+    def randomFadeMaskedPattern(patternInput):
+        thisframe = patternInput['frame']
+        randomFadeMaskProb = patternInput['randomFadeMaskProb']
+        randomFadeMaskWidth =  patternInput['randomFadeMaskWidth']
+        randomFadeMaskHeight =  patternInput['randomFadeMaskHeight']
+        randomFadeMaskFadeFrames = patternInput['randomFadeMaskFadeFrames']
+        randomFadeMaskNTries = patternInput['randomFadeMaskNTries']
+        width = patternInput['width']
+        height = patternInput['width']
+
+        for i in xrange(randomFadeMaskNTries):
+            spawn = random.random() < randomFadeMaskProb
+            if spawn:
+                x0= int(round(random.random() * width))
+                y0 = int(round(random.random() * height))
+                scaleX = randomFadeMaskWidth
+                scaleY = randomFadeMaskHeight
+                x1 = max(int(round(x0 + scaleX*width)), x0+1) %width
+                y1 = max(int(round(y0 + scaleY*height)), y0+1) %height
+                spawnedMask.append((x0,y0,x1,y1, thisframe))
+        while(len(spawnedMask)>0 and  thisframe - spawnedMask[0][4] > randomFadeMaskFadeFrames) :
+            spawnedMask.popleft()
+
+        patternOutput0 = pattern0(copy.deepcopy(patternInput))
+        patternOutput1 = pattern1(patternInput)
+        canvas0 = patternOutput0['canvas']
+
+        if (len(spawnedMask) < 100):
+            def masker(rgb, y, x):
+                value = 0
+                for (x0,y0,x1,y1,frame) in spawnedMask:
+                    if ((x>=x0 and x<x1) or (x1<=x0 and (x<x1 or x>=x0))) and ((y>=y0 and y<y1) or (y1<=y0 and (y<y1 or y>=y0))):
+                        value += (1-float(thisframe-frame)/randomFadeMaskFadeFrames)
+                colorOutput = tuple([min(color[0] * value + color[1] * (1 - value), 1) for color in zip(canvas0[y,x], rgb)])
+                return colorOutput
+            canvas1 = patternOutput1['canvas']
+            canvas1.mapFunction(masker)
+
+        else:
+            canvas1 = patternOutput1['canvas']
+            for (x0, y0, x1, y1, frame) in spawnedMask:
+                value = (1 - float(thisframe - frame) / randomFadeMaskFadeFrames)
+                if x1<x0:
+                    x1+=width
+                if y1<y0:
+                    y1+=height
+                for y in xrange(y0, y1):
+                    for x in xrange(x0, x1):
+                        canvas1[y,x] = tuple([min(color[0] * value + color[1] * (1 - value), 1) for color in zip(canvas0[y,x], canvas1[y,x])])
+        patternOutput0.pop('canvas')
+        patternOutput1.update(patternOutput0)
+        return patternOutput1
+    return randomFadeMaskedPattern
+
 
 ###################
 # Experimental functions

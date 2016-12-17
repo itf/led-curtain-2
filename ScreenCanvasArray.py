@@ -1,5 +1,31 @@
 import copy
-from array import array as array
+from collections import OrderedDict
+
+def simpleCached(cacheSize):
+    '''
+    A simple cache. Use like:
+    @simpleCache(cachesize)
+    def function:
+    '''
+    cache=OrderedDict()
+    def cacheFunction(function):
+        def cachedFunction(*args):
+            tArgs=tuple(args)
+            if tArgs in cache:
+                return cache[tArgs]
+            else:
+                answer=function(*args)
+                if len(cache)>cacheSize:
+                    cache.popitem(last = False)
+                    cache.popitem(last = False)
+                    cache.popitem(last = False)
+                    cache.popitem(last = False)
+                    cache.popitem(last = False)
+                cache[tArgs]=answer
+                return answer
+        return cachedFunction
+    return cacheFunction
+
 class Canvas:
     '''
     Array Implementation of canvas
@@ -56,11 +82,12 @@ class Canvas:
         setArray = self._setArray
         
         convertYX=self._convertYX
+        pendingFunctions = self.pendingMappingFunctions
         for y in xrange(height):
             for x in xrange(width):
                 pos = convertYX(y,x)
                 r,g,b = getArray[pos:pos+3]
-                for function in self.pendingMappingFunctions:
+                for function in pendingFunctions:
                     r,g,b= function((r,g,b), y, x)
                 setArray[pos], setArray[pos+1], setArray[pos+2] = r,g,b
         self.pendingMappingFunctions=[]
