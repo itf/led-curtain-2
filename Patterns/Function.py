@@ -395,15 +395,17 @@ def isolateCanvas(pattern):
 #############################
 #Hue, Color Brightness Functions
 
+
+hsvEpsilon = 1e-15 #Needed to avoid divisions by zero
 def hsvShifter(rgb,amount):
-    if rgb == (0,0,0):
+    r,g,b = rgb
+    if r < hsvEpsilon and g < hsvEpsilon and b < hsvEpsilon:
         return (0,0,0)
     else:
         h,s,v=colorsys.rgb_to_hsv(*rgb)
         h +=amount
-    return colorsys.hsv_to_rgb(h,s,v)
-
-
+        return colorsys.hsv_to_rgb(float(h),float(s),float(v))
+    
 @function('movingHue')
 @defaultArguments(hueFrameRate=0.01)
 @functionize
