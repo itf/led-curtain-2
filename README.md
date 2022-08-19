@@ -8,7 +8,7 @@ Demo of an earlier version of the code (the lag and statering was caused by send
 https://www.youtube.com/watch?v=TaUksNn31NY
 
 
-##Quick Start UNIX
+## Quick Start UNIX
 
 * Install pygame, if you want to develop locally
 * Install pypy (Or download it to the same directory and run it)
@@ -19,14 +19,14 @@ https://www.youtube.com/watch?v=TaUksNn31NY
 
 Everything is run from the terminal
 
-###Debian/Ubuntu Install
+### Debian/Ubuntu Install
 
 * sudo apt-get install pypy
 *  * For local display.
 *sudo apt-get install python-pygame
 
 
-##Quick Start Windows
+## Quick Start Windows
 
 If you are on windows you will have to run everything under cpython and there will be a performance problem:
 * Install pyReadline https://pypi.python.org/pypi/pyreadline
@@ -38,7 +38,7 @@ If you are on windows you will have to run everything under cpython and there wi
 
 Everything is run from the command line
 
-###Using images:
+### Using images:
 
 * install pillow on pypy (or cPython):
 (dependencies: sudo apt-get install pypy-dev python-dev)
@@ -68,7 +68,7 @@ A different color space. Can make some nice colors for patterns. Install husl: s
 Install requests (sudo pypy -m install requests)
 Create an account on openweather, and configure your city ID and your API Key in local config
 
-###Using Audio:
+### Using Audio:
 
 Making the audio work is non-trivial. If you still want to do so, follow the following instructions!
 * Install jack
@@ -94,7 +94,7 @@ Making the audio work is non-trivial. If you still want to do so, follow the fol
 * Use 'beat' or 'totalBeats' on your patterns
 
 
-#Installing on the raspberry pi to control
+# Installing on the raspberry pi to control
 I use the python bindings for rpi_ws281x; however, I had to modify the code to improve its performance. Check it out on
 https://github.com/itf/rpi_ws281x.
 You will need to install, swig and python-dev to compile it.
@@ -103,7 +103,7 @@ Instructions: install scons, install swig, install python-dev. Go to the top dir
 
 Also, remember to run piUdpBuffer.sh, to remove lag caused by the UDP buffer
 
-#Cli pattern programming language - Quick start
+# Cli pattern programming language - Quick start
 
 The Command Line interface has its own programming language to combine patterns. 
 
@@ -169,7 +169,7 @@ The easiest way to learn how to use the CLI is by examples. Example of patterns 
 * srr-> saves with the rr arguments you were using.
 
 
-####Audio example:
+#### Audio example:
 
 * hueShift(circle
 * rr circleRadius=beat; hue = int(totalBeats%4)/4.
@@ -177,9 +177,9 @@ The easiest way to learn how to use the CLI is by examples. Example of patterns 
 * name of this pattern
 
 
-#Project Detail
+# Project Detail
 
-##Objective
+## Objective
 
 This projects was created with the objective of controlling a 30x60 Ws2812b led panel. The objectives of the sofware part of the code were:
 
@@ -194,7 +194,7 @@ This projects was created with the objective of controlling a 30x60 Ws2812b led 
 
 This code was never meant to be efficient, and would probably struggle controlling anything larger than 100x100 pixels unless it was partially rewritten to make use of C extensions. Running the code under pypy is necessary if you want to do lots of hue operations, since function calls in pypy are much more efficient than in Cpython.
 
-##Code organization
+## Code organization
 
 There are 3 main types of executables in the code. The pattern generator, the display manager, and the audio listener. 
 
@@ -204,19 +204,19 @@ The display manager listens for data from the pattern generator and sends the da
 
 The audio listener processes audio events and sends data through UDP to the pattern generator.
 
-###Display manager
+### Display manager
 
 The display manager code is really simple: it is a while loop that reads data from a UDP socket and forwards it to the real display. There are two display managers in the code: LocalDisplay and PiDisplay. The first is used to control a local display on your own computer; useful when testing code. The second is used by a raspberry pi to send data to Ws2812b strips.
 
-###Audio Listener
+### Audio Listener
 
 The audio listener is also really simple: it uses the 'jack' python code, in order to have access to the audio beeing played by the computer; uses a third party library to perform beat detection and sends this data through UDP to a port specified on the Config file.
 
-###Pattern Generator
+### Pattern Generator
 
 This is where all the magic happens. It is made by the UI, audio event listener, canvas, patternInput, patterns, functions, color manager, savedFunctions and savedPatterns.
 
-####UI
+#### UI
 
 At the moment, the UI is responsible for getting input from the user, run the patterns, update the frame count eveyrtime a pattern is run, restart the frame count when the pattern being run changes, initialize the audio event listener, create the initial patternInput, add the audio functions to the pattern input and adds the previousPattern to the patternInput.
 
@@ -234,7 +234,7 @@ The Beat is a value between 0 and 1 that describes where in the beat you are. At
 
 The TotalBeats, it is the same as Beats, but it is strictly increasing. TotalBeasts = Beat + total beats that happened so far.
 
-####Canvas
+#### Canvas
 
 The canvas is one of the few optimized places of the code. It is a representation of the color of each pixel on the display.
 
@@ -255,7 +255,7 @@ Initially, the patternInput is almost empty, but after running patterns it gets 
 
 If something is not present on the patternInput, it is evaluated to 0, which provides some extra protection against patterns that could potentially depend on a pattern having run before them.
 
-####Pattern
+#### Pattern
 
 Patterns are functions that take a patternInput and return a modified patternInput. 
 
@@ -263,31 +263,31 @@ Usually the patterns modify the canvas inside the patternInput, so that they can
 
 You can take a look at some of the patterns by accessing Patterns/StaticPatterns/basicPatterns
 
-####Functions
+#### Functions
 
 Functions are functions (derp) that take one or more patterns and modify them. One example of function is 'hueShift', which shifts the hue of every pixel on the patternInput returned by a pattern.  Other examples are 'meanP', which takes the mean of one or more patterns; 'isolateCanvas' which protects the canvas that runs inside a pattern from being modified outside it; 'arg' which modifies the parameters inside the patternInput before running the pattern; 'transitionFade' which transitions smoothly from the previous pattern to the new pattern.
 
 Functions make extensive use of python @decorators, which allows the functions code to be very modular. Decorators are python functions that modify other functions. If you wish to contribute to the code, it is not necessary to understand exactly what they do, as long as you follow the examples in the code.
 
-####Color Manager
+#### Color Manager
 
 As you might be aware, our eyes perceive lights in a logarithmic way. This is taken into account by you computer screen, which displays colors in the SRGB color space; which basically applies a log scale on the intensity of the colors before displaying them to you.
 
 LEDs work in a linear color scale, rather than on the SRGB color scale. The color manager is responsible for converting between those two color spaces before sending the data to the display.
 
-####Saved Functions and Saved Patterns
+#### Saved Functions and Saved Patterns
 
 The user can create and save new functions and new patterns from the UI. They are saved as python code inside this python file.
 
 
 
-##Testing design choices:
+## Testing design choices:
 
 For testing, you are still using UDP sockets. They are more computation intensive than necessary when running the code locally, but this is to assure that the code would run with the led panel
 
 
 
-##Performance
+## Performance
 
 As said earlier, performance was not one of the main worries of this project. If you need to increase the performance of the code you should run the patternGenerator code from inside pypy.
 
@@ -306,7 +306,7 @@ pypy Cli.py
 This will make the code 2 to 4 times more efficient for simple functions, and can give a N times performance improvement where N is the number of nested functions, apparently, for more complex code.
 
 
-##Troubleshooting
+## Troubleshooting
 CLI should run out of box with no problemon linux and mac
 
 If you use windows you will need the readline module.
@@ -317,7 +317,7 @@ If you want to install the module and run it in python, install it from here: ht
 
 
 
-##TODO
+## TODO
 [x]Integrate audio
 
 [x]separate functions that are inside patterns to a separate file and organize them
