@@ -1,4 +1,5 @@
-curtain = ""
+curtain = "" #choose old, new or local
+whichProtocol = "UDP" #choose between UDP or TCP
 useImages = False
 useAudio = True
 useInput = False
@@ -21,6 +22,21 @@ pypyPath = "" #path to the pypy executable
 
 #end modify windows
 ############
+
+if whichProtocol == "TCP":
+    import Transportation.Sockets.ClientSocketTCP as Client
+    import Transportation.Sockets.ServerSocketTCP as Server
+    ClientProtocolClass = Client.ClientSocketTCP
+    ServerProtocolClass = Server.ServerSocketTCP
+elif whichProtocol == "UDP":
+    import Transportation.Sockets.ClientSocketUDP as Client
+    import Transportation.Sockets.ServerSocketUDP as Server
+    ClientProtocolClass =  Client.ClientSocketUDP
+    ServerProtocolClass = Server.ServerSocketUDP
+else:
+    print("PLEASE CHOOSE A VALID PROTOCOL")
+
+
 if curtain=="old":
     width = 15
     height = 5

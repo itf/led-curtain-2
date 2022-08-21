@@ -17,6 +17,10 @@ def testSendData():
     import Tests.TestSendData as T4
     T4.main()
 
+def testSendTCP():
+    import Tests.TestSendDataTCP as T5
+    T5.main()
+    
 def main(argv):
     if len(argv)>0:
         if(argv[0]=="localDisplay"):
@@ -27,6 +31,8 @@ def main(argv):
             testSimpleProtocol()
         elif(argv[0]=="sendData"):
             testSendData()
+        elif(argv[0]=="tcp"):
+            testSendTCP()
         else:
             print("Test not valid")
     else:

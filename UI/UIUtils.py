@@ -193,7 +193,8 @@ def _sendDataThread(host,
     
     safePatternInput = copy.deepcopy(patternInput)
 
-    clientSocket = Client.ClientSocketUDP(host,port)
+    #clientSocket = Client.ClientSocketUDP(host,port)
+    clientSocket = Config.ClientProtocolClass(host, port)
     timeSleep = 1.0/sendRate
     previousTime = time.time()
     while patternContainer[0] and not isClosed():

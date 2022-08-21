@@ -5,9 +5,12 @@ from Display.Pygame.pgCurtain import PygameCurtain
 import socket
 import Transportation.Protocol.SimpleProtocol as P
 try:
-    from LocalConfig import LocalDisplayConfig as Config
+    import LocalConfig as Config
 except:
-    from Config import LocalDisplayConfig as Config
+    import Config as Config
+    
+from Config import LocalDisplayConfig as LocalDisplayConfig
+
 
 try:
     from LocalConfig import InputServerConfig as InputConfig
@@ -17,13 +20,18 @@ except:
 from ColorManager import convertColorByteToS
 
 def testServer(host, port, height, width):
-    server=ServerSocketUDP(host,port)
+    server = Config.ServerProtocolClass(host, port)
     curtain = PygameCurtain(width,height)
     lastServer=["",""]
     while(1):
-        dataRaw = server.getDataHost()
-        data =dataRaw[0]
-        if data =="": #Necessary for games
+        isUDP = Config.whichProtocol =="UDP"
+        if isUDP:
+            dataRaw = server.getDataHost()
+            data =dataRaw[0]
+        else:
+            data = server.getData()
+            dataRaw = [data, ['','']] #compatibility for tcp code
+        if data =="" and isUDP: #Necessary for games
             try:
                 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
                 sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -36,9 +44,9 @@ def testServer(host, port, height, width):
         else:
             lastServer=dataRaw[1]        
             colorArray=P.dataToColorArray(data)
-            if Config.linearColorProfileCorretion:
+            if LocalDisplayConfig.linearColorProfileCorretion:
                 colorArray=map(lambda y: map(lambda x:convertColorByteToS(x),y),colorArray)
-            if Config.normalize:
+            if LocalDisplayConfig.normalize:
                 brightest= max ([1]+[c for row in colorArray  for color in row for c in color ])
                 def normalize((r,g,b)):
                     r = int(r*255./brightest)
@@ -58,7 +66,7 @@ def main(argv):
         testServer(host, int(port), int(height), int(width))
     elif len(argv)==0:
         host =''
-        testServer(host, Config.port, Config.height, Config.width)
+        testServer(host, LocalDisplayConfig.port, LocalDisplayConfig.height, LocalDisplayConfig.width)
     else:
         print "Usage Cli [host] <height> <width> <port> "
 
