@@ -4,6 +4,7 @@ from Transportation.ServerInterface import ServerInterface as ServerInterface
 import thread
 import threading
 import time
+import copy
 
 class ServerSocketTCP(ServerInterface):
     def __init__(self,host,port):
@@ -24,7 +25,7 @@ class ServerSocketTCP(ServerInterface):
         while(self.data == ''):
             time.sleep(0.001)
         self.lock.acquire()
-        data = self.data
+        data = copy.copy(self.data)
         self.data = ''
         self.lock.release()
         return data
