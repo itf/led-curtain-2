@@ -2,6 +2,7 @@ import socket
 import sys
 from Transportation.ServerInterface import ServerInterface as ServerInterface
 import thread
+import threading
 import time
 
 class ServerSocketTCP(ServerInterface):
@@ -16,13 +17,16 @@ class ServerSocketTCP(ServerInterface):
         print("create connect thread")
         thread.start_new_thread(self.createConnectionAcceptServer,(self.sock,))
         self.data = ''
+        self.lock = threading.Lock()
 
     def getData(self):
         #blocking get data. May return old data/data that is partially new and old
         while(self.data == ''):
-            time.sleep(0.003)
+            time.sleep(0.001)
+        self.lock.acquire()
         data = self.data
         self.data = ''
+        self.lock.release()
         return data
     def getDataHost(self):
         pass
@@ -54,7 +58,9 @@ class ServerSocketTCP(ServerInterface):
             if len(msg) == 0:
                 thisStopped = True
             #do some checks and if msg == someWeirdSignal: break:
+            self.lock.acquire()
             self.data = msg
+            self.lock.release()
         print ("closed connection")
         clientsocket.close()
 
